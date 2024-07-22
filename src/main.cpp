@@ -5,13 +5,16 @@ using namespace geode::prelude;
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 
-auto screenSize = CCDirector::sharedDirector()->getWinSize();
+auto screenSize = CCDirector::sharedDirector()->getWinSize().width;
+
 class $modify(MyFLAlertLayer, FLAlertLayer) {
 	struct Fields {
 		int linesProgressed = 0;
 	};
 	static FLAlertLayer* create(FLAlertLayerProtocol * delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
-		width = screenSize.width - 225;
+		if (screenSize >= 569)
+			screenSize = 569;
+		width = screenSize - 225;
 		height = 140;
 		scroll = false;
 		textScale = 1;
@@ -29,8 +32,8 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 
 		CCScale9Sprite* newBg = CCScale9Sprite::create("deltaruneSquare.png"_spr);
 		newBg->setContentHeight(140);
-		newBg->setContentWidth(screenSize.width);
-		newBg->setPosition(CCPoint(screenSize.width / 2, 70));
+		newBg->setContentWidth(screenSize);
+		newBg->setPosition(CCPoint(CCDirector::sharedDirector()->getWinSize().width / 2, 70));
 		newBg->setZOrder(bg->getZOrder());
 		newBg->setID("background");
 
@@ -49,7 +52,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		for (CCLabelBMFont* line : content) {
 			line->setFntFile("Determination.fnt"_spr);
 			line->setAnchorPoint(CCPoint(0, 0.5));
-			line->setPositionX(-screenSize.width / 2 + 24);
+			line->setPositionX(-screenSize / 2 + 24);
 			line->setPositionY(-8 - textSize * i);
 			if (i >= 3)
 				line->setVisible(false);
