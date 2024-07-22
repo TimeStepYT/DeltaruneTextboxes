@@ -107,6 +107,10 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		FLAlertLayer::show();
 		changeLook();
 	}
+	bool ccTouchBegan(CCTouch * touch, CCEvent * event) {
+		progressText();
+		return ccTouchBegan(touch, event);
+	}
 	void keyDown(enumKeyCodes key) {
 		if (key == enumKeyCodes::KEY_Enter || key == enumKeyCodes::KEY_Z || key == enumKeyCodes::CONTROLLER_A) {
 			progressText();

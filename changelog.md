@@ -1,2 +1,2 @@
-# 1.0.0
-- Edit this file to change your mod's changelog.
+# 0.1.0
+- Created the Text box and got scrolling to work
