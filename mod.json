@@ -1,0 +1,25 @@
+{
+    "geode": "3.2.0",
+    "gd": {
+        "win": "2.206",
+        "android": "2.206",
+        "mac": "2.206",
+        "ios": "2.206"
+    },
+    "id": "timestepyt.deltarune_textboxes",
+    "name": "Deltarune Textboxes",
+    "version": "v1.0.0",
+    "developer": "TimeStepYT",
+    "description": "Makes FLAlertLayers look like textboxes from Deltarune",
+    "resources": {
+        "fonts": {
+            "Determination": {
+                "path": "resources/determination-extended.ttf",
+                "size": 78
+            }
+        },
+        "sprites": [
+            "resources/deltaruneSquare.png"
+        ]
+    }
+}
