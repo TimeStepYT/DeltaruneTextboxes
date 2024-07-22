@@ -4,7 +4,6 @@ using namespace geode::prelude;
 
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
-#include <Geode/modify/MultiLineBitmapFont.hpp>
 
 auto screenSize = CCDirector::sharedDirector()->getWinSize();
 class $modify(MyFLAlertLayer, FLAlertLayer) {
