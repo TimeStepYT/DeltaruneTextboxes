@@ -19,7 +19,23 @@
             }
         },
         "sprites": [
-            "resources/deltaruneSquare.png"
+            "resources/deltaruneSquare.png",
+            "resources/heart.png"
         ]
+    },
+    "settings": {
+        "restrictWidth": {
+            "name": "Limit width",
+            "type": "bool",
+            "default": true,
+            "description": "Limits the <cy>textbox width</c> to max width for <cj>16:9</c>"
+        },
+        "clickToProgress": {
+            "name": "Progress by clicking",
+            "type": "bool",
+            "default": true,
+            "description": "Enables you to use <cy>clicking</c> to progress textboxes",
+            "platforms": ["win", "macos"]
+        }
     }
 }
