@@ -39,6 +39,7 @@ jobs:
           bindings-ref: main
           combine: true
           target: ${{ matrix.config.target }}
+          sdk: nightly
 
   package:
     name: Package builds
@@ -53,4 +54,3 @@ jobs:
         with:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
-          sdk: nightly
