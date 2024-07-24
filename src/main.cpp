@@ -163,7 +163,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 				return;
 			}
 			else if (m_fields->btnSelected != 0) {
-				m_fields->done = true;
+				m_fields->done =  true;
 				if (m_fields->btnSelected == 1)
 					FLAlertLayer::onBtn1(as<CCObject*>(btn1));
 				else if (m_fields->btnSelected == 2)
@@ -221,6 +221,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		if (Mod::get()->getSettingValue<bool>("clickToProgress"))
 			progressText();
 		bool ret = FLAlertLayer::ccTouchBegan(touch, event);
+		if (this->getChildByID("main-layer") == nullptr) return ret;
 		CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->getChildByID("main-layer")->getChildByID("main-menu")->getChildren();
 		for (auto button : buttons) {
 			auto parent = as<CCNode*>(button->getChildren()->objectAtIndex(0));
