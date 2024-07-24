@@ -228,7 +228,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			for (auto part : parts) {
 				if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 					if (button->isSelected()) {
-						label->setColor(ccColor3B(255, 255, 0));
+						label->setColor(_ccColor3B(255, 255, 0));
 						addHeart(parent, label);
 						if (button->getID() == "button-1")
 							m_fields->btnSelected = 1;
@@ -236,7 +236,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 							m_fields->btnSelected = 2;
 					}
 					else {
-						label->setColor(ccColor3B(255, 255, 255));
+						label->setColor(_ccColor3B(255, 255, 255));
 						auto heart = parent->getChildByID("heart");
 						if (heart != nullptr)
 							heart->removeFromParentAndCleanup(true);
@@ -270,10 +270,10 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 					if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
 						m_fields->btnSelected = 1;
 						addHeart(parent, label);
-						label->setColor(ccColor3B(255, 255, 0));
+						label->setColor(_ccColor3B(255, 255, 0));
 					}
 					else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
-						label->setColor(ccColor3B(255, 255, 255));
+						label->setColor(_ccColor3B(255, 255, 255));
 						auto heart = parent->getChildByID("heart");
 						if (heart != nullptr)
 							heart->removeFromParentAndCleanup(true);
@@ -285,7 +285,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			for (auto part : partsBtn2) {
 				if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 					if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
-						label->setColor(ccColor3B(255, 255, 255));
+						label->setColor(_ccColor3B(255, 255, 255));
 						auto heart = parent->getChildByID("heart");
 						if (heart != nullptr)
 							heart->removeFromParentAndCleanup(true);
@@ -293,7 +293,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 					else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
 						m_fields->btnSelected = 2;
 						addHeart(parent, label);
-						label->setColor(ccColor3B(255, 255, 0));
+						label->setColor(_ccColor3B(255, 255, 0));
 					}
 				}
 			}
