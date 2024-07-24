@@ -31,7 +31,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		CCScale9Sprite* newBg = CCScale9Sprite::create("deltaruneSquare.png"_spr);
 		newBg->setContentHeight(140);
 		newBg->setContentWidth(m_fields->screenSize);
-		newBg->setPosition(CCPoint(CCDirector::sharedDirector()->getWinSize().width / 2, 70));
+		newBg->setPosition(CCPoint{CCDirector::sharedDirector()->getWinSize().width / 2, 70});
 		newBg->setZOrder(bg->getZOrder());
 		newBg->setID("background");
 
@@ -72,9 +72,9 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		}
 	}
 	void changeTitle(CCNode * mainLayer, CCNode * newBg) {
-		mainLayer->getChildByID("title")->setAnchorPoint(CCPoint(0, 0.5));
+		mainLayer->getChildByID("title")->setAnchorPoint(CCPoint{0, 0.5});
 		as<CCLabelBMFont*>(mainLayer->getChildByID("title"))->setFntFile("Determination.fnt"_spr);
-		mainLayer->getChildByID("title")->setPosition(CCPoint(newBg->getPositionX() - newBg->getContentWidth() / 2 + 24, 145));
+		mainLayer->getChildByID("title")->setPosition(CCPoint{newBg->getPositionX() - newBg->getContentWidth() / 2 + 24, 145});
 	}
 	TextArea* changeText(CCNode * textArea, CCNode * newBg, CCNode * mainLayer) {
 		textArea->removeFromParent();
@@ -83,12 +83,12 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			"Determination.fnt"_spr,
 			1,
 			m_fields->screenSize - 100,
-			CCPoint(0, 1),
+			CCPoint{0, 1},
 			m_fields->textSize,
 			false
 		);
 		newDesc->setContentWidth(m_fields->screenSize);
-		newDesc->setAnchorPoint(CCPoint(0, 1));
+		newDesc->setAnchorPoint(CCPoint{0, 1});
 		newDesc->setPositionX(newBg->getPositionX() - m_fields->screenSize / 2 + 24);
 		newDesc->setPositionY(120);
 		newDesc->setZOrder(textArea->getZOrder());
@@ -212,8 +212,8 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			parent->getChildByID("heart")->removeFromParentAndCleanup(true);
 		}
 		auto heart = CCSprite::create("heart.png"_spr);
-		heart->setAnchorPoint(CCPoint(1, 0.5));
-		heart->setPosition(CCPoint(label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2));
+		heart->setAnchorPoint(CCPoint{1, 0.5});
+		heart->setPosition(CCPoint{label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2});
 		heart->setID("heart");
 		parent->addChild(heart);
 	}
