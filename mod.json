@@ -24,17 +24,17 @@
         ]
     },
     "settings": {
-        "restrictWidth": {
-            "name": "Limit width",
+        "dontRestrictWidth": {
+            "name": "Don't limit width",
             "type": "bool",
-            "default": true,
-            "description": "Limits the <cy>textbox width</c> to max width for <cj>16:9</c>"
+            "default": false,
+            "description": "Doesn't limit the <cy>textbox width</c> to max width for <cj>16:9</c>"
         },
-        "clickToProgress": {
-            "name": "Progress by clicking",
+        "disableClickToProgress": {
+            "name": "Don't progress by clicking",
             "type": "bool",
-            "default": true,
-            "description": "Enables you to use <cy>clicking</c> to progress textboxes",
+            "default": false,
+            "description": "Disables <cy>clicking</c> to progress textboxes",
             "platforms": ["win", "macos"]
         }
     }
