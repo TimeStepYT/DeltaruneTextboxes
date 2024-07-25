@@ -1,5 +1,5 @@
 {
-    "geode": "3.3.0",
+    "geode": "3.3.1",
     "gd": {
         "win": "2.206",
         "android": "2.206",
@@ -11,6 +11,7 @@
     "version": "v0.2.2",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
+    "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
     "resources": {
         "fonts": {
             "Determination": {
@@ -18,10 +19,7 @@
                 "size": 78
             }
         },
-        "sprites": [
-            "resources/deltaruneSquare.png",
-            "resources/heart.png"
-        ]
+        "sprites": ["resources/deltaruneSquare.png", "resources/heart.png"]
     },
     "settings": {
         "dontRestrictWidth": {

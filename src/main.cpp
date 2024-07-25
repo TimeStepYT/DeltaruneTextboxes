@@ -13,9 +13,17 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		int textSize = 36;
 		int btnSelected = 0;
+		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
+		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
+		CCNode* mainLayer;
+		CCNode* mainMenu;
+		CCNode* btn1;
+		CCNode* btn2;
+		CCNode* textArea;
+		CCNode* bg;
 	};
 	bool init(FLAlertLayerProtocol * delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
-		if (m_fields->screenSize >= 569 && Mod::get()->getSettingValue<bool>("dontRestrictWidth"))
+		if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
 			m_fields->screenSize = 569;
 		width = m_fields->screenSize;
 		m_fields->text = desc;
@@ -23,44 +31,48 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		scroll = false;
 		textScale = 1;
 		this->m_noElasticity = true;
-		return FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
+		bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
+		m_fields->mainLayer = this->getChildByID("main-layer");
+		m_fields->mainMenu = m_fields->mainLayer->getChildByID("main-menu");
+		m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
+		m_fields->btn1 = m_fields->mainMenu->getChildByID("button-1");
+		m_fields->btn2 = m_fields->mainMenu->getChildByID("button-2");
+		m_fields->bg = m_fields->mainLayer->getChildByID("background");
+		return ret;
 	}
-	CCScale9Sprite* changeBG(CCNode * bg, CCNode * mainLayer) {
-		bg->removeFromParent();
+	void changeBG() {
+		m_fields->bg->removeFromParent();
 
-		CCScale9Sprite* newBg = CCScale9Sprite::create("deltaruneSquare.png"_spr);
-		newBg->setContentHeight(140);
-		newBg->setContentWidth(m_fields->screenSize);
-		newBg->setPosition(CCPoint{CCDirector::sharedDirector()->getWinSize().width / 2, 70});
-		newBg->setZOrder(bg->getZOrder());
-		newBg->setID("background");
-
-		mainLayer->addChild(newBg);
-		return newBg;
+		m_fields->bg = CCScale9Sprite::create("deltaruneSquare.png"_spr);
+		m_fields->bg->setContentHeight(140);
+		m_fields->bg->setContentWidth(m_fields->screenSize);
+		m_fields->bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
+		m_fields->bg->setID("background");
+		
+		m_fields->mainLayer->addChild(m_fields->bg);
 	}
-	void changeButtons(CCNode * mainLayer, CCNode * newBg) {
-		CCNode* mainMenu = mainLayer->getChildByID("main-menu");
-		if (mainMenu == nullptr) return;
-		mainMenu->setPositionY(32);
-		mainMenu->setVisible(false);
+	void changeButtons() {
+		if (!m_fields->mainMenu) return;
+		m_fields->mainMenu->setPositionY(32);
+		m_fields->mainMenu->setVisible(false);
 
-		if (mainMenu->getChildByID("button-2") == nullptr) return;
+		if (!m_fields->btn2) return;
 
-		mainMenu->getChildByID("button-1")->setPositionX(newBg->getPositionX() - mainMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
-		mainMenu->getChildByID("button-2")->setPositionX(newBg->getPositionX() - mainMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
+		m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - m_fields->mainMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
+		m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - m_fields->mainMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
 
-		CCArrayExt<CCNode*> buttons = mainMenu->getChildren();
+		CCArrayExt<CCNode*> buttons = m_fields->mainMenu->getChildren();
 
 		auto heart = CCSprite::create("heart.png"_spr);
-		heart->setPositionX(-mainMenu->getChildByID("button-1")->getPositionX() + as<CCNode*>(mainMenu->getChildByID("button-1")->getChildren()->objectAtIndex(0))->getPositionX());
-		heart->setPositionY(mainMenu->getChildByID("button-1")->getPositionY() + mainMenu->getChildByID("button-1")->getContentHeight() / 2);
+		heart->setPositionX(-m_fields->btn1->getPositionX() + static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->getPositionX());
+		heart->setPositionY(m_fields->btn1->getPositionY() + m_fields->btn1->getContentHeight() / 2);
 		heart->setID("heart");
-		as<CCNode*>(mainMenu->getChildByID("button-1")->getChildren()->objectAtIndex(0))->addChild(heart);
+		static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->addChild(heart);
 
 		for (auto button : buttons) {
 			if (button != typeinfo_cast<CCMenuItemSpriteExtra*>(button)) continue;
-			as<CCMenuItemSpriteExtra*>(button)->m_animationEnabled = false;
-			CCArrayExt<CCNode*> parts = as<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren();
+			static_cast<CCMenuItemSpriteExtra*>(button)->m_animationEnabled = false;
+			CCArrayExt<CCNode*> parts = static_cast<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren();
 			for (auto part : parts) {
 				if (auto buttonTexture = typeinfo_cast<CCScale9Sprite*>(part)) {
 					buttonTexture->setVisible(false);
@@ -71,30 +83,31 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			}
 		}
 	}
-	void changeTitle(CCNode * mainLayer, CCNode * newBg) {
-		mainLayer->getChildByID("title")->setAnchorPoint(CCPoint{0, 0.5});
-		as<CCLabelBMFont*>(mainLayer->getChildByID("title"))->setFntFile("Determination.fnt"_spr);
-		mainLayer->getChildByID("title")->setPosition(CCPoint{newBg->getPositionX() - newBg->getContentWidth() / 2 + 24, 145});
+	void changeTitle() {
+		m_fields->mainLayer->getChildByID("title")->setAnchorPoint(CCPoint{ 0, 0.5 });
+		static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"))->setFntFile("Determination.fnt"_spr);
+		m_fields->mainLayer->getChildByID("title")->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 	}
-	TextArea* changeText(CCNode * textArea, CCNode * newBg, CCNode * mainLayer) {
-		textArea->removeFromParent();
+	void changeText() {
+		m_fields->textArea->removeFromParent();
 		auto newDesc = TextArea::create(
 			m_fields->text,
 			"Determination.fnt"_spr,
 			1,
 			m_fields->screenSize - 100,
-			CCPoint{0, 1},
+			CCPoint{ 0, 1 },
 			m_fields->textSize,
 			false
 		);
 		newDesc->setContentWidth(m_fields->screenSize);
-		newDesc->setAnchorPoint(CCPoint{0, 1});
-		newDesc->setPositionX(newBg->getPositionX() - m_fields->screenSize / 2 + 24);
+		newDesc->setAnchorPoint(CCPoint{ 0, 1 });
+		newDesc->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24);
 		newDesc->setPositionY(120);
-		newDesc->setZOrder(textArea->getZOrder());
+		newDesc->setZOrder(m_fields->textArea->getZOrder());
 		newDesc->setID("content-text-area");
-		mainLayer->addChild(newDesc);
-		CCArrayExt<CCLabelBMFont*> content = as<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
+		m_fields->mainLayer->addChild(newDesc);
+		m_fields->textArea = newDesc;
+		CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
 		int i = 0;
 		for (CCLabelBMFont* line : content) {
 			line->setPositionY(0 - m_fields->textSize * i);
@@ -102,29 +115,24 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 				line->setVisible(false);
 			i++;
 		}
-
-		return newDesc;
 	}
-	void showButtons(CCNode * mainLayer, CCArrayExt<CCLabelBMFont*> content) {
-		if (mainLayer->getChildByID("main-menu")->getChildByID("button-2") != nullptr && content.size() < 3) {
+	void showButtons(CCArrayExt<CCLabelBMFont*> content) {
+		if (m_fields->btn2 && content.size() < 3) {
 			m_fields->done = true;
-			mainLayer->getChildByID("main-menu")->setVisible(true);
+			m_fields->mainMenu->setVisible(true);
 		}
 	}
 	void changeLook() {
-		CCNode* mainLayer = this->getChildByID("main-layer");
-		if (mainLayer == nullptr) return;
-		CCNode* bg = mainLayer->getChildByID("background");
-		if (bg == nullptr) return;
-		CCNode* textArea = mainLayer->getChildByID("content-text-area");
-		if (textArea == nullptr) return;
+		if (!m_fields->mainLayer) return;
+		if (!m_fields->bg) return;
+		if (!m_fields->textArea) return;
 
-		auto newBg = changeBG(bg, mainLayer);
-		changeButtons(mainLayer, newBg);
-		changeTitle(mainLayer, newBg);
-		auto newDesc = changeText(textArea, newBg, mainLayer);
-		CCArrayExt<CCLabelBMFont*> content = as<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
-		showButtons(mainLayer, content);
+		changeBG();
+		changeButtons();
+		changeTitle();
+		changeText();
+		CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textArea->getChildren()->objectAtIndex(0))->getChildren();
+		showButtons(content);
 	}
 	// I can't check for enter key so I guess I have to hook these
 	void onBtn2(CCObject * sender) {
@@ -145,62 +153,57 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		}
 		FLAlertLayer::onBtn1(sender);
 	}
+	int getLinesLeft(auto & content) {
+		return content.size() - m_fields->linesProgressed;
+	}
 	void progressText() {
-		auto mainLayer = this->getChildByID("main-layer");
-		if (mainLayer == nullptr) return;
-		if (mainLayer->getChildByID("main-menu") == nullptr) return;
-		if (mainLayer->getChildByID("content-text-area") == nullptr) return;
+		if (!m_fields->mainLayer) return;
+		if (!m_fields->mainMenu) return;
+		if (!m_fields->textArea) return;
 
-		auto btn1 = mainLayer->getChildByID("main-menu")->getChildByID("button-1");
-		auto btn2 = mainLayer->getChildByID("main-menu")->getChildByID("button-2");
-		auto mlbmfont = mainLayer->getChildByID("content-text-area")->getChildren()->objectAtIndex(0);
-		CCArrayExt<CCLabelBMFont*> content = as<CCNode*>(mlbmfont)->getChildren();
+		auto mlbmFont = m_fields->textArea->getChildren()->objectAtIndex(0);
+		auto fontNode = static_cast<CCNode*>(mlbmFont);
+		CCArrayExt<CCLabelBMFont*> content = fontNode->getChildren();
 
-		if (content.size() - m_fields->linesProgressed <= 3) {
-			if (btn2 == nullptr) {
+		if (getLinesLeft(content) <= 3) {
+			if (!m_fields->btn2) {
 				m_fields->done = true;
-				FLAlertLayer::onBtn1(as<CCObject*>(btn1));
+				FLAlertLayer::onBtn1(m_fields->btn1);
 				return;
 			}
 			else if (m_fields->btnSelected != 0) {
-				m_fields->done =  true;
+				m_fields->done = true;
 				if (m_fields->btnSelected == 1)
-					FLAlertLayer::onBtn1(as<CCObject*>(btn1));
+					FLAlertLayer::onBtn1(m_fields->btn1);
 				else if (m_fields->btnSelected == 2)
-					FLAlertLayer::onBtn2(as<CCObject*>(btn2));
+					FLAlertLayer::onBtn2(m_fields->btn2);
 				return;
 			}
 		}
 
 		// move EVERYTHING up
 		int i = 0;
-		if (content.size() - m_fields->linesProgressed > 3) {
+
+		if (getLinesLeft(content) > 3)
 			m_fields->linesProgressed += 3;
-			for (CCLabelBMFont* line : content) {
-				line->setPositionY(0 - m_fields->textSize * i + m_fields->textSize * m_fields->linesProgressed);
-				if (i >= m_fields->linesProgressed && i < m_fields->linesProgressed + 3)
-					line->setVisible(true);
-				else
-					line->setVisible(false);
-				i++;
-			}
-		}
-		i = 0;
-		if (content.size() - m_fields->linesProgressed == 3) {
+
+		else if (getLinesLeft(content) == 3)
 			m_fields->linesProgressed += 2;
-			for (CCLabelBMFont* line : content) {
-				line->setPositionY(0 - m_fields->textSize * i + m_fields->textSize * m_fields->linesProgressed);
-				if (i >= m_fields->linesProgressed && i < m_fields->linesProgressed + 3)
-					line->setVisible(true);
-				else
-					line->setVisible(false);
-				i++;
-			}
+
+		for (CCLabelBMFont* line : content) {
+			line->setPositionY(0 - m_fields->textSize * i + m_fields->textSize * m_fields->linesProgressed);
+			// hide the lines outside of the textbox
+			// TODO replace with CCClippingNode
+			if (i >= m_fields->linesProgressed && i < m_fields->linesProgressed + 3)
+				line->setVisible(true);
+			else
+				line->setVisible(false);
+			i++;
 		}
 
-		if (btn2 != nullptr && content.size() - m_fields->linesProgressed < 3) {
+		if (m_fields->btn2 && getLinesLeft(content) < 3) {
 			m_fields->done = true;
-			mainLayer->getChildByID("main-menu")->setVisible(true);
+			m_fields->mainMenu->setVisible(true);
 		}
 	}
 	void show() {
@@ -208,23 +211,30 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		changeLook();
 	}
 	void addHeart(CCNode * parent, CCLabelBMFont * label) {
-		if (parent->getChildByID("heart") != nullptr) {
+		if (parent->getChildByID("heart")) {
 			parent->getChildByID("heart")->removeFromParentAndCleanup(true);
 		}
 		auto heart = CCSprite::create("heart.png"_spr);
-		heart->setAnchorPoint(CCPoint{1, 0.5});
-		heart->setPosition(CCPoint{label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2});
+		heart->setAnchorPoint(CCPoint{ 1, 0.5 });
+		heart->setPosition(CCPoint{ label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2 });
 		heart->setID("heart");
 		parent->addChild(heart);
 	}
 	bool ccTouchBegan(CCTouch * touch, CCEvent * event) {
-		if (!Mod::get()->getSettingValue<bool>("disableClickToProgress"))
+		if (!m_fields->done && !m_fields->disableClickToProgress)
 			progressText();
 		bool ret = FLAlertLayer::ccTouchBegan(touch, event);
-		if (this->getChildByID("main-layer") == nullptr) return ret;
-		CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->getChildByID("main-layer")->getChildByID("main-menu")->getChildren();
+		if (!m_fields->mainLayer) return ret;
+		if (!m_fields->mainMenu) return ret;
+		CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_fields->mainMenu->getChildren();
+		bool selected = false;
 		for (auto button : buttons) {
-			auto parent = as<CCNode*>(button->getChildren()->objectAtIndex(0));
+			if (button->isSelected()) {
+				selected = true;
+			}
+		}
+		for (auto button : buttons) {
+			auto parent = static_cast<CCNode*>(button->getChildren()->objectAtIndex(0));
 			CCArrayExt<CCNode*> parts = parent->getChildren();
 			for (auto part : parts) {
 				if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
@@ -233,13 +243,13 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 						addHeart(parent, label);
 						if (button->getID() == "button-1")
 							m_fields->btnSelected = 1;
-						else if (button->getID() == "button-2") 
+						else if (button->getID() == "button-2")
 							m_fields->btnSelected = 2;
 					}
-					else {
+					else if (selected) {
 						label->setColor(ccColor3B{ 255,255,255 });
 						auto heart = parent->getChildByID("heart");
-						if (heart != nullptr)
+						if (heart)
 							heart->removeFromParentAndCleanup(true);
 					}
 				}
@@ -248,24 +258,21 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		return ret;
 	}
 	void keyDown(enumKeyCodes key) {
-		log::info("{}", (int) key);
 		if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::CONTROLLER_A) {
 			progressText();
 			return;
 		}
 		else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
-			if (this->getChildByID("main-layer") == nullptr) {
+			if (!m_fields->mainLayer) {
 				FLAlertLayer::keyDown(key);
 				return;
 			}
-			CCNode* btn1 = this->getChildByID("main-layer")->getChildByID("main-menu")->getChildByID("button-1");
-			CCNode* btn2 = this->getChildByID("main-layer")->getChildByID("main-menu")->getChildByID("button-2");
-			if (btn2 == nullptr) {
+			if (!m_fields->btn2) {
 				FLAlertLayer::keyDown(key);
 				return;
 			}
 
-			auto parent = as<CCNode*>(btn1->getChildren()->objectAtIndex(0));
+			auto parent = static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0));
 			CCArrayExt<CCNode*> partsBtn1 = parent->getChildren();
 			for (auto part : partsBtn1) {
 				if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
@@ -277,19 +284,19 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 					else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
 						label->setColor(ccColor3B{ 255,255,255 });
 						auto heart = parent->getChildByID("heart");
-						if (heart != nullptr)
+						if (heart)
 							heart->removeFromParentAndCleanup(true);
 					}
 				}
 			}
-			parent = as<CCNode*>(btn2->getChildren()->objectAtIndex(0));
+			parent = static_cast<CCNode*>(m_fields->btn2->getChildren()->objectAtIndex(0));
 			CCArrayExt<CCNode*> partsBtn2 = parent->getChildren();
 			for (auto part : partsBtn2) {
 				if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 					if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
 						label->setColor(ccColor3B{ 255,255,255 });
 						auto heart = parent->getChildByID("heart");
-						if (heart != nullptr)
+						if (heart)
 							heart->removeFromParentAndCleanup(true);
 					}
 					else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
@@ -300,6 +307,6 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 				}
 			}
 		}
-		FLAlertLayer::keyDown(key);
+		else FLAlertLayer::keyDown(key);
 	}
 };
