@@ -15,7 +15,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		int btnSelected = 0;
 	};
 	bool init(FLAlertLayerProtocol * delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
-		if (m_fields->screenSize >= 569 && Mod::get()->getSettingValue<bool>("restrictWidth"))
+		if (m_fields->screenSize >= 569 && Mod::get()->getSettingValue<bool>("dontRestrictWidth"))
 			m_fields->screenSize = 569;
 		width = m_fields->screenSize;
 		m_fields->text = desc;
@@ -218,7 +218,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		parent->addChild(heart);
 	}
 	bool ccTouchBegan(CCTouch * touch, CCEvent * event) {
-		if (Mod::get()->getSettingValue<bool>("clickToProgress"))
+		if (!Mod::get()->getSettingValue<bool>("disableClickToProgress"))
 			progressText();
 		bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 		if (this->getChildByID("main-layer") == nullptr) return ret;
@@ -233,7 +233,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 						addHeart(parent, label);
 						if (button->getID() == "button-1")
 							m_fields->btnSelected = 1;
-						else if (button->getID() == "button-2")
+						else if (button->getID() == "button-2") 
 							m_fields->btnSelected = 2;
 					}
 					else {
