@@ -12,6 +12,14 @@
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
+    "tags": ["customization"],
+    "dependencies": [
+        {
+            "id": "geode.node-ids",
+            "importance": "required",
+            "version": ">=1.10.0"
+        }
+    ],
     "resources": {
         "fonts": {
             "Determination": {
