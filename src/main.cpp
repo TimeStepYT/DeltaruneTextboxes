@@ -3,8 +3,22 @@
 using namespace geode::prelude;
 
 #include <Geode/modify/FLAlertLayer.hpp>
-#include <Geode/modify/CCMenuItemSpriteExtra.hpp>
+#include <Geode/modify/CCKeyboardDispatcher.hpp>
 
+bool blockKeys = false;
+
+class $modify(MyHookLol, CCKeyboardDispatcher) {
+	bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool idk) {
+		if (blockKeys && down) {
+			if (key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right)
+				return true;
+			else if (key == enumKeyCodes::KEY_Escape)
+				blockKeys = false;
+		}
+
+		return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, idk);
+	}
+};
 class $modify(MyFLAlertLayer, FLAlertLayer) {
 	struct Fields {
 		int linesProgressed = 0;
@@ -21,6 +35,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		CCNode* btn2;
 		CCNode* textArea;
 		CCNode* bg;
+		CCNode* title;
 	};
 	bool init(FLAlertLayerProtocol * delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
 		if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
@@ -32,12 +47,16 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		textScale = 1;
 		this->m_noElasticity = true;
 		bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
-		m_fields->mainLayer = this->getChildByID("main-layer");
-		m_fields->mainMenu = m_fields->mainLayer->getChildByID("main-menu");
-		m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
-		m_fields->btn1 = m_fields->mainMenu->getChildByID("button-1");
-		m_fields->btn2 = m_fields->mainMenu->getChildByID("button-2");
-		m_fields->bg = m_fields->mainLayer->getChildByID("background");
+		if (m_fields->mainLayer = this->getChildByID("main-layer")) {
+			if (m_fields->mainMenu = m_fields->mainLayer->getChildByID("main-menu")) {
+				m_fields->btn1 = m_fields->mainMenu->getChildByID("button-1");
+				m_fields->btn2 = m_fields->mainMenu->getChildByID("button-2");
+			}
+			m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
+			m_fields->bg = m_fields->mainLayer->getChildByID("background");
+			m_fields->title = m_fields->mainLayer->getChildByID("title");
+		}
+		this->setID("FLAlertLayer");
 		return ret;
 	}
 	void changeBG() {
@@ -48,7 +67,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		m_fields->bg->setContentWidth(m_fields->screenSize);
 		m_fields->bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
 		m_fields->bg->setID("background");
-		
+
 		m_fields->mainLayer->addChild(m_fields->bg);
 	}
 	void changeButtons() {
@@ -84,9 +103,9 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		}
 	}
 	void changeTitle() {
-		m_fields->mainLayer->getChildByID("title")->setAnchorPoint(CCPoint{ 0, 0.5 });
-		static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"))->setFntFile("Determination.fnt"_spr);
-		m_fields->mainLayer->getChildByID("title")->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
+		m_fields->title->setAnchorPoint(CCPoint{ 0, 0.5 });
+		static_cast<CCLabelBMFont*>(m_fields->title)->setFntFile("Determination.fnt"_spr);
+		m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 	}
 	void changeText() {
 		m_fields->textArea->removeFromParent();
@@ -123,9 +142,10 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		}
 	}
 	void changeLook() {
-		if (!m_fields->mainLayer) return;
 		if (!m_fields->bg) return;
+		if (!m_fields->title) return;
 		if (!m_fields->textArea) return;
+		if (!m_fields->mainLayer) return;
 
 		changeBG();
 		changeButtons();
@@ -151,6 +171,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			progressText();
 			return;
 		}
+		blockKeys = false;
 		FLAlertLayer::onBtn1(sender);
 	}
 	int getLinesLeft(auto & content) {
@@ -208,6 +229,20 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	}
 	void show() {
 		FLAlertLayer::show();
+		int numOfSiblings = 0;
+		if (auto parent = this->getParent()) {
+			CCArrayExt<CCNode*> siblings = parent->getChildren();
+
+			for (auto sibling : siblings) {
+				if (sibling->getID() == "FLAlertLayer")
+					numOfSiblings++;
+			}
+		}
+		if (numOfSiblings >= 1 && !m_fields->btn2)
+			blockKeys = true;
+		else
+			blockKeys = false;
+
 		changeLook();
 	}
 	void addHeart(CCNode * parent, CCLabelBMFont * label) {
