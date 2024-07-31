@@ -8,8 +8,9 @@ using namespace geode::prelude;
 bool blockKeys = false;
 
 class $modify(MyHookLol, CCKeyboardDispatcher) {
+	// Needed because BetterInfo has special FLAlertLayers that duplicate for some reason
 	bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool idk) {
-		if (blockKeys && down) {
+		if (blockKeys && down && Loader::get()->isModLoaded("cvolton.betterinfo")) {
 			if (key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right)
 				return true;
 			else if (key == enumKeyCodes::KEY_Escape)
@@ -30,7 +31,6 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
 		CCNode* mainLayer;
-		CCNode* mainMenu;
 		CCNode* btn1;
 		CCNode* btn2;
 		CCNode* textArea;
@@ -48,9 +48,9 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		this->m_noElasticity = true;
 		bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
 		if (m_fields->mainLayer = this->getChildByID("main-layer")) {
-			if (m_fields->mainMenu = m_fields->mainLayer->getChildByID("main-menu")) {
-				m_fields->btn1 = m_fields->mainMenu->getChildByID("button-1");
-				m_fields->btn2 = m_fields->mainMenu->getChildByID("button-2");
+			if (this->m_buttonMenu) {
+				m_fields->btn1 = this->m_buttonMenu->getChildByID("button-1");
+				m_fields->btn2 = this->m_buttonMenu->getChildByID("button-2");
 			}
 			m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
 			m_fields->bg = m_fields->mainLayer->getChildByID("background");
@@ -71,16 +71,16 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		m_fields->mainLayer->addChild(m_fields->bg);
 	}
 	void changeButtons() {
-		if (!m_fields->mainMenu) return;
-		m_fields->mainMenu->setPositionY(32);
-		m_fields->mainMenu->setVisible(false);
+		if (!this->m_buttonMenu) return;
+		this->m_buttonMenu->setPositionY(32);
+		this->m_buttonMenu->setVisible(false);
 
 		if (!m_fields->btn2) return;
 
-		m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - m_fields->mainMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
-		m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - m_fields->mainMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
+		m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - this->m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
+		m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - this->m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
 
-		CCArrayExt<CCNode*> buttons = m_fields->mainMenu->getChildren();
+		CCArrayExt<CCNode*> buttons = this->m_buttonMenu->getChildren();
 
 		auto heart = CCSprite::create("heart.png"_spr);
 		heart->setPositionX(-m_fields->btn1->getPositionX() + static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->getPositionX());
@@ -138,7 +138,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	void showButtons(CCArrayExt<CCLabelBMFont*> content) {
 		if (m_fields->btn2 && content.size() < 3) {
 			m_fields->done = true;
-			m_fields->mainMenu->setVisible(true);
+			this->m_buttonMenu->setVisible(true);
 		}
 	}
 	void changeLook() {
@@ -179,7 +179,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	}
 	void progressText() {
 		if (!m_fields->mainLayer) return;
-		if (!m_fields->mainMenu) return;
+		if (!this->m_buttonMenu) return;
 		if (!m_fields->textArea) return;
 
 		auto mlbmFont = m_fields->textArea->getChildren()->objectAtIndex(0);
@@ -224,7 +224,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 
 		if (m_fields->btn2 && getLinesLeft(content) < 3) {
 			m_fields->done = true;
-			m_fields->mainMenu->setVisible(true);
+			this->m_buttonMenu->setVisible(true);
 		}
 	}
 	void show() {
@@ -260,8 +260,8 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 			progressText();
 		bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 		if (!m_fields->mainLayer) return ret;
-		if (!m_fields->mainMenu) return ret;
-		CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_fields->mainMenu->getChildren();
+		if (!this->m_buttonMenu) return ret;
+		CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->m_buttonMenu->getChildren();
 		bool selected = false;
 		for (auto button : buttons) {
 			if (button->isSelected()) {
