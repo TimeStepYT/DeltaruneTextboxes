@@ -33,13 +33,16 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		CCNode* mainLayer;
 		CCNode* btn1;
 		CCNode* btn2;
+		CCNode* textAreaClippingNode;
 		CCNode* textArea;
+		CCNode* gradientOverlay;
 		CCNode* bg;
 		CCNode* title;
 	};
 	bool init(FLAlertLayerProtocol * delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
 		if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
 			m_fields->screenSize = 569;
+
 		width = m_fields->screenSize;
 		m_fields->text = desc;
 		height = 140;
@@ -47,12 +50,15 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		textScale = 1;
 		this->m_noElasticity = true;
 		bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
+
+		NodeIDs::provideFor(this);
+
 		if (m_fields->mainLayer = this->getChildByID("main-layer")) {
 			if (this->m_buttonMenu) {
 				m_fields->btn1 = this->m_buttonMenu->getChildByID("button-1");
 				m_fields->btn2 = this->m_buttonMenu->getChildByID("button-2");
 			}
-			m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
+			m_fields->textAreaClippingNode = m_fields->mainLayer->getChildByID("content-text-area");
 			m_fields->bg = m_fields->mainLayer->getChildByID("background");
 			m_fields->title = m_fields->mainLayer->getChildByID("title");
 		}
@@ -98,6 +104,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 				}
 				else if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 					label->setFntFile("Determination.fnt"_spr);
+					label->setScale(1);
 				}
 			}
 		}
@@ -108,7 +115,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 	}
 	void changeText() {
-		m_fields->textArea->removeFromParent();
+		m_fields->textAreaClippingNode->removeFromParent();
 		auto newDesc = TextArea::create(
 			m_fields->text,
 			"Determination.fnt"_spr,
@@ -121,19 +128,44 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 		newDesc->setContentWidth(m_fields->screenSize);
 		newDesc->setAnchorPoint(CCPoint{ 0, 1 });
 		newDesc->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24);
-		newDesc->setPositionY(120);
-		newDesc->setZOrder(m_fields->textArea->getZOrder());
+		newDesc->setPositionY(110);
+		newDesc->setZOrder(m_fields->textAreaClippingNode->getZOrder());
 		newDesc->setID("content-text-area");
-		m_fields->mainLayer->addChild(newDesc);
-		m_fields->textArea = newDesc;
-		CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
-		int i = 0;
-		for (CCLabelBMFont* line : content) {
-			line->setPositionY(0 - m_fields->textSize * i);
-			if (i >= 3)
-				line->setVisible(false);
-			i++;
+
+		auto newDescGrad = TextArea::create(
+			m_fields->text,
+			"DeterminationGradient.fnt"_spr,
+			1,
+			m_fields->screenSize - 100,
+			CCPoint{ 0, 1 },
+			m_fields->textSize,
+			false
+		);
+		newDescGrad->setContentWidth(m_fields->screenSize);
+		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
+		newDescGrad->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24);
+		newDescGrad->setPositionY(110);
+		newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
+		newDescGrad->setID("gradient-overlay"_spr);
+
+		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
+
+		for (auto line : lines) {
+			CCArrayExt<CCSprite*> letters = line->getChildren();
+			for (auto letter : letters) {
+				letter->setColor(ccColor3B{ 255, 255, 255 });
+			}
 		}
+
+		auto clippingNode = CCClippingNode::create(CCLayerColor::create({ 0,0,0,0 }, m_fields->bg->getContentWidth(), m_fields->bg->getContentHeight() - 20));
+		clippingNode->setID("content-text-area"_spr);
+		clippingNode->setPositionY(10);
+		clippingNode->addChild(newDesc);
+		clippingNode->addChild(newDescGrad);
+		m_fields->mainLayer->addChild(clippingNode);
+		m_fields->textAreaClippingNode = clippingNode;
+		m_fields->textArea = newDesc;
+		m_fields->gradientOverlay = newDescGrad;
 	}
 	void showButtons(CCArrayExt<CCLabelBMFont*> content) {
 		if (m_fields->btn2 && content.size() < 3) {
@@ -144,14 +176,14 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	void changeLook() {
 		if (!m_fields->bg) return;
 		if (!m_fields->title) return;
-		if (!m_fields->textArea) return;
+		if (!m_fields->textAreaClippingNode) return;
 		if (!m_fields->mainLayer) return;
 
 		changeBG();
 		changeButtons();
 		changeTitle();
 		changeText();
-		CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textArea->getChildren()->objectAtIndex(0))->getChildren();
+		CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textAreaClippingNode->getChildren()->objectAtIndex(0))->getChildren();
 		showButtons(content);
 	}
 	// I can't check for enter key so I guess I have to hook these
@@ -180,6 +212,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	void progressText() {
 		if (!m_fields->mainLayer) return;
 		if (!this->m_buttonMenu) return;
+		if (!m_fields->textAreaClippingNode) return;
 		if (!m_fields->textArea) return;
 
 		auto mlbmFont = m_fields->textArea->getChildren()->objectAtIndex(0);
@@ -204,23 +237,15 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 
 		// move EVERYTHING up
 		int i = 0;
+		int offset;
 
-		if (getLinesLeft(content) > 3)
-			m_fields->linesProgressed += 3;
-
-		else if (getLinesLeft(content) == 3)
-			m_fields->linesProgressed += 2;
-
-		for (CCLabelBMFont* line : content) {
-			line->setPositionY(0 - m_fields->textSize * i + m_fields->textSize * m_fields->linesProgressed);
-			// hide the lines outside of the textbox
-			// TODO replace with CCClippingNode
-			if (i >= m_fields->linesProgressed && i < m_fields->linesProgressed + 3)
-				line->setVisible(true);
-			else
-				line->setVisible(false);
-			i++;
-		}
+		if (getLinesLeft(content) > 3) 
+			offset = 3;
+		else if (getLinesLeft(content) == 3) 
+			offset = 2;
+		m_fields->linesProgressed += offset;
+		m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
+		m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
 
 		if (m_fields->btn2 && getLinesLeft(content) < 3) {
 			m_fields->done = true;
