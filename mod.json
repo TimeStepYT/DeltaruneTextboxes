@@ -21,13 +21,21 @@
         }
     ],
     "resources": {
+        "sprites": ["resources/deltaruneSquare.png", "resources/heart.png"],
         "fonts": {
             "Determination": {
-                "path": "resources/determination-extended.ttf",
-                "size": 78
+                "size": 78,
+                "path": "resources/determination-extended.ttf"
             }
         },
-        "sprites": ["resources/deltaruneSquare.png", "resources/heart.png"]
+        "files": [
+            "resources/DeterminationGradient-uhd.fnt",
+            "resources/DeterminationGradient-hd.fnt",
+            "resources/DeterminationGradient.fnt",
+            "resources/DeterminationGradient-uhd.png",
+            "resources/DeterminationGradient-hd.png",
+            "resources/DeterminationGradient.png"
+        ]
     },
     "settings": {
         "dontRestrictWidth": {
