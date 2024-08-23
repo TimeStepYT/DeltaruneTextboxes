@@ -14,16 +14,16 @@ void MyFLAlertLayer::changeBG() {
 }
 
 void MyFLAlertLayer::changeButtons() {
-	if (!this->m_buttonMenu) return;
-	this->m_buttonMenu->setPositionY(32);
-	this->m_buttonMenu->setVisible(false);
+	if (!m_buttonMenu) return;
+	m_buttonMenu->setPositionY(32);
+	m_buttonMenu->setVisible(false);
 
 	if (!m_fields->btn2) return;
 
-	m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - this->m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
-	m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - this->m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
+	m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
+	m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
 
-	CCArrayExt<CCNode*> buttons = this->m_buttonMenu->getChildren();
+	CCArrayExt<CCNode*> buttons = m_buttonMenu->getChildren();
 
 	auto heart = CCSprite::create("heart.png"_spr);
 	heart->setPositionX(-m_fields->btn1->getPositionX() + static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->getPositionX());

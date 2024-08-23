@@ -12,27 +12,27 @@ bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd:
 	height = 140;
 	scroll = false;
 	textScale = 1;
-	this->m_noElasticity = true;
+	m_noElasticity = true;
 	bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
 
 	NodeIDs::provideFor(this);
 
-	if (m_fields->mainLayer = this->getChildByID("main-layer")) {
-		if (this->m_buttonMenu) {
-			m_fields->btn1 = this->m_buttonMenu->getChildByID("button-1");
-			m_fields->btn2 = this->m_buttonMenu->getChildByID("button-2");
+	if (m_fields->mainLayer = getChildByID("main-layer")) {
+		if (m_buttonMenu) {
+			m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
+			m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
 		}
 		m_fields->textAreaClippingNode = m_fields->mainLayer->getChildByID("content-text-area");
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
 		m_fields->title = m_fields->mainLayer->getChildByID("title");
 	}
-	this->setID("FLAlertLayer");
+	setID("FLAlertLayer");
 	return ret;
 }
 void MyFLAlertLayer::showButtons(CCArrayExt<CCLabelBMFont*> content) {
 	if (m_fields->btn2 && content.size() < 3) {
 		m_fields->done = true;
-		this->m_buttonMenu->setVisible(true);
+		m_buttonMenu->setVisible(true);
 	}
 }
 void MyFLAlertLayer::onBtn2(CCObject* sender) {
@@ -59,7 +59,7 @@ int MyFLAlertLayer::getLinesLeft(auto& content) {
 }
 void MyFLAlertLayer::progressText() {
 	if (!m_fields->mainLayer) return;
-	if (!this->m_buttonMenu) return;
+	if (!m_buttonMenu) return;
 	if (!m_fields->textAreaClippingNode) return;
 	if (!m_fields->textArea) return;
 
@@ -97,13 +97,13 @@ void MyFLAlertLayer::progressText() {
 
 	if (m_fields->btn2 && getLinesLeft(content) < 3) {
 		m_fields->done = true;
-		this->m_buttonMenu->setVisible(true);
+		m_buttonMenu->setVisible(true);
 	}
 }
 void MyFLAlertLayer::show() {
 	FLAlertLayer::show();
 	int numOfSiblings = 0;
-	if (auto parent = this->getParent()) {
+	if (auto parent = getParent()) {
 		CCArrayExt<CCNode*> siblings = parent->getChildren();
 
 		for (auto sibling : siblings) {
@@ -133,8 +133,8 @@ bool MyFLAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 		progressText();
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 	if (!m_fields->mainLayer) return ret;
-	if (!this->m_buttonMenu) return ret;
-	CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->m_buttonMenu->getChildren();
+	if (!m_buttonMenu) return ret;
+	CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_buttonMenu->getChildren();
 	bool selected = false;
 	for (auto button : buttons) {
 		if (button->isSelected()) {
