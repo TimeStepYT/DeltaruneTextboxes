@@ -13,9 +13,12 @@ bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd:
 	scroll = false;
 	textScale = 1;
 	m_noElasticity = true;
+
 	bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
+	if (!ret) return false;
 
 	NodeIDs::provideFor(this);
+	setID("FLAlertLayer");
 
 	if (m_fields->mainLayer = getChildByID("main-layer")) {
 		if (m_buttonMenu) {
@@ -26,11 +29,10 @@ bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd:
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
 		m_fields->title = m_fields->mainLayer->getChildByID("title");
 	}
-	setID("FLAlertLayer");
 	return ret;
 }
-void MyFLAlertLayer::showButtons(CCArrayExt<CCLabelBMFont*> content) {
-	if (m_fields->btn2 && content.size() < 3) {
+void MyFLAlertLayer::showButtons() {
+	if (m_fields->btn2 && getLinesLeft() < 3 && m_fields->doneRolling) {
 		m_fields->done = true;
 		m_buttonMenu->setVisible(true);
 	}
@@ -54,51 +56,11 @@ void MyFLAlertLayer::onBtn1(CCObject* sender) {
 	blockKeys = false;
 	FLAlertLayer::onBtn1(sender);
 }
-int MyFLAlertLayer::getLinesLeft(auto& content) {
+int MyFLAlertLayer::getLinesLeft() {
+	if (!m_fields->textAreaClippingNode) return 0;
+	if (!m_fields->textArea) return 0;
+	CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textArea->getChildren()->objectAtIndex(0))->getChildren();
 	return content.size() - m_fields->linesProgressed;
-}
-void MyFLAlertLayer::progressText() {
-	if (!m_fields->mainLayer) return;
-	if (!m_buttonMenu) return;
-	if (!m_fields->textAreaClippingNode) return;
-	if (!m_fields->textArea) return;
-
-	auto mlbmFont = m_fields->textArea->getChildren()->objectAtIndex(0);
-	auto fontNode = static_cast<CCNode*>(mlbmFont);
-	CCArrayExt<CCLabelBMFont*> content = fontNode->getChildren();
-
-	if (getLinesLeft(content) <= 3) {
-		if (!m_fields->btn2) {
-			m_fields->done = true;
-			FLAlertLayer::onBtn1(m_fields->btn1);
-			return;
-		}
-		else if (m_fields->btnSelected != 0) {
-			m_fields->done = true;
-			if (m_fields->btnSelected == 1)
-				FLAlertLayer::onBtn1(m_fields->btn1);
-			else if (m_fields->btnSelected == 2)
-				FLAlertLayer::onBtn2(m_fields->btn2);
-			return;
-		}
-	}
-
-	// move EVERYTHING up
-	int i = 0;
-	int offset;
-
-	if (getLinesLeft(content) > 3)
-		offset = 3;
-	else if (getLinesLeft(content) == 3)
-		offset = 2;
-	m_fields->linesProgressed += offset;
-	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
-	m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
-
-	if (m_fields->btn2 && getLinesLeft(content) < 3) {
-		m_fields->done = true;
-		m_buttonMenu->setVisible(true);
-	}
 }
 void MyFLAlertLayer::show() {
 	FLAlertLayer::show();
@@ -118,19 +80,13 @@ void MyFLAlertLayer::show() {
 
 	changeLook();
 }
-void MyFLAlertLayer::addHeart(CCNode* parent, CCLabelBMFont* label) {
-	if (parent->getChildByID("heart")) {
-		parent->getChildByID("heart")->removeFromParentAndCleanup(true);
-	}
-	auto heart = CCSprite::create("heart.png"_spr);
-	heart->setAnchorPoint(CCPoint{ 1, 0.5 });
-	heart->setPosition(CCPoint{ label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2 });
-	heart->setID("heart");
-	parent->addChild(heart);
-}
 bool MyFLAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
-	if (!m_fields->done && !m_fields->disableClickToProgress)
-		progressText();
+	if (!m_fields->done && !m_fields->disableClickToProgress) {
+		if (m_fields->rolledPage)
+			progressText();
+		else
+			skipText();
+	}
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 	if (!m_fields->mainLayer) return ret;
 	if (!m_buttonMenu) return ret;
@@ -166,16 +122,17 @@ bool MyFLAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	return ret;
 }
 void MyFLAlertLayer::keyDown(enumKeyCodes key) {
-	if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::CONTROLLER_A) {
-		progressText();
+	if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::KEY_Y /*screw QWERTZ*/ || key == enumKeyCodes::CONTROLLER_A) {
+		if (m_fields->rolledPage)
+			progressText();
+		return;
+	}
+	else if (key == enumKeyCodes::KEY_X || key == enumKeyCodes::KEY_Shift || key == enumKeyCodes::CONTROLLER_B) {
+		skipText();
 		return;
 	}
 	else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
-		if (!m_fields->mainLayer) {
-			FLAlertLayer::keyDown(key);
-			return;
-		}
-		if (!m_fields->btn2) {
+		if (!m_fields->mainLayer || !m_fields->btn2 || !m_fields->doneRolling) {
 			FLAlertLayer::keyDown(key);
 			return;
 		}
@@ -216,4 +173,142 @@ void MyFLAlertLayer::keyDown(enumKeyCodes key) {
 		}
 	}
 	else FLAlertLayer::keyDown(key);
+}
+void MyFLAlertLayer::skipText() {
+	unschedule(schedule_selector(MyFLAlertLayer::rollText));
+	if (!m_fields->textAreaClippingNode) return;
+	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
+	for (auto textArea : textAreas) {
+		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
+
+		for (int i = m_fields->linesProgressed + m_fields->rollingLine; i < lines.size() && i < m_fields->linesProgressed + 3; i++) {
+			auto line = lines[i];
+			CCArrayExt<CCNode*> letters = line->getChildren();
+			for (auto letter : letters) {
+				letter->setVisible(true);
+			}
+		}
+	}
+
+	m_fields->rolledPage = true;
+	if (m_fields->btn2) {
+		if (getLinesLeft() < 3)
+			m_fields->doneRolling = true;
+	}
+	else {
+		if (getLinesLeft() <= 3)
+			m_fields->doneRolling = true;
+	}
+	if (m_fields->doneRolling) showButtons();
+}
+void MyFLAlertLayer::progressText() {
+	if (!m_fields->mainLayer) return;
+	if (!m_buttonMenu) return;
+	if (!m_fields->textAreaClippingNode) return;
+	if (!m_fields->textArea) return;
+
+	if (getLinesLeft() <= 3) {
+		if (!m_fields->btn2) {
+			m_fields->done = true;
+			FLAlertLayer::onBtn1(m_fields->btn1);
+			return;
+		}
+		else if (m_fields->btnSelected != 0) {
+			m_fields->done = true;
+			if (m_fields->btnSelected == 1)
+				FLAlertLayer::onBtn1(m_fields->btn1);
+			else if (m_fields->btnSelected == 2)
+				FLAlertLayer::onBtn2(m_fields->btn2);
+			return;
+		}
+	}
+	if (getLinesLeft() < 3 && m_fields->btn2)
+		return;
+
+	// move EVERYTHING up
+	int offset;
+
+	unschedule(schedule_selector(MyFLAlertLayer::rollText));
+	m_fields->characterCount = 0;
+	m_fields->rollingLine = 0;
+
+	if (getLinesLeft() > 3)
+		offset = 3;
+	else if (getLinesLeft() == 3)
+		offset = 2;
+	m_fields->linesProgressed += offset;
+	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
+	m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
+
+	if (m_fields->btn2 && getLinesLeft() < 3) {
+		m_fields->done = true;
+		m_buttonMenu->setVisible(true);
+	}
+	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
+	schedule(schedule_selector(MyFLAlertLayer::rollText), pause / 30);
+}
+void MyFLAlertLayer::rollText(float dt) {
+	if (m_fields->waitQueue != 0) {
+		m_fields->waitQueue--;
+		return;
+	}
+	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
+	if (m_fields->rollingLine == 3) {
+		unschedule(schedule_selector(MyFLAlertLayer::rollText));
+		m_fields->rolledPage = true;
+		return;
+	}
+	else
+		m_fields->rolledPage = false;
+	bool newLine = false;
+	bool playSound = true;
+	for (auto textArea : textAreas) {
+		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
+		int i = m_fields->linesProgressed + m_fields->rollingLine;
+		if (i < lines.size() && i < m_fields->linesProgressed + 3) {
+			auto line = lines[i];
+			CCArrayExt<CCNode*> letters = line->getChildren();
+			auto letter = letters[m_fields->characterCount];
+			if (letter->isVisible()) {
+				unschedule(schedule_selector(MyFLAlertLayer::rollText));
+				m_fields->doneRolling = true;
+				m_fields->rolledPage = true;
+				showButtons();
+				return;
+			}
+			letter->setVisible(true);
+			switch (line->getString()[m_fields->characterCount]) {
+				case ' ':
+					playSound = false;
+					break;
+				case '.':
+				case ',':
+				case ':':
+				case ';':
+				case '?':
+				case '!':
+					m_fields->waitQueue = 2;
+					break;
+				default:
+					break;
+			}
+			if (m_fields->characterCount == line->getChildrenCount() - 1) {
+				newLine = true;
+			}
+		}
+		else {
+			unschedule(schedule_selector(MyFLAlertLayer::rollText));
+			m_fields->doneRolling = true;
+			m_fields->rolledPage = true;
+			showButtons();
+			return;
+		}
+	}
+	m_fields->characterCount++;
+	if (newLine) {
+		m_fields->characterCount = 0;
+		m_fields->rollingLine++;
+	}
+	if (playSound)
+		FMODAudioEngine::sharedEngine()->playEffect("SND_TXT1.wav"_spr);
 }

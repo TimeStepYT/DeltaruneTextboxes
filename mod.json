@@ -34,7 +34,8 @@
             "resources/DeterminationGradient.fnt",
             "resources/DeterminationGradient-uhd.png",
             "resources/DeterminationGradient-hd.png",
-            "resources/DeterminationGradient.png"
+            "resources/DeterminationGradient.png",
+            "resources/SND_TXT1.wav"
         ]
     },
     "settings": {
@@ -50,6 +51,14 @@
             "default": false,
             "description": "Disables <cy>clicking</c> to progress textboxes",
             "platforms": ["win", "macos"]
+        },
+        "textRollingPause": {
+            "name": "Text Rolling Pause",
+            "type": "float",
+            "min": 0,
+            "max": 10,
+            "default": 1,
+            "description": "How many 30ths of a second it should pause between characters for the rolling effect"
         }
     }
 }

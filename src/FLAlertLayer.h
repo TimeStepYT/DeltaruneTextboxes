@@ -2,7 +2,12 @@
 
 class $modify(MyFLAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool doneRolling = false;
+		bool rolledPage = false;
+		int waitQueue = 0;
+		int rollingLine = 0;
 		int linesProgressed = 0;
+		int characterCount = 0;
 		bool done = false;
 		gd::string text = "";
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
@@ -24,15 +29,17 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	void changeTitle();
 	void changeText();
 	void changeLook();
+	void addHeart(CCNode*, CCLabelBMFont*);
+	void show();
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
-	void showButtons(CCArrayExt<CCLabelBMFont*>);
+	void rollText(float);
+	void showButtons();
+	int getLinesLeft();
+	void skipText();
+	void progressText();
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
-	int getLinesLeft(auto&);
-	void progressText();
-	void show();
-	void addHeart(CCNode*, CCLabelBMFont*);
 	bool ccTouchBegan(CCTouch*, CCEvent*);
 	void keyDown(enumKeyCodes);
 };

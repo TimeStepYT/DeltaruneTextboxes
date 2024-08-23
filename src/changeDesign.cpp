@@ -85,12 +85,20 @@ void MyFLAlertLayer::changeText() {
 	newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
 	newDescGrad->setID("gradient-overlay"_spr);
 
-	CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
+	CCArrayExt<CCLabelBMFont*> linesGrad = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
+	CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
 
-	for (auto line : lines) {
+	for (auto line : linesGrad) {
 		CCArrayExt<CCSprite*> letters = line->getChildren();
 		for (auto letter : letters) {
 			letter->setColor(ccColor3B{ 255, 255, 255 });
+			letter->setVisible(false);
+		}
+	}
+	for (auto line : lines) {
+		CCArrayExt<CCSprite*> letters = line->getChildren();
+		for (auto letter : letters) {
+			letter->setVisible(false);
 		}
 	}
 
@@ -103,6 +111,8 @@ void MyFLAlertLayer::changeText() {
 	m_fields->textAreaClippingNode = clippingNode;
 	m_fields->textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
+	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
+	schedule(schedule_selector(MyFLAlertLayer::rollText), pause / 30);
 }
 void MyFLAlertLayer::changeLook() {
 	if (!m_fields->bg) return;
@@ -114,6 +124,14 @@ void MyFLAlertLayer::changeLook() {
 	changeButtons();
 	changeTitle();
 	changeText();
-	CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textAreaClippingNode->getChildren()->objectAtIndex(0))->getChildren();
-	showButtons(content);
+}
+void MyFLAlertLayer::addHeart(CCNode* parent, CCLabelBMFont* label) {
+	if (parent->getChildByID("heart")) {
+		parent->getChildByID("heart")->removeFromParentAndCleanup(true);
+	}
+	auto heart = CCSprite::create("heart.png"_spr);
+	heart->setAnchorPoint(CCPoint{ 1, 0.5 });
+	heart->setPosition(CCPoint{ label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2 });
+	heart->setID("heart");
+	parent->addChild(heart);
 }
