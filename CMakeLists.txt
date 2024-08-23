@@ -7,7 +7,9 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 project(DeltaruneTextboxes VERSION 0.2.2)
 
 add_library(${PROJECT_NAME} SHARED
-    src/main.cpp
+    src/FLAlertLayer.cpp
+    src/CCKeyboardDispatcher.cpp
+    src/changeDesign.cpp
     # Add any extra C++ source files here
 )
 
