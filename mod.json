@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v0.2.2",
+    "version": "v0.3.0",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -56,9 +56,9 @@
             "name": "Text Rolling Pause",
             "type": "float",
             "min": 0,
-            "max": 10,
+            "max": 5,
             "default": 1,
-            "description": "How many 30ths of a second it should pause between characters for the rolling effect"
+            "description": "How many <cy>30th</c>s of a second it should <cj>pause</c> between characters for the <cg>rolling effect</c>"
         }
     }
 }

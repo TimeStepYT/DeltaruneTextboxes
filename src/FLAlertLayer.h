@@ -30,7 +30,7 @@ class $modify(MyFLAlertLayer, FLAlertLayer) {
 	void changeText();
 	void changeLook();
 	void addHeart(CCNode*, CCLabelBMFont*);
-	void show();
+	void show() override;
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();

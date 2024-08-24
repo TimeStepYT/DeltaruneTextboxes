@@ -281,11 +281,11 @@ void MyFLAlertLayer::rollText(float dt) {
 				case ' ':
 					playSound = false;
 					break;
-				case '.':
-				case ',':
-				case ':':
-				case ';':
-				case '?':
+				case '.': [[fallthrough]];
+				case ',': [[fallthrough]];
+				case ':': [[fallthrough]];
+				case ';': [[fallthrough]];
+				case '?': [[fallthrough]];
 				case '!':
 					m_fields->waitQueue = 2;
 					break;
