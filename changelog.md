@@ -1,3 +1,5 @@
+### 0.4.0
+- Support for DialogLayer
 ### 0.3.0
 - Reworked scrolling to be much simpler to work with
 - Gave colored text a gradient almost like in the original game
