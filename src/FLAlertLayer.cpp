@@ -3,7 +3,7 @@
 
 bool blockKeys = false;
 
-bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
+bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
 	if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
 		m_fields->screenSize = 569;
 
@@ -14,8 +14,7 @@ bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd:
 	textScale = 1;
 	m_noElasticity = true;
 
-	bool ret = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
-	if (!ret) return false;
+	if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
@@ -29,15 +28,15 @@ bool MyFLAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd:
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
 		m_fields->title = m_fields->mainLayer->getChildByID("title");
 	}
-	return ret;
+	return true;
 }
-void MyFLAlertLayer::showButtons() {
+void DeltaruneAlertLayer::showButtons() {
 	if (m_fields->btn2 && getLinesLeft() < 3 && m_fields->doneRolling) {
 		m_fields->done = true;
 		m_buttonMenu->setVisible(true);
 	}
 }
-void MyFLAlertLayer::onBtn2(CCObject* sender) {
+void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 	if (!m_fields->done) {
 		progressText();
 		return;
@@ -48,7 +47,7 @@ void MyFLAlertLayer::onBtn2(CCObject* sender) {
 	else if (m_fields->btnSelected == 1)
 		FLAlertLayer::onBtn1(sender);
 }
-void MyFLAlertLayer::onBtn1(CCObject* sender) {
+void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 	if (!m_fields->done) {
 		progressText();
 		return;
@@ -56,13 +55,13 @@ void MyFLAlertLayer::onBtn1(CCObject* sender) {
 	blockKeys = false;
 	FLAlertLayer::onBtn1(sender);
 }
-int MyFLAlertLayer::getLinesLeft() {
+int DeltaruneAlertLayer::getLinesLeft() {
 	if (!m_fields->textAreaClippingNode) return 0;
 	if (!m_fields->textArea) return 0;
 	CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textArea->getChildren()->objectAtIndex(0))->getChildren();
 	return content.size() - m_fields->linesProgressed;
 }
-void MyFLAlertLayer::show() {
+void DeltaruneAlertLayer::show() {
 	FLAlertLayer::show();
 	int numOfSiblings = 0;
 	if (auto parent = getParent()) {
@@ -80,7 +79,7 @@ void MyFLAlertLayer::show() {
 
 	changeLook();
 }
-bool MyFLAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
+bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (!m_fields->done && !m_fields->disableClickToProgress) {
 		if (m_fields->rolledPage)
 			progressText();
@@ -121,7 +120,7 @@ bool MyFLAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	}
 	return ret;
 }
-void MyFLAlertLayer::keyDown(enumKeyCodes key) {
+void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 	if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::KEY_Y /*screw QWERTZ*/ || key == enumKeyCodes::CONTROLLER_A) {
 		if (m_fields->rolledPage)
 			progressText();
@@ -174,8 +173,8 @@ void MyFLAlertLayer::keyDown(enumKeyCodes key) {
 	}
 	else FLAlertLayer::keyDown(key);
 }
-void MyFLAlertLayer::skipText() {
-	unschedule(schedule_selector(MyFLAlertLayer::rollText));
+void DeltaruneAlertLayer::skipText() {
+	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	if (!m_fields->textAreaClippingNode) return;
 	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
 	for (auto textArea : textAreas) {
@@ -201,7 +200,7 @@ void MyFLAlertLayer::skipText() {
 	}
 	if (m_fields->doneRolling) showButtons();
 }
-void MyFLAlertLayer::progressText() {
+void DeltaruneAlertLayer::progressText() {
 	if (!m_fields->mainLayer) return;
 	if (!m_buttonMenu) return;
 	if (!m_fields->textAreaClippingNode) return;
@@ -227,8 +226,10 @@ void MyFLAlertLayer::progressText() {
 
 	// move EVERYTHING up
 	int offset;
+	if (m_fields->dialog)
+		m_fields->mainLayer->getChildByID("star"_spr)->setVisible(false);
 
-	unschedule(schedule_selector(MyFLAlertLayer::rollText));
+	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
 	m_fields->rollingLine = 0;
 
@@ -245,16 +246,16 @@ void MyFLAlertLayer::progressText() {
 		m_buttonMenu->setVisible(true);
 	}
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
-	schedule(schedule_selector(MyFLAlertLayer::rollText), pause / 30);
+	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
-void MyFLAlertLayer::rollText(float dt) {
+void DeltaruneAlertLayer::rollText(float dt) {
 	if (m_fields->waitQueue != 0) {
 		m_fields->waitQueue--;
 		return;
 	}
 	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
 	if (m_fields->rollingLine == 3) {
-		unschedule(schedule_selector(MyFLAlertLayer::rollText));
+		unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 		m_fields->rolledPage = true;
 		return;
 	}
@@ -270,7 +271,7 @@ void MyFLAlertLayer::rollText(float dt) {
 			CCArrayExt<CCNode*> letters = line->getChildren();
 			auto letter = letters[m_fields->characterCount];
 			if (letter->isVisible()) {
-				unschedule(schedule_selector(MyFLAlertLayer::rollText));
+				unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 				m_fields->doneRolling = true;
 				m_fields->rolledPage = true;
 				showButtons();
@@ -297,7 +298,7 @@ void MyFLAlertLayer::rollText(float dt) {
 			}
 		}
 		else {
-			unschedule(schedule_selector(MyFLAlertLayer::rollText));
+			unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 			m_fields->doneRolling = true;
 			m_fields->rolledPage = true;
 			showButtons();
