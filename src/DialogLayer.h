@@ -24,5 +24,4 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 	};
 	bool init(DialogObject*, CCArray*, int);
 	void displayDialogObject(DialogObject*);
-	void closeWithDelay(float);
 };
