@@ -3,7 +3,7 @@
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
 		bool dialog = false;
-#ifdef GEODE_IS_ANDROID || GEODE_IS_MACOS
+#ifdef GEODE_IS_ANDROID || GEODE_IS_MACOS // I want this binding for Windows pls
 		CCSpriteGrayscale* characterSprite;
 #else
 		CCSprite* characterSprite;
