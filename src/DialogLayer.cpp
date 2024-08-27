@@ -9,7 +9,11 @@ bool DeltaruneDialogLayer::init(DialogObject* p0, CCArray* p1, int p2) {
 	auto alert = FLAlertLayer::create(title, text, "OK");
 
 	auto texture = m_characterSprite->getTexture();
+#ifdef GEODE_IS_ANDROID || GEODE_IS_MACOS
+	static_cast<DeltaruneAlertLayer*>(alert)->m_fields->characterSprite = CCSpriteGrayscale::createWithTexture(texture);
+#else
 	static_cast<DeltaruneAlertLayer*>(alert)->m_fields->characterSprite = CCSprite::createWithTexture(texture);
+#endif
 	static_cast<DeltaruneAlertLayer*>(alert)->m_fields->dialog = true;
 	alert->show();
 

@@ -3,7 +3,11 @@
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
 		bool dialog = false;
+#ifdef GEODE_IS_ANDROID || GEODE_IS_MACOS
+		CCSpriteGrayscale* characterSprite;
+#else
 		CCSprite* characterSprite;
+#endif
 		bool doneRolling = false;
 		bool rolledPage = false;
 		int waitQueue = 0;
