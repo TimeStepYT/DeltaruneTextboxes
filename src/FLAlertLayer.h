@@ -1,7 +1,9 @@
 #include "include.h"
 
-class $modify(MyFLAlertLayer, FLAlertLayer) {
+class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool dialog = false;
+		CCSprite* characterSprite;
 		bool doneRolling = false;
 		bool rolledPage = false;
 		int waitQueue = 0;

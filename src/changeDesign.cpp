@@ -1,7 +1,7 @@
 #include "include.h"
 #include "FLAlertLayer.h"
 
-void MyFLAlertLayer::changeBG() {
+void DeltaruneAlertLayer::changeBG() {
 	m_fields->bg->removeFromParent();
 
 	m_fields->bg = CCScale9Sprite::create("deltaruneSquare.png"_spr);
@@ -9,11 +9,17 @@ void MyFLAlertLayer::changeBG() {
 	m_fields->bg->setContentWidth(m_fields->screenSize);
 	m_fields->bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
 	m_fields->bg->setID("background");
+	if (m_fields->dialog) {
+		m_fields->characterSprite->setZOrder(m_fields->bg->getZOrder() + 1);
+		m_fields->characterSprite->setPosition({ m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 65, m_fields->bg->getPositionY() });
 
+		m_fields->characterSprite->setID("character-sprite"_spr);
+		m_fields->mainLayer->addChild(m_fields->characterSprite);
+	}
 	m_fields->mainLayer->addChild(m_fields->bg);
 }
 
-void MyFLAlertLayer::changeButtons() {
+void DeltaruneAlertLayer::changeButtons() {
 	if (!m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
 	m_buttonMenu->setVisible(false);
@@ -46,25 +52,34 @@ void MyFLAlertLayer::changeButtons() {
 		}
 	}
 }
-void MyFLAlertLayer::changeTitle() {
+void DeltaruneAlertLayer::changeTitle() {
 	m_fields->title->setAnchorPoint(CCPoint{ 0, 0.5 });
 	static_cast<CCLabelBMFont*>(m_fields->title)->setFntFile("Determination.fnt"_spr);
 	m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 }
-void MyFLAlertLayer::changeText() {
+void DeltaruneAlertLayer::changeText() {
 	m_fields->textAreaClippingNode->removeFromParent();
+	int xOffset = 0;
+	auto star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+	star->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + xOffset + 120);
+	star->setPositionY(110);
+	star->setID("star"_spr);
+	if (m_fields->dialog) {
+		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
+	}
 	auto newDesc = TextArea::create(
 		m_fields->text,
 		"Determination.fnt"_spr,
 		1,
-		m_fields->screenSize - 100,
+		m_fields->screenSize - 100 - xOffset,
 		CCPoint{ 0, 1 },
 		m_fields->textSize,
 		false
 	);
+
 	newDesc->setContentWidth(m_fields->screenSize);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
-	newDesc->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24);
+	newDesc->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24 + xOffset);
 	newDesc->setPositionY(110);
 	newDesc->setZOrder(m_fields->textAreaClippingNode->getZOrder());
 	newDesc->setID("content-text-area");
@@ -73,14 +88,14 @@ void MyFLAlertLayer::changeText() {
 		m_fields->text,
 		"DeterminationGradient.fnt"_spr,
 		1,
-		m_fields->screenSize - 100,
+		m_fields->screenSize - 100 - xOffset,
 		CCPoint{ 0, 1 },
 		m_fields->textSize,
 		false
 	);
 	newDescGrad->setContentWidth(m_fields->screenSize);
 	newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
-	newDescGrad->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24);
+	newDescGrad->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24 + xOffset);
 	newDescGrad->setPositionY(110);
 	newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
 	newDescGrad->setID("gradient-overlay"_spr);
@@ -101,6 +116,8 @@ void MyFLAlertLayer::changeText() {
 			letter->setVisible(false);
 		}
 	}
+	if (m_fields->dialog)
+		m_fields->mainLayer->addChild(star);
 
 	auto clippingNode = CCClippingNode::create(CCLayerColor::create({ 0,0,0,0 }, m_fields->bg->getContentWidth(), m_fields->bg->getContentHeight() - 20));
 	clippingNode->setID("content-text-area"_spr);
@@ -112,9 +129,9 @@ void MyFLAlertLayer::changeText() {
 	m_fields->textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
-	schedule(schedule_selector(MyFLAlertLayer::rollText), pause / 30);
+	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
-void MyFLAlertLayer::changeLook() {
+void DeltaruneAlertLayer::changeLook() {
 	if (!m_fields->bg) return;
 	if (!m_fields->title) return;
 	if (!m_fields->textAreaClippingNode) return;
@@ -125,7 +142,7 @@ void MyFLAlertLayer::changeLook() {
 	changeTitle();
 	changeText();
 }
-void MyFLAlertLayer::addHeart(CCNode* parent, CCLabelBMFont* label) {
+void DeltaruneAlertLayer::addHeart(CCNode* parent, CCLabelBMFont* label) {
 	if (parent->getChildByID("heart")) {
 		parent->getChildByID("heart")->removeFromParentAndCleanup(true);
 	}
