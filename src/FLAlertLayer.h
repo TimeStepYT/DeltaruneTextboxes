@@ -3,24 +3,22 @@
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
 		bool dialog = false;
-#ifdef GEODE_IS_ANDROID || GEODE_IS_MACOS // I want this binding for Windows pls
 		CCSpriteGrayscale* characterSprite;
-#else
-		CCSprite* characterSprite;
-#endif
 		bool doneRolling = false;
 		bool rolledPage = false;
 		int waitQueue = 0;
 		int rollingLine = 0;
 		int linesProgressed = 0;
+		bool playedSound = false;
 		int characterCount = 0;
 		bool done = false;
-		gd::string text = "";
+		std::string text = "";
+		std::string textSound = SETTING(std::string, "textSound");
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		int textSize = 36;
 		int btnSelected = 0;
-		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
-		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
+		bool dontRestrictWidth = SETTING(bool, "dontRestrictWidth");
+		bool disableClickToProgress = SETTING(bool, "disableClickToProgress");
 		CCNode* mainLayer;
 		CCNode* btn1;
 		CCNode* btn2;
@@ -28,7 +26,10 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* textArea;
 		CCNode* gradientOverlay;
 		CCNode* bg;
-		CCNode* title;
+		CCLabelBMFont* title;
+		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
+		FMOD::Channel* channel;
+		FMOD::Sound* sound;
 	};
 	void changeBG();
 	void changeButtons();

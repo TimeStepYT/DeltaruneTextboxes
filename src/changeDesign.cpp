@@ -1,6 +1,25 @@
 #include "include.h"
 #include "FLAlertLayer.h"
 
+void capitalize(std::string& str) {
+	bool disable = false;
+	for (char& c : str) {
+		char next = *(&c + 1);
+		if (c == '<') {
+			if (next == 'c' || next == 'd' || next == '/') {
+				disable = true;
+				continue;
+			}
+		}
+		else if (c == '>') {
+			disable = false;
+			continue;
+		}
+		if (disable) continue;
+		c = toupper(c);
+	}
+}
+
 void DeltaruneAlertLayer::changeBG() {
 	m_fields->bg->removeFromParent();
 
@@ -61,55 +80,75 @@ void DeltaruneAlertLayer::changeText() {
 	m_fields->textAreaClippingNode->removeFromParent();
 	int xOffset = 0;
 	auto star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-	star->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + xOffset + 120);
+	auto str = m_fields->text;
+	auto screenSize = m_fields->screenSize;
+	auto titleString = std::string_view(m_fields->title->getString());
+	auto bg = m_fields->bg;
+	star->setPositionX(m_fields->bg->getPositionX() - screenSize / 2 + xOffset + 120);
 	star->setPositionY(110);
 	star->setID("star"_spr);
 	if (m_fields->dialog) {
 		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
+		if (titleString == "The Mechanic") m_fields->textSound = "Alphys";
+		else if (titleString == "Scratch") m_fields->textSound = "Lancer";
+		else if (titleString == "The Shopkeeper") m_fields->textSound = "Spamton";
+		else if (titleString == "Potbor") m_fields->textSound = "Spamton NEO";
+		else if (titleString == "Diamond Shopkeeper") m_fields->textSound = "Papyrus";
+		else if (titleString == "The Keymaster") m_fields->textSound = "Susie";
+	}
+	auto sound = m_fields->textSound;
+	std::string font = "Determination.fnt"_spr;
+	if (sound == "Sans") font = "ComicSans.fnt"_spr;
+	if (sound == "Papyrus") {
+		font = "Papyrus.fnt"_spr;
+		capitalize(str);
 	}
 	auto newDesc = TextArea::create(
-		m_fields->text,
-		"Determination.fnt"_spr,
+		str,
+		font.c_str(),
 		1,
-		m_fields->screenSize - 100 - xOffset,
+		screenSize - 100 - xOffset,
 		CCPoint{ 0, 1 },
 		m_fields->textSize,
 		false
 	);
 
-	newDesc->setContentWidth(m_fields->screenSize);
+	newDesc->setContentWidth(screenSize);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
-	newDesc->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24 + xOffset);
+	newDesc->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 	newDesc->setPositionY(110);
 	newDesc->setZOrder(m_fields->textAreaClippingNode->getZOrder());
 	newDesc->setID("content-text-area");
 
-	auto newDescGrad = TextArea::create(
-		m_fields->text,
-		"DeterminationGradient.fnt"_spr,
-		1,
-		m_fields->screenSize - 100 - xOffset,
-		CCPoint{ 0, 1 },
-		m_fields->textSize,
-		false
-	);
-	newDescGrad->setContentWidth(m_fields->screenSize);
-	newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
-	newDescGrad->setPositionX(m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 24 + xOffset);
-	newDescGrad->setPositionY(110);
-	newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
-	newDescGrad->setID("gradient-overlay"_spr);
+	TextArea* newDescGrad = nullptr;
+	if (!SETTING(bool, "noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
+		newDescGrad = TextArea::create(
+			m_fields->text,
+			"DeterminationGradient.fnt"_spr,
+			1,
+			screenSize - 100 - xOffset,
+			CCPoint{ 0, 1 },
+			m_fields->textSize,
+			false
+		);
+		newDescGrad->setContentWidth(screenSize);
+		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
+		newDescGrad->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
+		newDescGrad->setPositionY(110);
+		newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
+		newDescGrad->setID("gradient-overlay"_spr);
 
-	CCArrayExt<CCLabelBMFont*> linesGrad = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
-	CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
-
-	for (auto line : linesGrad) {
-		CCArrayExt<CCSprite*> letters = line->getChildren();
-		for (auto letter : letters) {
-			letter->setColor(ccColor3B{ 255, 255, 255 });
-			letter->setVisible(false);
+		CCArrayExt<CCLabelBMFont*> linesGrad = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
+		for (auto line : linesGrad) {
+			CCArrayExt<CCSprite*> letters = line->getChildren();
+			for (auto letter : letters) {
+				letter->setColor(ccColor3B{ 255, 255, 255 });
+				letter->setVisible(false);
+			}
 		}
 	}
+	CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(newDesc->getChildren()->objectAtIndex(0))->getChildren();
+
 	for (auto line : lines) {
 		CCArrayExt<CCSprite*> letters = line->getChildren();
 		for (auto letter : letters) {
@@ -119,16 +158,18 @@ void DeltaruneAlertLayer::changeText() {
 	if (m_fields->dialog)
 		m_fields->mainLayer->addChild(star);
 
-	auto clippingNode = CCClippingNode::create(CCLayerColor::create({ 0,0,0,0 }, m_fields->bg->getContentWidth(), m_fields->bg->getContentHeight() - 20));
+	auto rect = CCLayerColor::create({ 0,0,0,0 }, bg->getContentWidth(), bg->getContentHeight() - 20);
+	auto clippingNode = CCClippingNode::create(rect);
 	clippingNode->setID("content-text-area"_spr);
 	clippingNode->setPositionY(10);
 	clippingNode->addChild(newDesc);
-	clippingNode->addChild(newDescGrad);
+	if (newDescGrad)
+		clippingNode->addChild(newDescGrad);
 	m_fields->mainLayer->addChild(clippingNode);
 	m_fields->textAreaClippingNode = clippingNode;
 	m_fields->textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
-	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
+	float pause = SETTING(double, "textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::changeLook() {
