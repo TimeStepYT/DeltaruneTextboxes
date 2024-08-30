@@ -18,20 +18,23 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	textScale = 1;
 	m_noElasticity = true;
 
+	log::info("initing");
 	if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
+	log::info("inited");
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
-
-	if (m_fields->mainLayer = getChildByID("main-layer")) {
+	m_fields->mainLayer = getChildByID("main-layer");
+	if (m_fields->mainLayer) {
 		if (m_buttonMenu) {
 			m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
 			m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
 		}
-		m_fields->textAreaClippingNode = m_fields->mainLayer->getChildByID("content-text-area");
+		m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
 		m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
 	}
+	log::info("set fields");
 	return true;
 }
 void DeltaruneAlertLayer::showButtons() {
@@ -66,7 +69,9 @@ int DeltaruneAlertLayer::getLinesLeft() {
 	return content.size() - m_fields->linesProgressed;
 }
 void DeltaruneAlertLayer::show() {
+	log::info("this is showing right");
 	FLAlertLayer::show();
+	log::info("was it");
 	int numOfSiblings = 0;
 	if (auto parent = getParent()) {
 		CCArrayExt<CCNode*> siblings = parent->getChildren();
@@ -80,8 +85,9 @@ void DeltaruneAlertLayer::show() {
 		blockKeys = true;
 	else
 		blockKeys = false;
-
+	log::info("it should change look now");
 	changeLook();
+	log::info("did it finish");
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (!m_fields->done && !m_fields->disableClickToProgress) {
