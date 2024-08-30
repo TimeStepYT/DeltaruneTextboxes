@@ -77,7 +77,10 @@ void DeltaruneAlertLayer::changeTitle() {
 	m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 }
 void DeltaruneAlertLayer::changeText() {
-	m_fields->textAreaClippingNode->removeFromParent();
+	if (!m_fields->textArea) {
+		log::info("changeText can't area the text");
+	}
+	m_fields->textArea->removeFromParent();
 	int xOffset = 0;
 	auto star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 	auto str = m_fields->text;
@@ -117,7 +120,7 @@ void DeltaruneAlertLayer::changeText() {
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
 	newDesc->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 	newDesc->setPositionY(110);
-	newDesc->setZOrder(m_fields->textAreaClippingNode->getZOrder());
+	newDesc->setZOrder(m_fields->textArea->getZOrder());
 	newDesc->setID("content-text-area");
 
 	TextArea* newDescGrad = nullptr;
@@ -135,7 +138,7 @@ void DeltaruneAlertLayer::changeText() {
 		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
 		newDescGrad->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 		newDescGrad->setPositionY(110);
-		newDescGrad->setZOrder(m_fields->textAreaClippingNode->getZOrder() + 1);
+		newDescGrad->setZOrder(m_fields->textArea->getZOrder() + 1);
 		newDescGrad->setID("gradient-overlay"_spr);
 
 		CCArrayExt<CCLabelBMFont*> linesGrad = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
@@ -173,11 +176,22 @@ void DeltaruneAlertLayer::changeText() {
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::changeLook() {
-	if (!m_fields->bg) return;
-	if (!m_fields->title) return;
-	if (!m_fields->textAreaClippingNode) return;
-	if (!m_fields->mainLayer) return;
-
+	if (!m_fields->bg) {
+		log::info("No BG");
+		return;
+	}
+	if (!m_fields->title) {
+		log::info("No title");
+		return;
+	}
+	if (!m_fields->textArea) {
+		log::info("No textArea");
+		return;
+	}
+	if (!m_fields->mainLayer) {
+		log::info("No mainLayer");
+		return;
+	}
 	changeBG();
 	changeButtons();
 	changeTitle();
