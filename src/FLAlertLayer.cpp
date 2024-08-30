@@ -3,10 +3,14 @@
 
 bool blockKeys = false;
 
+float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float range) { // thanks cvolton for this amazing name
+	return static_cast<float>(rand() % static_cast<int>(range * 100 + 1)) / 100.f - (range / 2.f);
+}
+
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
 	if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
 		m_fields->screenSize = 569;
-
+	std::srand(std::time(NULL));
 	width = m_fields->screenSize;
 	m_fields->text = desc;
 	height = 140;
@@ -26,7 +30,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 		}
 		m_fields->textAreaClippingNode = m_fields->mainLayer->getChildByID("content-text-area");
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
-		m_fields->title = m_fields->mainLayer->getChildByID("title");
+		m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
 	}
 	return true;
 }
@@ -130,6 +134,11 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 		skipText();
 		return;
 	}
+	// else if (key == enumKeyCodes::KEY_G) {
+	// 	CCSprite* e = nullptr;
+	// 	static_cast<CCSprite*>(e->getChildByID("crashmepls"))->getTexture();
+	// 	return;
+	// }
 	else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
 		if (!m_fields->mainLayer || !m_fields->btn2 || !m_fields->doneRolling) {
 			FLAlertLayer::keyDown(key);
@@ -239,18 +248,20 @@ void DeltaruneAlertLayer::progressText() {
 		offset = 2;
 	m_fields->linesProgressed += offset;
 	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
-	m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
+	if (m_fields->gradientOverlay)
+		m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
 
 	if (m_fields->btn2 && getLinesLeft() < 3) {
 		m_fields->done = true;
 		m_buttonMenu->setVisible(true);
 	}
-	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
+	float pause = SETTING(double, "textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::rollText(float dt) {
 	if (m_fields->waitQueue != 0) {
 		m_fields->waitQueue--;
+		m_fields->playedSound = false;
 		return;
 	}
 	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
@@ -310,6 +321,41 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		m_fields->characterCount = 0;
 		m_fields->rollingLine++;
 	}
-	if (playSound)
-		FMODAudioEngine::sharedEngine()->playEffect("SND_TXT1.wav"_spr);
+	if (playSound) {
+		if (m_fields->playedSound) {
+			m_fields->playedSound = false;
+			return;
+		}
+		float pitch = 1;
+		m_fields->playedSound = true;
+		std::string sound = "";
+		auto character = m_fields->textSound;
+		if (character == "Default") sound = "SND_TXT1";
+		else if (character == "Typewriter") sound = "SND_TXT2";
+		else if (character == "Toriel") sound = "snd_txttor";
+		else if (character == "Sans") sound = "snd_txtsans";
+		else if (character == "Papyrus") sound = "snd_txtpap";
+		else if (character == "Undyne") sound = "snd_txtund";
+		else if (character == "Alphys") sound = "snd_txtal";
+		else if (character == "Asgore") sound = "snd_txtasg";
+		else if (character == "Asriel") sound = "snd_txtasr";
+		else if (character == "Susie") sound = "snd_txtsus";
+		else if (character == "Ralsei") sound = "snd_txtral";
+		else if (character == "Lancer") sound = "snd_txtlan";
+		else if (character == "Noelle") sound = "snd_txtnoe";
+		else if (character == "Berdly") sound = "snd_txtber";
+		else if (character == "Spamton") sound = "snd_txtspam";
+		else if (character == "Spamton NEO") sound = "snd_txtspam2";
+		else if (character == "Jevil") sound = "snd_txtjok";
+		else if (character == "Queen") {
+			sound = "snd_txtq";
+			pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
+		}
+		std::string path = fmt::format("{}/{}.wav", Mod::get()->getResourcesDir().string(), sound);
+		m_fields->system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &(m_fields->sound));
+		m_fields->system->playSound(m_fields->sound, nullptr, false, &(m_fields->channel));
+		m_fields->channel->setPitch(pitch);
+		m_fields->channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
+	}
+	else m_fields->playedSound = false;
 }

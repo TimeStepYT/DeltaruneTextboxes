@@ -1,3 +1,5 @@
+### 0.4.1
+- Different character text sounds and fonts
 ### 0.4.0
 - Support for DialogLayer
 ### 0.3.0
@@ -6,8 +8,6 @@
 - Made the text roll out like in the original game (including the sound)
 - Added a mod icon!
 - Licensed under GLGPLv2.1 license
-### 0.2.2
-- Crashfix and bugfix
 ### 0.2.0
 - Choices.
 ### 0.1.0

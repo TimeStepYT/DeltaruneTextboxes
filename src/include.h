@@ -5,7 +5,11 @@
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/DialogLayer.hpp>
+#include <vector>
+#include <random>
 
 using namespace geode::prelude;
 
 extern bool blockKeys;
+
+#define SETTING(type, key) Mod::get()->getSettingValue<type>(key)

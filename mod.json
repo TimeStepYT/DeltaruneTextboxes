@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v0.4.0",
+    "version": "v0.4.1",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -26,6 +26,14 @@
             "Determination": {
                 "size": 78,
                 "path": "resources/determination-extended.ttf"
+            },
+            "ComicSans": {
+                "size": 78,
+                "path": "resources/comic-sans-pixel.ttf"
+            },
+            "Papyrus": {
+                "size": 78,
+                "path": "resources/papyrus-pixel.ttf"
             }
         },
         "files": [
@@ -35,7 +43,25 @@
             "resources/DeterminationGradient-uhd.png",
             "resources/DeterminationGradient-hd.png",
             "resources/DeterminationGradient.png",
-            "resources/SND_TXT1.wav"
+            "resources/SND_TXT1.wav",
+            "resources/SND_TXT2.wav",
+            "resources/snd_txtal.wav",
+            "resources/snd_txtasg.wav",
+            "resources/snd_txtasr.wav",
+            "resources/snd_txtsans.wav",
+            "resources/snd_txtpap.wav",
+            "resources/snd_txtund.wav",
+            "resources/snd_txttor.wav",
+            "resources/snd_txtsus.wav",
+            "resources/snd_txtral.wav",
+            "resources/snd_txtlan.wav",
+            "resources/snd_txtnoe.wav",
+            "resources/snd_txtber.wav",
+            "resources/snd_txtjok.wav",
+            "resources/snd_txtspam.wav",
+            "resources/snd_txtspam2.wav",
+            "resources/snd_txtq.wav",
+            "resources/snd_txtq2.wav"
         ]
     },
     "settings": {
@@ -52,6 +78,12 @@
             "description": "Disables <cy>clicking</c> to progress textboxes",
             "platforms": ["win", "macos"]
         },
+        "noGradientOverlay": {
+            "name": "Disable gradient",
+            "type": "bool",
+            "default": false,
+            "description": "<cr>Disables</c> the <cy>gradient</c> that you can see on <cj>colored text</c>"
+        },
         "textRollingPause": {
             "name": "Text Rolling Pause",
             "type": "float",
@@ -59,6 +91,32 @@
             "max": 5,
             "default": 1,
             "description": "How many <cy>30th</c>s of a second it should <cj>pause</c> between characters for the <cg>rolling effect</c>"
+        },
+        "textSound": {
+            "name": "Text Sound",
+            "type": "string",
+            "default": "Default",
+            "description": "The <cy>sound</c> that plays for <cj>every letter</c> when rolling out",
+            "one-of": [
+                "Default",
+                "Typewriter",
+                "Toriel",
+                "Sans",
+                "Papyrus",
+                "Undyne",
+                "Alphys",
+                "Asgore",
+                "Asriel",
+                "Susie",
+                "Ralsei",
+                "Lancer",
+                "Jevil",
+                "Noelle",
+                "Berdly",
+                "Queen",
+                "Spamton",
+                "Spamton NEO"
+            ]
         }
     }
 }
