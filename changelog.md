@@ -1,3 +1,5 @@
+### 0.4.2
+- Readd gradient overlay fnt for Medium quality (it was there once, idk how it disappeared)
 ### 0.4.1
 - Different character text sounds and fonts
 ### 0.4.0

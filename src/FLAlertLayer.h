@@ -13,12 +13,12 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int characterCount = 0;
 		bool done = false;
 		std::string text = "";
-		std::string textSound = SETTING(std::string, "textSound");
+		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		int textSize = 36;
 		int btnSelected = 0;
-		bool dontRestrictWidth = SETTING(bool, "dontRestrictWidth");
-		bool disableClickToProgress = SETTING(bool, "disableClickToProgress");
+		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
+		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
 		CCNode* mainLayer;
 		CCNode* btn1;
 		CCNode* btn2;
@@ -47,6 +47,6 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
-	bool ccTouchBegan(CCTouch*, CCEvent*);
-	void keyDown(enumKeyCodes);
+	bool ccTouchBegan(CCTouch*, CCEvent*) override;
+	void keyDown(enumKeyCodes) override;
 };

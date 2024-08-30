@@ -5,5 +5,4 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 		DialogObject* p0;
 	};
 	bool init(DialogObject*, CCArray*, int);
-	void displayDialogObject(DialogObject*);
 };
