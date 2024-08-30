@@ -61,7 +61,8 @@
             "resources/snd_txtspam.wav",
             "resources/snd_txtspam2.wav",
             "resources/snd_txtq.wav",
-            "resources/snd_txtq2.wav"
+            "resources/snd_txtq2.wav",
+            "resources/g.jpg"
         ]
     },
     "settings": {
