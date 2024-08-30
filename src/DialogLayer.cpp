@@ -19,7 +19,3 @@ bool DeltaruneDialogLayer::init(DialogObject* p0, CCArray* p1, int p2) {
 		});
 	return true;
 }
-
-void DeltaruneDialogLayer::displayDialogObject(DialogObject* p0) {
-	DialogLayer::displayDialogObject(p0);
-}

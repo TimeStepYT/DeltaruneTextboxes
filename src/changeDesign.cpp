@@ -39,7 +39,7 @@ void DeltaruneAlertLayer::changeBG() {
 }
 
 void DeltaruneAlertLayer::changeButtons() {
-	if (!m_buttonMenu) return;
+	if (!this->m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
 	m_buttonMenu->setVisible(false);
 
@@ -77,9 +77,7 @@ void DeltaruneAlertLayer::changeTitle() {
 	m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
 }
 void DeltaruneAlertLayer::changeText() {
-	if (!m_fields->textArea) {
-		log::info("changeText can't area the text");
-	}
+	if (!m_fields->textArea) return;
 	m_fields->textArea->removeFromParent();
 	int xOffset = 0;
 	auto star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
@@ -124,7 +122,7 @@ void DeltaruneAlertLayer::changeText() {
 	newDesc->setID("content-text-area");
 
 	TextArea* newDescGrad = nullptr;
-	if (!SETTING(bool, "noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
+	if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
 		newDescGrad = TextArea::create(
 			m_fields->text,
 			"DeterminationGradient.fnt"_spr,
@@ -172,26 +170,14 @@ void DeltaruneAlertLayer::changeText() {
 	m_fields->textAreaClippingNode = clippingNode;
 	m_fields->textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
-	float pause = SETTING(double, "textRollingPause");
+	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::changeLook() {
-	if (!m_fields->bg) {
-		log::info("No BG");
-		return;
-	}
-	if (!m_fields->title) {
-		log::info("No title");
-		return;
-	}
-	if (!m_fields->textArea) {
-		log::info("No textArea");
-		return;
-	}
-	if (!m_fields->mainLayer) {
-		log::info("No mainLayer");
-		return;
-	}
+	if (!m_fields->bg) return;
+	if (!m_fields->title) return;
+	if (!m_fields->textArea) return;
+	if (!m_fields->mainLayer) return;
 	changeBG();
 	changeButtons();
 	changeTitle();

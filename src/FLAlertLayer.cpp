@@ -16,17 +16,15 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	height = 140;
 	scroll = false;
 	textScale = 1;
-	m_noElasticity = true;
 
-	log::info("initing");
 	if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
-	log::info("inited");
+	this->m_noElasticity = true;
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
 	m_fields->mainLayer = getChildByID("main-layer");
 	if (m_fields->mainLayer) {
-		if (m_buttonMenu) {
+		if (this->m_buttonMenu) {
 			m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
 			m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
 		}
@@ -34,13 +32,12 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 		m_fields->bg = m_fields->mainLayer->getChildByID("background");
 		m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
 	}
-	log::info("set fields");
 	return true;
 }
 void DeltaruneAlertLayer::showButtons() {
 	if (m_fields->btn2 && getLinesLeft() < 3 && m_fields->doneRolling) {
 		m_fields->done = true;
-		m_buttonMenu->setVisible(true);
+		this->m_buttonMenu->setVisible(true);
 	}
 }
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
@@ -69,9 +66,7 @@ int DeltaruneAlertLayer::getLinesLeft() {
 	return content.size() - m_fields->linesProgressed;
 }
 void DeltaruneAlertLayer::show() {
-	log::info("this is showing right");
 	FLAlertLayer::show();
-	log::info("was it");
 	int numOfSiblings = 0;
 	if (auto parent = getParent()) {
 		CCArrayExt<CCNode*> siblings = parent->getChildren();
@@ -85,9 +80,7 @@ void DeltaruneAlertLayer::show() {
 		blockKeys = true;
 	else
 		blockKeys = false;
-	log::info("it should change look now");
 	changeLook();
-	log::info("did it finish");
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (!m_fields->done && !m_fields->disableClickToProgress) {
@@ -98,7 +91,7 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	}
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 	if (!m_fields->mainLayer) return ret;
-	if (!m_buttonMenu) return ret;
+	if (!this->m_buttonMenu) return ret;
 	CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_buttonMenu->getChildren();
 	bool selected = false;
 	for (auto button : buttons) {
@@ -259,9 +252,9 @@ void DeltaruneAlertLayer::progressText() {
 
 	if (m_fields->btn2 && getLinesLeft() < 3) {
 		m_fields->done = true;
-		m_buttonMenu->setVisible(true);
+		this->m_buttonMenu->setVisible(true);
 	}
-	float pause = SETTING(double, "textRollingPause");
+	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::rollText(float dt) {

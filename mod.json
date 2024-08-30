@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v0.4.1",
+    "version": "v0.4.2",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -61,7 +61,6 @@
             "resources/snd_txtspam.wav",
             "resources/snd_txtspam2.wav",
             "resources/snd_txtq.wav",
-            "resources/snd_txtq2.wav",
             "resources/g.jpg"
         ]
     },

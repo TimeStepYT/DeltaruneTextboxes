@@ -11,5 +11,3 @@
 using namespace geode::prelude;
 
 extern bool blockKeys;
-
-#define SETTING(type, key) Mod::get()->getSettingValue<type>(key)
