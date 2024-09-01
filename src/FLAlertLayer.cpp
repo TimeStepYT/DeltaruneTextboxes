@@ -18,7 +18,6 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
-	m_fields->mainLayer = getChildByID("main-layer");
 	if (Loader::get()->isModLoaded("firee.prism")) {
 		if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
 			m_fields->incompatible = true;
@@ -28,9 +27,9 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	this->m_noElasticity = true;
 	m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
 	m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
-	m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
-	m_fields->bg = m_fields->mainLayer->getChildByID("background");
-	m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
+	m_fields->textArea = this->m_mainLayer->getChildByID("content-text-area");
+	m_fields->bg = this->m_mainLayer->getChildByID("background");
+	m_fields->title = static_cast<CCLabelBMFont*>(this->m_mainLayer->getChildByID("title"));
 	Loader::get()->queueInMainThread([this] {
 		if (m_fields->incompatible) return;
 		if (m_fields->showing) return;
@@ -38,7 +37,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 		if (!m_fields->bg) return;
 		if (!m_fields->title) return;
 		if (!m_fields->textArea) return;
-		if (!m_fields->mainLayer) return;
+		if (!this->m_mainLayer) return;
 
 		m_fields->showing = true;
 		decideToBlockKeys();
@@ -112,7 +111,7 @@ void DeltaruneAlertLayer::show() {
 	if (!m_fields->bg) return;
 	if (!m_fields->title) return;
 	if (!m_fields->textArea) return;
-	if (!m_fields->mainLayer) return;
+	if (!this->m_mainLayer) return;
 
 	decideToBlockKeys();
 	changeLook();
@@ -132,7 +131,7 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 			skipText();
 	}
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
-	if (!m_fields->mainLayer) return ret;
+	if (!this->m_mainLayer) return ret;
 	if (!this->m_buttonMenu) return ret;
 	CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_buttonMenu->getChildren();
 	bool selected = false;
@@ -185,7 +184,7 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 	// 	return;
 	// }
 	else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
-		if (!m_fields->mainLayer || !m_fields->btn2 || !m_fields->doneRolling) {
+		if (!this->m_mainLayer || !m_fields->btn2 || !m_fields->doneRolling) {
 			FLAlertLayer::keyDown(key);
 			return;
 		}
@@ -249,7 +248,7 @@ void DeltaruneAlertLayer::skipText() {
 	if (m_fields->doneRolling) showButtons();
 }
 void DeltaruneAlertLayer::progressText() {
-	if (!m_fields->mainLayer) return;
+	if (!this->m_mainLayer) return;
 	if (!m_buttonMenu) return;
 	if (!m_fields->textAreaClippingNode) return;
 	if (!m_fields->textArea) return;
@@ -275,7 +274,8 @@ void DeltaruneAlertLayer::progressText() {
 	// move EVERYTHING up
 	int offset;
 	if (m_fields->dialog)
-		m_fields->mainLayer->getChildByID("star"_spr)->setVisible(false);
+		this->m_mainLayer->getChildByID("star"_spr)->setVisible(false);
+		this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
 
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
@@ -289,6 +289,8 @@ void DeltaruneAlertLayer::progressText() {
 	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
 	if (m_fields->gradientOverlay)
 		m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
+	if (m_fields->shadow)
+		m_fields->shadow->setPositionY(m_fields->textArea->getPositionY() - 1);
 
 	if (m_fields->btn2 && getLinesLeft() < 3) {
 		m_fields->done = true;

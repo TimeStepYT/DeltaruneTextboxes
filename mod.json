@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.0.1",
+    "version": "v1.1.0",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -83,6 +83,12 @@
             "type": "bool",
             "default": false,
             "description": "<cr>Disables</c> the <cy>gradient</c> that you can see on <cj>colored text</c>"
+        },
+        "noShadow": {
+            "name": "Disable shadow",
+            "description": "<cr>Disables</c> the <cp>shadow</c> <cy>behind the text</c>",
+            "type": "bool",
+            "default": false
         },
         "textRollingPause": {
             "name": "Text Rolling Pause",
