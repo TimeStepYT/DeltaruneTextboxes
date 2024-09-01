@@ -1,3 +1,6 @@
+### v1.1.1
+- Crashfix
+
 ### v1.1.0
 - Fix text being cut off on wider screens while having restrict width on
 - Fix weirdness with Prism Menu

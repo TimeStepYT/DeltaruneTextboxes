@@ -82,7 +82,7 @@ void DeltaruneAlertLayer::changeText() {
 	if (!m_fields->textArea) return;
 	m_fields->textArea->removeFromParent();
 
-	bool noShadow = Mod::get()->getSettingValue<bool>("noShadow");
+	bool noShadow = Mod::get()->getSettingValue<bool>("noShadow") || m_fields->textSound == "Sans" || m_fields->textSound == "Papyrus";
 
 	CCLabelBMFont* star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 	CCLabelBMFont* starShadow = nullptr;
