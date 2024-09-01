@@ -116,7 +116,6 @@ void DeltaruneAlertLayer::changeText() {
 
 	newDesc->setContentWidth(screenSize);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
-	newDesc->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 	newDesc->setPositionY(110);
 	newDesc->setZOrder(m_fields->textArea->getZOrder());
 	newDesc->setID("content-text-area");
@@ -134,7 +133,6 @@ void DeltaruneAlertLayer::changeText() {
 		);
 		newDescGrad->setContentWidth(screenSize);
 		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
-		newDescGrad->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 		newDescGrad->setPositionY(110);
 		newDescGrad->setZOrder(m_fields->textArea->getZOrder() + 1);
 		newDescGrad->setID("gradient-overlay"_spr);
@@ -163,6 +161,7 @@ void DeltaruneAlertLayer::changeText() {
 	auto clippingNode = CCClippingNode::create(rect);
 	clippingNode->setID("content-text-area"_spr);
 	clippingNode->setPositionY(10);
+	clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 	clippingNode->addChild(newDesc);
 	if (newDescGrad)
 		clippingNode->addChild(newDescGrad);
@@ -174,10 +173,6 @@ void DeltaruneAlertLayer::changeText() {
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::changeLook() {
-	if (!m_fields->bg) return;
-	if (!m_fields->title) return;
-	if (!m_fields->textArea) return;
-	if (!m_fields->mainLayer) return;
 	changeBG();
 	changeButtons();
 	changeTitle();

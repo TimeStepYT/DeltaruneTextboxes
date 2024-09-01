@@ -1,3 +1,10 @@
+### v1.1.0
+- [x] Fix text being cut off on wider screens while having restrict width on
+- [x] Fix weirdness with Prism Menu
+- [ ] Fix weirdness with Death Tracker
+- [ ] Add drop shadow layer that is barely noticable
+- [ ] Add star to non dialog as well
+
 ### v1.0.0
 - Different character text sounds and fonts
 - Support for DialogLayer
