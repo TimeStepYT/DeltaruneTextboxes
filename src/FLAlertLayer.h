@@ -2,6 +2,7 @@
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool incompatible = false;
 		bool dialog = false;
 		CCSpriteGrayscale* characterSprite;
 		bool doneRolling = false;

@@ -11,19 +11,22 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
 		m_fields->screenSize = 569;
 	std::srand(std::time(NULL));
-	width = m_fields->screenSize;
 	m_fields->text = desc;
-	height = 140;
 	scroll = false;
-	textScale = 1;
 
 	if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
-	this->m_noElasticity = true;
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
 	m_fields->mainLayer = getChildByID("main-layer");
 	if (m_fields->mainLayer) {
+		if (Loader::get()->isModLoaded("firee.prism")) {
+			if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
+				m_fields->incompatible = true;
+				return true;
+			}
+		}
+		this->m_noElasticity = true;
 		if (this->m_buttonMenu) {
 			m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
 			m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
@@ -41,6 +44,10 @@ void DeltaruneAlertLayer::showButtons() {
 	}
 }
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
+	if (m_fields->incompatible) {
+		FLAlertLayer::onBtn2(sender);
+		return;
+	}
 	if (!m_fields->done) {
 		progressText();
 		return;
@@ -52,6 +59,10 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 		FLAlertLayer::onBtn1(sender);
 }
 void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
+	if (m_fields->incompatible) {
+		FLAlertLayer::onBtn1(sender);
+		return;
+	}
 	if (!m_fields->done) {
 		progressText();
 		return;
@@ -67,6 +78,14 @@ int DeltaruneAlertLayer::getLinesLeft() {
 }
 void DeltaruneAlertLayer::show() {
 	FLAlertLayer::show();
+
+	if (m_fields->incompatible) return;
+
+	if (!m_fields->bg) return;
+	if (!m_fields->title) return;
+	if (!m_fields->textArea) return;
+	if (!m_fields->mainLayer) return;
+
 	int numOfSiblings = 0;
 	if (auto parent = getParent()) {
 		CCArrayExt<CCNode*> siblings = parent->getChildren();
@@ -83,6 +102,8 @@ void DeltaruneAlertLayer::show() {
 	changeLook();
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
+	if (m_fields->incompatible) return FLAlertLayer::ccTouchBegan(touch, event);
+
 	if (!m_fields->done && !m_fields->disableClickToProgress) {
 		if (m_fields->rolledPage)
 			progressText();
@@ -124,6 +145,10 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	return ret;
 }
 void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
+	if (m_fields->incompatible) {
+		FLAlertLayer::keyDown(key);
+		return;
+	}
 	if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::KEY_Y /*screw QWERTZ*/ || key == enumKeyCodes::CONTROLLER_A) {
 		if (m_fields->rolledPage)
 			progressText();
