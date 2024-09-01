@@ -51,10 +51,12 @@ void DeltaruneAlertLayer::changeButtons() {
 	CCArrayExt<CCNode*> buttons = m_buttonMenu->getChildren();
 
 	auto heart = CCSprite::create("heart.png"_spr);
-	heart->setPositionX(-m_fields->btn1->getPositionX() + static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->getPositionX());
-	heart->setPositionY(m_fields->btn1->getPositionY() + m_fields->btn1->getContentHeight() / 2);
-	heart->setID("heart");
-	static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0))->addChild(heart);
+	heart->setVisible(false);
+	heart->setPositionY(this->m_buttonMenu->getPositionY());
+	heart->setPositionX(this->m_buttonMenu->getPositionX());
+	heart->setID("heart"_spr);
+	m_fields->mainLayer->addChild(heart);
+	m_fields->heart = heart;
 
 	for (auto button : buttons) {
 		if (button != typeinfo_cast<CCMenuItemSpriteExtra*>(button)) continue;
@@ -79,15 +81,12 @@ void DeltaruneAlertLayer::changeTitle() {
 void DeltaruneAlertLayer::changeText() {
 	if (!m_fields->textArea) return;
 	m_fields->textArea->removeFromParent();
-	int xOffset = 0;
 	auto star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 	auto str = m_fields->text;
 	auto screenSize = m_fields->screenSize;
 	auto titleString = std::string_view(m_fields->title->getString());
 	auto bg = m_fields->bg;
-	star->setPositionX(m_fields->bg->getPositionX() - screenSize / 2 + xOffset + 120);
-	star->setPositionY(110);
-	star->setID("star"_spr);
+	int xOffset = star->getContentWidth();
 	if (m_fields->dialog) {
 		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
 		if (titleString == "The Mechanic") m_fields->textSound = "Alphys";
@@ -97,6 +96,9 @@ void DeltaruneAlertLayer::changeText() {
 		else if (titleString == "Diamond Shopkeeper") m_fields->textSound = "Papyrus";
 		else if (titleString == "The Keymaster") m_fields->textSound = "Susie";
 	}
+	star->setPositionX(m_fields->bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
+	star->setPositionY(110);
+	star->setID("star"_spr);
 	auto sound = m_fields->textSound;
 	std::string font = "Determination.fnt"_spr;
 	if (sound == "Sans") font = "ComicSans.fnt"_spr;
@@ -154,8 +156,7 @@ void DeltaruneAlertLayer::changeText() {
 			letter->setVisible(false);
 		}
 	}
-	if (m_fields->dialog)
-		m_fields->mainLayer->addChild(star);
+	m_fields->mainLayer->addChild(star);
 
 	auto rect = CCLayerColor::create({ 0,0,0,0 }, bg->getContentWidth(), bg->getContentHeight() - 20);
 	auto clippingNode = CCClippingNode::create(rect);
@@ -177,14 +178,4 @@ void DeltaruneAlertLayer::changeLook() {
 	changeButtons();
 	changeTitle();
 	changeText();
-}
-void DeltaruneAlertLayer::addHeart(CCNode* parent, CCLabelBMFont* label) {
-	if (parent->getChildByID("heart")) {
-		parent->getChildByID("heart")->removeFromParentAndCleanup(true);
-	}
-	auto heart = CCSprite::create("heart.png"_spr);
-	heart->setAnchorPoint(CCPoint{ 1, 0.5 });
-	heart->setPosition(CCPoint{ label->getPositionX() - 5 - label->getContentWidth() / 2, label->getPositionY() - 2 });
-	heart->setID("heart");
-	parent->addChild(heart);
 }

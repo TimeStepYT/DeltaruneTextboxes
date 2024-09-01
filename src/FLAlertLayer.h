@@ -2,6 +2,7 @@
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool showing = false;
 		bool incompatible = false;
 		bool dialog = false;
 		CCSpriteGrayscale* characterSprite;
@@ -27,6 +28,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* textArea;
 		CCNode* gradientOverlay;
 		CCNode* bg;
+		CCSprite* heart;
 		CCLabelBMFont* title;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
@@ -37,11 +39,12 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void changeTitle();
 	void changeText();
 	void changeLook();
-	void addHeart(CCNode*, CCLabelBMFont*);
+	void decideToBlockKeys();
 	void show() override;
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();
+	void setHeartPosition(CCNode*);
 	int getLinesLeft();
 	void skipText();
 	void progressText();

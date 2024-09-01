@@ -19,30 +19,57 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
 	m_fields->mainLayer = getChildByID("main-layer");
-	if (m_fields->mainLayer) {
-		if (Loader::get()->isModLoaded("firee.prism")) {
-			if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
-				m_fields->incompatible = true;
-				return true;
-			}
+	if (Loader::get()->isModLoaded("firee.prism")) {
+		if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
+			m_fields->incompatible = true;
+			return true;
 		}
-		this->m_noElasticity = true;
-		if (this->m_buttonMenu) {
-			m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
-			m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
-		}
-		m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
-		m_fields->bg = m_fields->mainLayer->getChildByID("background");
-		m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
 	}
+	this->m_noElasticity = true;
+	m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
+	m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
+	m_fields->textArea = m_fields->mainLayer->getChildByID("content-text-area");
+	m_fields->bg = m_fields->mainLayer->getChildByID("background");
+	m_fields->title = static_cast<CCLabelBMFont*>(m_fields->mainLayer->getChildByID("title"));
+	Loader::get()->queueInMainThread([this] {
+		if (m_fields->incompatible) return;
+		if (m_fields->showing) return;
+
+		if (!m_fields->bg) return;
+		if (!m_fields->title) return;
+		if (!m_fields->textArea) return;
+		if (!m_fields->mainLayer) return;
+
+		m_fields->showing = true;
+		decideToBlockKeys();
+		changeLook();
+		});
 	return true;
 }
 void DeltaruneAlertLayer::showButtons() {
 	if (m_fields->btn2 && getLinesLeft() < 3 && m_fields->doneRolling) {
 		m_fields->done = true;
 		this->m_buttonMenu->setVisible(true);
+		m_fields->heart->setVisible(true);
 	}
 }
+
+void DeltaruneAlertLayer::decideToBlockKeys() {
+	int numOfSiblings = 0;
+	if (auto parent = getParent()) {
+		CCArrayExt<CCNode*> siblings = parent->getChildren();
+
+		for (auto sibling : siblings) {
+			if (sibling->getID() == "FLAlertLayer")
+				numOfSiblings++;
+		}
+	}
+	if (numOfSiblings >= 1 && !m_fields->btn2)
+		blockKeys = true;
+	else
+		blockKeys = false;
+}
+
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 	if (m_fields->incompatible) {
 		FLAlertLayer::onBtn2(sender);
@@ -78,7 +105,8 @@ int DeltaruneAlertLayer::getLinesLeft() {
 }
 void DeltaruneAlertLayer::show() {
 	FLAlertLayer::show();
-
+	if (m_fields->showing) return;
+	m_fields->showing = true;
 	if (m_fields->incompatible) return;
 
 	if (!m_fields->bg) return;
@@ -86,20 +114,13 @@ void DeltaruneAlertLayer::show() {
 	if (!m_fields->textArea) return;
 	if (!m_fields->mainLayer) return;
 
-	int numOfSiblings = 0;
-	if (auto parent = getParent()) {
-		CCArrayExt<CCNode*> siblings = parent->getChildren();
-
-		for (auto sibling : siblings) {
-			if (sibling->getID() == "FLAlertLayer")
-				numOfSiblings++;
-		}
-	}
-	if (numOfSiblings >= 1 && !m_fields->btn2)
-		blockKeys = true;
-	else
-		blockKeys = false;
+	decideToBlockKeys();
 	changeLook();
+}
+void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
+	auto heart = m_fields->heart;
+	auto btnMenu = this->m_buttonMenu;
+	heart->setPositionX(btnMenu->getPositionX() + button->getPositionX() - button->getContentWidth() / 2);
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (m_fields->incompatible) return FLAlertLayer::ccTouchBegan(touch, event);
@@ -127,17 +148,17 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (button->isSelected()) {
 					label->setColor(ccColor3B{ 255, 255, 0 });
-					addHeart(parent, label);
-					if (button->getID() == "button-1")
+					if (button->getID() == "button-1") {
 						m_fields->btnSelected = 1;
-					else if (button->getID() == "button-2")
+						setHeartPosition(m_fields->btn1);
+					}
+					else if (button->getID() == "button-2") {
 						m_fields->btnSelected = 2;
+						setHeartPosition(m_fields->btn2);
+					}
 				}
 				else if (selected) {
 					label->setColor(ccColor3B{ 255,255,255 });
-					auto heart = parent->getChildByID("heart");
-					if (heart)
-						heart->removeFromParentAndCleanup(true);
 				}
 			}
 		}
@@ -175,14 +196,11 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
 					m_fields->btnSelected = 1;
-					addHeart(parent, label);
 					label->setColor(ccColor3B{ 255,255,0 });
+					setHeartPosition(m_fields->btn1);
 				}
 				else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
 					label->setColor(ccColor3B{ 255,255,255 });
-					auto heart = parent->getChildByID("heart");
-					if (heart)
-						heart->removeFromParentAndCleanup(true);
 				}
 			}
 		}
@@ -192,14 +210,11 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
 					label->setColor(ccColor3B{ 255,255,255 });
-					auto heart = parent->getChildByID("heart");
-					if (heart)
-						heart->removeFromParentAndCleanup(true);
 				}
 				else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
 					m_fields->btnSelected = 2;
-					addHeart(parent, label);
 					label->setColor(ccColor3B{ 255,255,0 });
+					setHeartPosition(m_fields->btn2);
 				}
 			}
 		}
