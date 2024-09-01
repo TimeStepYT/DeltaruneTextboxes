@@ -133,7 +133,8 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
 	if (!this->m_mainLayer) return ret;
 	if (!this->m_buttonMenu) return ret;
-	CCArrayExt<CCMenuItemSpriteExtra*> buttons = m_buttonMenu->getChildren();
+	if (!m_fields->btn1) return ret;
+	CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->m_buttonMenu->getChildren();
 	bool selected = false;
 	for (auto button : buttons) {
 		if (button->isSelected()) {
@@ -273,9 +274,8 @@ void DeltaruneAlertLayer::progressText() {
 
 	// move EVERYTHING up
 	int offset;
-	if (m_fields->dialog)
-		this->m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-		this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
+	this->m_mainLayer->getChildByID("star"_spr)->setVisible(false);
+	this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
 
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
@@ -285,6 +285,21 @@ void DeltaruneAlertLayer::progressText() {
 		offset = 3;
 	else if (getLinesLeft() == 3)
 		offset = 2;
+
+	auto fontNode = (CCNode*) m_fields->textArea->getChildren()->objectAtIndex(0);
+	while (true) {
+		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(m_fields->linesProgressed + offset);
+		std::string topLineString = topLine->getString();
+		std::string noSpaceTopLineString = "";
+		std::for_each(topLineString.begin(), topLineString.end(), [&](char c) {
+			if (c != ' ') noSpaceTopLineString += c;
+			});
+		log::info("{}", noSpaceTopLineString);
+		if (noSpaceTopLineString != "") break;
+		offset++;
+		this->m_mainLayer->getChildByID("star"_spr)->setVisible(true);
+		if (!m_fields->noShadow) this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+	}
 	m_fields->linesProgressed += offset;
 	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
 	if (m_fields->gradientOverlay)

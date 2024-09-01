@@ -1,3 +1,8 @@
+### v1.1.2
+- Fix star not fully disappearing
+- Prevent the first line from being empty
+- Animated corner pixels :D
+
 ### v1.1.1
 - Crashfix
 

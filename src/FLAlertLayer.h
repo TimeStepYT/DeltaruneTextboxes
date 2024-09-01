@@ -2,13 +2,16 @@
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool reverseAnim = false;
 		bool showing = false;
 		bool incompatible = false;
 		bool dialog = false;
+		bool noShadow = false;
 		CCSpriteGrayscale* characterSprite;
 		bool doneRolling = false;
 		bool rolledPage = false;
 		int waitQueue = 0;
+		int frame = 0;
 		int rollingLine = 0;
 		int linesProgressed = 0;
 		bool playedSound = false;
@@ -34,6 +37,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		FMOD::Channel* channel;
 		FMOD::Sound* sound;
 	};
+	void animateBG(float);
 	void changeBG();
 	void changeButtons();
 	void changeTitle();
