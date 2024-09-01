@@ -21,7 +21,14 @@
         }
     ],
     "resources": {
-        "sprites": ["resources/deltaruneSquare.png", "resources/heart.png"],
+        "sprites": [
+            "resources/deltaruneSquare_0.png", 
+            "resources/deltaruneSquare_1.png", 
+            "resources/deltaruneSquare_2.png", 
+            "resources/deltaruneSquare_3.png", 
+            "resources/deltaruneSquare_4.png", 
+            "resources/heart.png"
+        ],
         "fonts": {
             "Determination": {
                 "size": 78,
