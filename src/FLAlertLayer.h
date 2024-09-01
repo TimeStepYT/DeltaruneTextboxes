@@ -21,12 +21,12 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int btnSelected = 0;
 		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
-		CCNode* mainLayer;
 		CCNode* btn1;
 		CCNode* btn2;
 		CCNode* textAreaClippingNode;
 		CCNode* textArea;
 		CCNode* gradientOverlay;
+		CCNode* shadow;
 		CCNode* bg;
 		CCSprite* heart;
 		CCLabelBMFont* title;
