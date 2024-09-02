@@ -66,7 +66,7 @@ void DeltaruneAlertLayer::changeButtons() {
 	m_buttonMenu->setPositionY(32);
 	m_buttonMenu->setVisible(false);
 
-	if (!m_fields->btn2) return;
+	if (!m_fields->hasChoice) return;
 
 	m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
 	m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);

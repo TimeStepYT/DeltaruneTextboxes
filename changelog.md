@@ -1,3 +1,6 @@
+### v1.1.3
+- Hypothetical fix for buttons not showing up again
+- Mod comments support
 ### v1.1.2
 - Fix star not fully disappearing
 - Prevent the first line from being empty
