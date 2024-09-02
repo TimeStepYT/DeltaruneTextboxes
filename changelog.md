@@ -1,5 +1,5 @@
 ### v1.1.3
-- Hypothetical fix for buttons not showing up again
+- Finally fixed choices not showing up
 - Mod comments support
 ### v1.1.2
 - Fix star not fully disappearing
