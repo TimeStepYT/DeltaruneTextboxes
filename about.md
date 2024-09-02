@@ -12,4 +12,4 @@ If you want to suggest a feature, create an issue on github or ping me on discor
 ## Special Thanks
 <cr>prevter</c>: Answered my stupid questions, and helped a lot!
 
-captainfalcon.2000: Reported a bug where choices don't appear, which never happened to me.
+JOHNNYENGLISH1: Reported a bug where choices don't appear, which never happened to me.
