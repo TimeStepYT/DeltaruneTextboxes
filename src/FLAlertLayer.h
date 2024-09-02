@@ -2,7 +2,6 @@
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
-		bool hasChoice = false;
 		bool reverseAnim = false;
 		bool showing = false;
 		bool incompatible = false;

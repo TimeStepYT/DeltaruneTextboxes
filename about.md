@@ -7,3 +7,9 @@ You can <cj>advance</c> the text by pressing <cy>Z</c>, <cy>Enter</c> or by </cy
 You can <cj>skip</c> the text by pressing <cy>X</c> or <cy>tapping</c>/<cy>clicking</c> while the text rolls out!
 
 If you want to suggest a feature, create an issue on github or ping me on discord (@timestepyt)
+
+
+## Special Thanks
+<cr>prevter</c>: Answered my stupid questions, and helped a lot!
+
+captainfalcon.2000: Reported a bug where choices don't appear, which never happened to me.
