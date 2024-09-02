@@ -25,7 +25,7 @@ void DeltaruneAlertLayer::animateBG(float dt) {
 	int& frame = m_fields->frame;
 	bool& reverseAnim = m_fields->reverseAnim;
 
-	this->m_mainLayer->getChildByIDRecursive("background")->removeFromParentAndCleanup(true);
+	m_mainLayer->getChildByIDRecursive("background")->removeFromParentAndCleanup(true);
 	bg = CCScale9Sprite::create(fmt::format("deltaruneSquare_{}.png"_spr, frame).c_str());
 	bg->setContentHeight(140);
 	bg->setContentWidth(m_fields->screenSize);
@@ -33,7 +33,7 @@ void DeltaruneAlertLayer::animateBG(float dt) {
 	bg->setID("background");
 	bg->setZOrder(-1);
 
-	this->m_mainLayer->addChild(bg);
+	m_mainLayer->addChild(bg);
 
 	if (reverseAnim) frame--;
 	else frame++;
@@ -42,47 +42,52 @@ void DeltaruneAlertLayer::animateBG(float dt) {
 }
 
 void DeltaruneAlertLayer::changeBG() {
-	m_fields->bg->removeFromParentAndCleanup(true);
-	m_fields->bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
-	m_fields->bg->setContentHeight(140);
-	m_fields->bg->setContentWidth(m_fields->screenSize);
-	m_fields->bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
-	m_fields->bg->setID("background");
-	m_fields->bg->setZOrder(-1);
+	auto& bg = m_fields->bg;
+	auto const screenSize = m_fields->screenSize;
+	auto& character = m_fields->characterSprite;
+	bg->removeFromParentAndCleanup(true);
+	bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
+	bg->setContentHeight(140);
+	bg->setContentWidth(screenSize);
+	bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
+	bg->setID("background");
+	bg->setZOrder(-1);
 	schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
 
 	if (m_fields->dialog) {
-		m_fields->characterSprite->setZOrder(m_fields->bg->getZOrder() + 1);
-		m_fields->characterSprite->setPosition({ m_fields->bg->getPositionX() - m_fields->screenSize / 2 + 65, m_fields->bg->getPositionY() });
+		character->setZOrder(bg->getZOrder() + 1);
+		character->setPosition({ bg->getPositionX() - screenSize / 2 + 65, bg->getPositionY() });
 
-		m_fields->characterSprite->setID("character-sprite"_spr);
-		this->m_mainLayer->addChild(m_fields->characterSprite);
+		character->setID("character-sprite"_spr);
+		m_mainLayer->addChild(character);
 	}
-	this->m_mainLayer->addChild(m_fields->bg);
+	m_mainLayer->addChild(bg);
 }
 
 void DeltaruneAlertLayer::changeButtons() {
-	if (!this->m_buttonMenu) return;
+	if (!m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
 	m_buttonMenu->setVisible(false);
 
-	if (!m_fields->hasChoice) return;
-
-	m_fields->btn1->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + m_fields->screenSize / 4);
-	m_fields->btn2->setPositionX(m_fields->bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 + (m_fields->screenSize / 4) * 3);
+	if (!m_button2) return;
+	auto& bg = m_fields->bg;
+	float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2;
+	m_fields->btn1->setPositionX(positionStart + m_fields->screenSize / 4);
+	m_fields->btn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
 
 	CCArrayExt<CCNode*> buttons = m_buttonMenu->getChildren();
 
 	auto heart = CCSprite::create("heart.png"_spr);
 	heart->setVisible(false);
-	heart->setPositionY(this->m_buttonMenu->getPositionY());
-	heart->setPositionX(this->m_buttonMenu->getPositionX());
+	heart->setPositionY(m_buttonMenu->getPositionY());
+	heart->setPositionX(m_buttonMenu->getPositionX());
 	heart->setID("heart"_spr);
-	this->m_mainLayer->addChild(heart);
+	m_mainLayer->addChild(heart);
 	m_fields->heart = heart;
 
 	for (auto button : buttons) {
-		if (button != typeinfo_cast<CCMenuItemSpriteExtra*>(button)) continue;
+		auto confirmedButton = typeinfo_cast<CCMenuItemSpriteExtra*>(button);
+		if (button != confirmedButton) continue;
 		static_cast<CCMenuItemSpriteExtra*>(button)->m_animationEnabled = false;
 		CCArrayExt<CCNode*> parts = static_cast<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren();
 		for (auto part : parts) {
@@ -97,84 +102,94 @@ void DeltaruneAlertLayer::changeButtons() {
 	}
 }
 void DeltaruneAlertLayer::changeTitle() {
-	m_fields->title->setAnchorPoint(CCPoint{ 0, 0.5 });
-	static_cast<CCLabelBMFont*>(m_fields->title)->setFntFile("Determination.fnt"_spr);
-	m_fields->title->setPosition(CCPoint{ m_fields->bg->getPositionX() - m_fields->bg->getContentWidth() / 2 + 24, 145 });
+	CCLabelBMFont*& title = m_fields->title;
+	auto& bg = m_fields->bg;
+	title->setAnchorPoint(CCPoint{ 0, 0.5 });
+	title->setFntFile("Determination.fnt"_spr);
+	title->setPosition(CCPoint{ bg->getPositionX() - bg->getContentWidth() / 2 + 24, 145 });
 }
 void DeltaruneAlertLayer::changeText() {
-	if (!m_fields->textArea) return;
-	m_fields->textArea->removeFromParent();
+	auto& textArea = m_fields->textArea;
+	if (!textArea) return;
+	textArea->removeFromParent();
 
-	m_fields->noShadow = Mod::get()->getSettingValue<bool>("noShadow") || m_fields->textSound == "Sans" || m_fields->textSound == "Papyrus";
+	auto& sound = m_fields->textSound;
+	auto& size = m_fields->textSize;
+	bool& noShadow = m_fields->noShadow;
+
+	noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
 
 	CCLabelBMFont* star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 	CCLabelBMFont* starShadow = nullptr;
-	if (!m_fields->noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+	if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+
 	auto str = m_fields->text;
 	auto screenSize = m_fields->screenSize;
 	auto titleString = std::string_view(m_fields->title->getString());
-	auto bg = m_fields->bg;
+	auto& bg = m_fields->bg;
+
 	int xOffset = star->getContentWidth();
+
 	if (m_fields->dialog) {
 		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
-		if (titleString == "The Mechanic") m_fields->textSound = "Alphys";
-		else if (titleString == "Scratch") m_fields->textSound = "Lancer";
-		else if (titleString == "The Shopkeeper") m_fields->textSound = "Spamton";
-		else if (titleString == "Potbor") m_fields->textSound = "Spamton NEO";
-		else if (titleString == "Diamond Shopkeeper") m_fields->textSound = "Papyrus";
-		else if (titleString == "The Keymaster") m_fields->textSound = "Susie";
+		if (titleString == "The Mechanic") sound = "Alphys";
+		else if (titleString == "Scratch") sound = "Lancer";
+		else if (titleString == "The Shopkeeper") sound = "Spamton";
+		else if (titleString == "Potbor") sound = "Spamton NEO";
+		else if (titleString == "Diamond Shopkeeper") sound = "Papyrus";
+		else if (titleString == "The Keymaster") sound = "Susie";
 	}
-	star->setPositionX(m_fields->bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
+	star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
 	star->setPositionY(110);
 	star->setZOrder(1);
 	star->setID("star"_spr);
-	if (!m_fields->noShadow) {
-		starShadow->setPositionX(m_fields->bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
+	if (!noShadow) {
+		starShadow->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
 		starShadow->setPositionY(109);
 		starShadow->setZOrder(0);
 		starShadow->setID("starShadow"_spr);
 		auto character = (CCSprite*) starShadow->getChildren()->objectAtIndex(0);
 		character->setColor({ 15, 15, 127 });
 	}
-	auto sound = m_fields->textSound;
 	std::string font = "Determination.fnt"_spr;
 	if (sound == "Sans") font = "ComicSans.fnt"_spr;
 	if (sound == "Papyrus") {
 		font = "Papyrus.fnt"_spr;
 		capitalize(str);
 	}
+	float creatingWidth = screenSize - 100 - xOffset * 2;
 	auto newDesc = TextArea::create(
 		str,
 		font.c_str(),
 		1,
-		screenSize - 100 - xOffset,
+		creatingWidth,
 		CCPoint{ 0, 1 },
-		m_fields->textSize,
+		size,
 		false
 	);
 
 	newDesc->setContentWidth(screenSize);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
 	newDesc->setPositionY(110);
-	newDesc->setZOrder(m_fields->textArea->getZOrder());
+	newDesc->setZOrder(textArea->getZOrder());
 	newDesc->setID("content-text-area");
 
 	TextArea* newDescGrad = nullptr;
 	TextArea* newDescShad = nullptr;
 	if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
 		newDescGrad = TextArea::create(
-			m_fields->text,
+			str,
 			"DeterminationGradient.fnt"_spr,
 			1,
-			screenSize - 100 - xOffset,
+			creatingWidth,
 			CCPoint{ 0, 1 },
-			m_fields->textSize,
+			size,
 			false
 		);
 		newDescGrad->setContentWidth(screenSize);
 		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
 		newDescGrad->setPositionY(110);
-		newDescGrad->setZOrder(m_fields->textArea->getZOrder() + 1);
+		newDescGrad->setZOrder(textArea->getZOrder() + 1);
 		newDescGrad->setID("gradient-overlay"_spr);
 
 		CCArrayExt<CCLabelBMFont*> linesGrad = static_cast<CCNode*>(newDescGrad->getChildren()->objectAtIndex(0))->getChildren();
@@ -186,21 +201,21 @@ void DeltaruneAlertLayer::changeText() {
 			}
 		}
 	}
-	if (!m_fields->noShadow) {
+	if (!noShadow) {
 		newDescShad = TextArea::create(
-			m_fields->text,
+			str,
 			font.c_str(),
 			1,
-			screenSize - 100 - xOffset,
+			creatingWidth,
 			CCPoint{ 0, 1 },
-			m_fields->textSize,
+			size,
 			false
 		);
 		newDescShad->setContentWidth(screenSize);
 		newDescShad->setAnchorPoint(CCPoint{ 0, 1 });
 		newDescShad->setPositionY(109);
 		newDescShad->setPositionX(newDescShad->getPositionX() + 1);
-		newDescShad->setZOrder(m_fields->textArea->getZOrder() - 1);
+		newDescShad->setZOrder(textArea->getZOrder() - 1);
 		newDescShad->setID("shadow"_spr);
 
 		CCArrayExt<CCLabelBMFont*> linesShad = static_cast<CCNode*>(newDescShad->getChildren()->objectAtIndex(0))->getChildren();
@@ -241,8 +256,8 @@ void DeltaruneAlertLayer::changeText() {
 			letter->setVisible(false);
 		}
 	}
-	this->m_mainLayer->addChild(star);
-	if (!m_fields->noShadow) this->m_mainLayer->addChild(starShadow);
+	m_mainLayer->addChild(star);
+	if (!noShadow) m_mainLayer->addChild(starShadow);
 
 	auto rect = CCLayerColor::create({ 0,0,0,0 }, bg->getContentWidth(), bg->getContentHeight() - 20);
 	auto clippingNode = CCClippingNode::create(rect);
@@ -251,10 +266,10 @@ void DeltaruneAlertLayer::changeText() {
 	clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
 	clippingNode->addChild(newDesc);
 	if (newDescGrad) clippingNode->addChild(newDescGrad);
-	if (!m_fields->noShadow) clippingNode->addChild(newDescShad);
-	this->m_mainLayer->addChild(clippingNode);
+	if (!noShadow) clippingNode->addChild(newDescShad);
+	m_mainLayer->addChild(clippingNode);
 	m_fields->textAreaClippingNode = clippingNode;
-	m_fields->textArea = newDesc;
+	textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
 	m_fields->shadow = newDescShad;
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");

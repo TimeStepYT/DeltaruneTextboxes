@@ -8,12 +8,12 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 }
 
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
-	if (m_fields->screenSize >= 569 && !m_fields->dontRestrictWidth)
-		m_fields->screenSize = 569;
+	float& screenSize = m_fields->screenSize;
+	if (screenSize >= 569 && !m_fields->dontRestrictWidth)
+		screenSize = 569;
 	std::srand(std::time(NULL));
 	m_fields->text = desc;
 	scroll = false;
-	if (btn2) m_fields->hasChoice = true;
 
 	if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
 
@@ -25,23 +25,26 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 			return true;
 		}
 	}
+
+	auto& textArea = m_fields->textArea;
+	auto& bg = m_fields->bg;
+	auto& titleNode = m_fields->title;
+
 	this->m_noElasticity = true;
-	m_fields->btn1 = m_buttonMenu->getChildByID("button-1");
-	m_fields->btn2 = m_buttonMenu->getChildByID("button-2");
-	m_fields->textArea = this->m_mainLayer->getChildByID("content-text-area");
-	m_fields->bg = this->m_mainLayer->getChildByID("background");
-	m_fields->title = static_cast<CCLabelBMFont*>(this->m_mainLayer->getChildByID("title"));
-	Loader::get()->queueInMainThread([this] {
+	m_fields->btn1 = m_button1 ? this->m_button1->getParent() : nullptr;
+	m_fields->btn2 = m_button2 ? this->m_button2->getParent() : nullptr;
+
+	textArea = m_mainLayer->getChildByID("content-text-area");
+	bg = m_mainLayer->getChildByID("background");
+	titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
+	Loader::get()->queueInMainThread([&] {
 		if (m_fields->incompatible) return;
 		if (m_fields->showing) return;
 
-		if (!m_fields->bg) return;
-		if (!m_fields->title) return;
-		if (!m_fields->textArea) return;
-		if (!this->m_mainLayer) return;
-
-		if (m_fields->hasChoice)
-			this->m_button2->getParent()->setID("button-2");
+		if (!bg) return;
+		if (!titleNode) return;
+		if (!textArea) return;
+		if (!m_mainLayer) return;
 
 		m_fields->showing = true;
 		decideToBlockKeys();
@@ -50,9 +53,9 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	return true;
 }
 void DeltaruneAlertLayer::showButtons() {
-	if (m_fields->hasChoice && getLinesLeft() < 3 && m_fields->doneRolling) {
+	if (m_button2 && getLinesLeft() < 3 && m_fields->doneRolling) {
 		m_fields->done = true;
-		this->m_buttonMenu->setVisible(true);
+		m_buttonMenu->setVisible(true);
 		m_fields->heart->setVisible(true);
 	}
 }
@@ -67,7 +70,7 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
 				numOfSiblings++;
 		}
 	}
-	if (numOfSiblings >= 1 && !m_fields->hasChoice)
+	if (numOfSiblings >= 1 && !m_button2)
 		blockKeys = true;
 	else
 		blockKeys = false;
@@ -83,10 +86,11 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 		progressText();
 		return;
 	}
-	if (m_fields->btnSelected == 0) return;
-	if (m_fields->btnSelected == 2)
+	int& btnSelected = m_fields->btnSelected;
+	if (btnSelected == 0) return;
+	if (btnSelected == 2)
 		FLAlertLayer::onBtn2(sender);
-	else if (m_fields->btnSelected == 1)
+	else if (btnSelected == 1)
 		FLAlertLayer::onBtn1(sender);
 }
 void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
@@ -102,32 +106,39 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 	FLAlertLayer::onBtn1(sender);
 }
 int DeltaruneAlertLayer::getLinesLeft() {
+	auto& textArea = m_fields->textArea;
 	if (!m_fields->textAreaClippingNode) return 0;
-	if (!m_fields->textArea) return 0;
-	CCArrayExt<CCLabelBMFont*> content = static_cast<CCNode*>(m_fields->textArea->getChildren()->objectAtIndex(0))->getChildren();
+	if (!textArea) return 0;
+
+	auto bitmapFont = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0));
+	CCArrayExt<CCLabelBMFont*> content = bitmapFont->getChildren();
 	return content.size() - m_fields->linesProgressed;
 }
 void DeltaruneAlertLayer::show() {
+	bool& showing = m_fields->showing;
+	bool& incompatible = m_fields->incompatible;
+	auto& titleNode = m_fields->title;
+
 	FLAlertLayer::show();
-	if (m_fields->showing) return;
-	m_fields->showing = true;
-	if (m_fields->incompatible) return;
+
+	if (showing) return;
+	showing = true;
+	if (incompatible) return;
 
 	if (!m_fields->bg) return;
-	if (!m_fields->title) return;
+	if (!titleNode) return;
 	if (!m_fields->textArea) return;
-	if (!this->m_mainLayer) return;
+	if (!m_mainLayer) return;
 
-	if (m_fields->hasChoice) this->m_button2->getParent()->setID("button-2");
 
-	auto title = std::string_view(m_fields->title->getString());
+	auto title = std::string_view(titleNode->getString());
 
 	if (Loader::get()->isModLoaded("user95401.geode-mod-comments") && (title == "Create Comment" || this->getID() == "finish")) {
 		this->setVisible(false);
-		Loader::get()->queueInMainThread([this] {
+		Loader::get()->queueInMainThread([&] {
 			this->setVisible(true);
-			if (this->m_buttonMenu->getChildByID("input")) {
-				m_fields->incompatible = true;
+			if (m_buttonMenu->getChildByID("input")) {
+				incompatible = true;
 				return;
 			}
 			decideToBlockKeys();
@@ -139,8 +150,7 @@ void DeltaruneAlertLayer::show() {
 	changeLook();
 }
 void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
-	auto heart = m_fields->heart;
-	auto btnMenu = this->m_buttonMenu;
+	auto& heart = m_fields->heart;
 	CCNode* text = nullptr;
 	for (auto node : (CCArrayExt<CCNode*>) static_cast<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren()) {
 		if (auto label = typeinfo_cast<CCLabelBMFont*>(node)) {
@@ -149,7 +159,7 @@ void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
 		}
 	}
 	if (!text) return;
-	heart->setPositionX(btnMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5);
+	heart->setPositionX(m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5);
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (m_fields->incompatible) return FLAlertLayer::ccTouchBegan(touch, event);
@@ -161,9 +171,14 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 			skipText();
 	}
 	bool ret = FLAlertLayer::ccTouchBegan(touch, event);
-	if (!this->m_mainLayer) return ret;
-	if (!this->m_buttonMenu) return ret;
-	if (!m_fields->btn1) return ret;
+	auto& btn1 = m_fields->btn1;
+	auto& btn2 = m_fields->btn2;
+	int& btnSelected = m_fields->btnSelected;
+
+	if (!m_mainLayer) return ret;
+	if (!m_buttonMenu) return ret;
+	if (!btn1) return ret;
+	if (!btn2) return ret;
 	CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->m_buttonMenu->getChildren();
 	bool selected = false;
 	for (auto button : buttons) {
@@ -179,12 +194,12 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 				if (button->isSelected()) {
 					label->setColor(ccColor3B{ 255, 255, 0 });
 					if (button->getID() == "button-1") {
-						m_fields->btnSelected = 1;
-						setHeartPosition(m_fields->btn1);
+						btnSelected = 1;
+						setHeartPosition(btn1);
 					}
 					else if (button->getID() == "button-2") {
-						m_fields->btnSelected = 2;
-						setHeartPosition(m_fields->btn2);
+						btnSelected = 2;
+						setHeartPosition(btn2);
 					}
 				}
 				else if (selected) {
@@ -209,23 +224,18 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 		skipText();
 		return;
 	}
-	// else if (key == enumKeyCodes::KEY_G) {
-	// 	CCSprite* e = nullptr;
-	// 	static_cast<CCSprite*>(e->getChildByID("crashmepls"))->getTexture();
-	// 	return;
-	// }
 	else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
-		if (!this->m_mainLayer || !m_fields->hasChoice || !m_fields->doneRolling) {
+		if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
 			FLAlertLayer::keyDown(key);
 			return;
 		}
 
-		auto parent = static_cast<CCNode*>(m_fields->btn1->getChildren()->objectAtIndex(0));
-		CCArrayExt<CCNode*> partsBtn1 = parent->getChildren();
+		int& btnSelected = m_fields->btnSelected;
+		CCArrayExt<CCNode*> partsBtn1 = m_button1->getChildren();
 		for (auto part : partsBtn1) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
-					m_fields->btnSelected = 1;
+					btnSelected = 1;
 					label->setColor(ccColor3B{ 255,255,0 });
 					setHeartPosition(m_fields->btn1);
 				}
@@ -234,15 +244,14 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 				}
 			}
 		}
-		parent = static_cast<CCNode*>(m_fields->btn2->getChildren()->objectAtIndex(0));
-		CCArrayExt<CCNode*> partsBtn2 = parent->getChildren();
+		CCArrayExt<CCNode*> partsBtn2 = m_button2->getChildren();
 		for (auto part : partsBtn2) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
 					label->setColor(ccColor3B{ 255,255,255 });
 				}
 				else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
-					m_fields->btnSelected = 2;
+					btnSelected = 2;
 					label->setColor(ccColor3B{ 255,255,0 });
 					setHeartPosition(m_fields->btn2);
 				}
@@ -253,12 +262,16 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 }
 void DeltaruneAlertLayer::skipText() {
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-	if (!m_fields->textAreaClippingNode) return;
-	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
+	auto& clippingNode = m_fields->textAreaClippingNode;
+	int& linesProgressed = m_fields->linesProgressed;
+	bool& doneRolling = m_fields->doneRolling;
+
+	if (!clippingNode) return;
+	CCArrayExt<TextArea*> textAreas = clippingNode->getChildren();
 	for (auto textArea : textAreas) {
 		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
 
-		for (int i = m_fields->linesProgressed + m_fields->rollingLine; i < lines.size() && i < m_fields->linesProgressed + 3; i++) {
+		for (int i = linesProgressed + m_fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
 			auto line = lines[i];
 			CCArrayExt<CCNode*> letters = line->getChildren();
 			for (auto letter : letters) {
@@ -268,44 +281,54 @@ void DeltaruneAlertLayer::skipText() {
 	}
 
 	m_fields->rolledPage = true;
-	if (m_fields->hasChoice) {
+	if (m_button2) {
 		if (getLinesLeft() < 3)
-			m_fields->doneRolling = true;
+			doneRolling = true;
 	}
 	else {
 		if (getLinesLeft() <= 3)
-			m_fields->doneRolling = true;
+			doneRolling = true;
 	}
-	if (m_fields->doneRolling) showButtons();
+	if (doneRolling) showButtons();
 }
 void DeltaruneAlertLayer::progressText() {
-	if (!this->m_mainLayer) return;
+	if (!m_mainLayer) return;
 	if (!m_buttonMenu) return;
 	if (!m_fields->textAreaClippingNode) return;
-	if (!m_fields->textArea) return;
+
+	auto& textArea = m_fields->textArea;
+	auto& btn1 = m_fields->btn1;
+	auto& btn2 = m_fields->btn2;
+	auto& shadow = m_fields->shadow;
+	auto& gradientOverlay = m_fields->gradientOverlay;
+	int& btnSelected = m_fields->btnSelected;
+	int& linesProgressed = m_fields->linesProgressed;
+	bool& done = m_fields->done;
+
+	if (!textArea) return;
 
 	if (getLinesLeft() <= 3) {
-		if (!m_fields->hasChoice) {
-			m_fields->done = true;
-			FLAlertLayer::onBtn1(m_fields->btn1);
+		if (!m_button2) {
+			done = true;
+			FLAlertLayer::onBtn1(btn1);
 			return;
 		}
-		else if (m_fields->btnSelected != 0) {
-			m_fields->done = true;
-			if (m_fields->btnSelected == 1)
-				FLAlertLayer::onBtn1(m_fields->btn1);
-			else if (m_fields->btnSelected == 2)
-				FLAlertLayer::onBtn2(m_fields->btn2);
+		else if (btnSelected != 0) {
+			done = true;
+			if (btnSelected == 1)
+				FLAlertLayer::onBtn1(btn1);
+			else if (btnSelected == 2)
+				FLAlertLayer::onBtn2(btn2);
 			return;
 		}
 	}
-	if (getLinesLeft() < 3 && m_fields->hasChoice)
+	if (getLinesLeft() < 3 && m_button2)
 		return;
 
 	// move EVERYTHING up
 	int offset;
-	this->m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-	this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
+	m_mainLayer->getChildByID("star"_spr)->setVisible(false);
+	m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
 
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
@@ -316,64 +339,71 @@ void DeltaruneAlertLayer::progressText() {
 	else if (getLinesLeft() == 3)
 		offset = 2;
 
-	auto fontNode = (CCNode*) m_fields->textArea->getChildren()->objectAtIndex(0);
+	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
 	while (true) {
-		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(m_fields->linesProgressed + offset);
+		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + offset);
 		if (!topLine) break;
 		std::string topLineString = topLine->getString();
 		std::string noSpaceTopLineString = "";
 		std::for_each(topLineString.begin(), topLineString.end(), [&](char c) {
 			if (c != ' ') noSpaceTopLineString += c;
 			});
-		log::info("{}", noSpaceTopLineString);
 		if (noSpaceTopLineString != "") break;
 		offset++;
-		this->m_mainLayer->getChildByID("star"_spr)->setVisible(true);
-		if (!m_fields->noShadow) this->m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
+		if (!m_fields->noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
 	}
-	m_fields->linesProgressed += offset;
-	m_fields->textArea->setPositionY(m_fields->textArea->getPositionY() + m_fields->textSize * offset);
-	if (m_fields->gradientOverlay)
-		m_fields->gradientOverlay->setPositionY(m_fields->textArea->getPositionY());
-	if (m_fields->shadow)
-		m_fields->shadow->setPositionY(m_fields->textArea->getPositionY() - 1);
+	linesProgressed += offset;
+	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * offset);
+	if (gradientOverlay)
+		gradientOverlay->setPositionY(textArea->getPositionY());
+	if (shadow)
+		shadow->setPositionY(textArea->getPositionY() - 1);
 
 	showButtons();
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::rollText(float dt) {
-	if (m_fields->waitQueue != 0) {
-		m_fields->waitQueue--;
-		m_fields->playedSound = false;
+	int& waitQueue = m_fields->waitQueue;
+	int& linesProgressed = m_fields->linesProgressed;
+	int& characterCount = m_fields->characterCount;
+	int& rollingLine = m_fields->rollingLine;
+	bool& playedSound = m_fields->playedSound;
+	bool& doneRolling = m_fields->doneRolling;
+	bool& rolledPage = m_fields->rolledPage;
+
+	if (waitQueue != 0) {
+		waitQueue--;
+		playedSound = false;
 		return;
 	}
 	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
-	if (m_fields->rollingLine == 3) {
+	if (rollingLine == 3) {
 		unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-		m_fields->rolledPage = true;
+		rolledPage = true;
 		return;
 	}
-	else
-		m_fields->rolledPage = false;
+	else rolledPage = false;
+
 	bool newLine = false;
 	bool playSound = true;
 	for (auto textArea : textAreas) {
 		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
-		int i = m_fields->linesProgressed + m_fields->rollingLine;
-		if (i < lines.size() && i < m_fields->linesProgressed + 3) {
+		int i = linesProgressed + rollingLine;
+		if (i < lines.size() && i < linesProgressed + 3) {
 			auto line = lines[i];
 			CCArrayExt<CCNode*> letters = line->getChildren();
-			auto letter = letters[m_fields->characterCount];
+			auto letter = letters[characterCount];
 			if (letter->isVisible()) {
 				unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-				m_fields->doneRolling = true;
-				m_fields->rolledPage = true;
+				doneRolling = true;
+				rolledPage = true;
 				showButtons();
 				return;
 			}
 			letter->setVisible(true);
-			switch (line->getString()[m_fields->characterCount]) {
+			switch (line->getString()[characterCount]) {
 				case ' ':
 					playSound = false;
 					break;
@@ -383,63 +413,66 @@ void DeltaruneAlertLayer::rollText(float dt) {
 				case ';': [[fallthrough]];
 				case '?': [[fallthrough]];
 				case '!':
-					m_fields->waitQueue = 2;
+					waitQueue = 2;
 					break;
 				default:
 					break;
 			}
-			if (m_fields->characterCount == line->getChildrenCount() - 1) {
+			if (characterCount == line->getChildrenCount() - 1) {
 				newLine = true;
 			}
 		}
 		else {
 			unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-			m_fields->doneRolling = true;
-			m_fields->rolledPage = true;
+			doneRolling = true;
+			rolledPage = true;
 			showButtons();
 			return;
 		}
 	}
-	m_fields->characterCount++;
+	characterCount++;
 	if (newLine) {
-		m_fields->characterCount = 0;
-		m_fields->rollingLine++;
+		characterCount = 0;
+		rollingLine++;
 	}
 	if (playSound) {
-		if (m_fields->playedSound) {
-			m_fields->playedSound = false;
+		if (playedSound) {
+			playedSound = false;
 			return;
 		}
 		float pitch = 1;
-		m_fields->playedSound = true;
+		playedSound = true;
 		std::string sound = "";
-		auto character = m_fields->textSound;
-		if (character == "Default") sound = "SND_TXT1";
-		else if (character == "Typewriter") sound = "SND_TXT2";
-		else if (character == "Toriel") sound = "snd_txttor";
-		else if (character == "Sans") sound = "snd_txtsans";
-		else if (character == "Papyrus") sound = "snd_txtpap";
-		else if (character == "Undyne") sound = "snd_txtund";
-		else if (character == "Alphys") sound = "snd_txtal";
-		else if (character == "Asgore") sound = "snd_txtasg";
-		else if (character == "Asriel") sound = "snd_txtasr";
-		else if (character == "Susie") sound = "snd_txtsus";
-		else if (character == "Ralsei") sound = "snd_txtral";
-		else if (character == "Lancer") sound = "snd_txtlan";
-		else if (character == "Noelle") sound = "snd_txtnoe";
-		else if (character == "Berdly") sound = "snd_txtber";
-		else if (character == "Spamton") sound = "snd_txtspam";
-		else if (character == "Spamton NEO") sound = "snd_txtspam2";
-		else if (character == "Jevil") sound = "snd_txtjok";
-		else if (character == "Queen") {
+		if (sound == "Default") sound = "SND_TXT1";
+		else if (sound == "Typewriter") sound = "SND_TXT2";
+		else if (sound == "Toriel") sound = "snd_txttor";
+		else if (sound == "Sans") sound = "snd_txtsans";
+		else if (sound == "Papyrus") sound = "snd_txtpap";
+		else if (sound == "Undyne") sound = "snd_txtund";
+		else if (sound == "Alphys") sound = "snd_txtal";
+		else if (sound == "Asgore") sound = "snd_txtasg";
+		else if (sound == "Asriel") sound = "snd_txtasr";
+		else if (sound == "Susie") sound = "snd_txtsus";
+		else if (sound == "Ralsei") sound = "snd_txtral";
+		else if (sound == "Lancer") sound = "snd_txtlan";
+		else if (sound == "Noelle") sound = "snd_txtnoe";
+		else if (sound == "Berdly") sound = "snd_txtber";
+		else if (sound == "Spamton") sound = "snd_txtspam";
+		else if (sound == "Spamton NEO") sound = "snd_txtspam2";
+		else if (sound == "Jevil") sound = "snd_txtjok";
+		else if (sound == "Queen") {
 			sound = "snd_txtq";
 			pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 		}
 		std::string path = fmt::format("{}/{}.wav", Mod::get()->getResourcesDir().string(), sound);
-		m_fields->system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &(m_fields->sound));
-		m_fields->system->playSound(m_fields->sound, nullptr, false, &(m_fields->channel));
-		m_fields->channel->setPitch(pitch);
-		m_fields->channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
+		auto& system = m_fields->system;
+		auto& fmodSound = m_fields->sound;
+		auto& channel = m_fields->channel;
+
+		system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &fmodSound);
+		system->playSound(fmodSound, nullptr, false, &channel);
+		channel->setPitch(pitch);
+		channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
 	}
-	else m_fields->playedSound = false;
+	else playedSound = false;
 }
