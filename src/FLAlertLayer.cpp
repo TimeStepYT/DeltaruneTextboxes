@@ -193,11 +193,11 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
 				if (button->isSelected()) {
 					label->setColor(ccColor3B{ 255, 255, 0 });
-					if (button->getID() == "button-1") {
+					if (button == btn1) {
 						btnSelected = 1;
 						setHeartPosition(btn1);
 					}
-					else if (button->getID() == "button-2") {
+					else if (button == btn2) {
 						btnSelected = 2;
 						setHeartPosition(btn2);
 					}
