@@ -115,7 +115,9 @@ void DeltaruneAlertLayer::changeText() {
 
 	auto& sound = m_fields->textSound;
 	auto& size = m_fields->textSize;
+	auto& nameToSound = m_fields->nameToSound;
 	bool& noShadow = m_fields->noShadow;
+
 
 	noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
 
@@ -125,19 +127,14 @@ void DeltaruneAlertLayer::changeText() {
 
 	auto str = m_fields->text;
 	auto screenSize = m_fields->screenSize;
-	auto titleString = std::string_view(m_fields->title->getString());
 	auto& bg = m_fields->bg;
+	std::string titleString = m_fields->title->getString();
 
 	int xOffset = star->getContentWidth();
 
 	if (m_fields->dialog) {
+		if (nameToSound.find(titleString.c_str()) != nameToSound.end()) sound = nameToSound[titleString];
 		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
-		if (titleString == "The Mechanic") sound = "Alphys";
-		else if (titleString == "Scratch") sound = "Lancer";
-		else if (titleString == "The Shopkeeper") sound = "Spamton";
-		else if (titleString == "Potbor") sound = "Spamton NEO";
-		else if (titleString == "Diamond Shopkeeper") sound = "Papyrus";
-		else if (titleString == "The Keymaster") sound = "Susie";
 	}
 	star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
 	star->setPositionY(110);
@@ -168,7 +165,7 @@ void DeltaruneAlertLayer::changeText() {
 		false
 	);
 
-	newDesc->setContentWidth(screenSize);
+	newDesc->setContentWidth(creatingWidth);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
 	newDesc->setPositionY(110);
 	newDesc->setZOrder(textArea->getZOrder());
@@ -186,7 +183,7 @@ void DeltaruneAlertLayer::changeText() {
 			size,
 			false
 		);
-		newDescGrad->setContentWidth(screenSize);
+		newDescGrad->setContentWidth(creatingWidth);
 		newDescGrad->setAnchorPoint(CCPoint{ 0, 1 });
 		newDescGrad->setPositionY(110);
 		newDescGrad->setZOrder(textArea->getZOrder() + 1);
@@ -211,7 +208,7 @@ void DeltaruneAlertLayer::changeText() {
 			size,
 			false
 		);
-		newDescShad->setContentWidth(screenSize);
+		newDescShad->setContentWidth(creatingWidth);
 		newDescShad->setAnchorPoint(CCPoint{ 0, 1 });
 		newDescShad->setPositionY(109);
 		newDescShad->setPositionX(newDescShad->getPositionX() + 1);
@@ -228,7 +225,8 @@ void DeltaruneAlertLayer::changeText() {
 				auto origLine = (CCLabelBMFont*) origLinesParent->getChildren()->objectAtIndex(i);
 				auto origChar = (CCSprite*) origLine->getChildren()->objectAtIndex(j);
 				auto color = origChar->getColor();
-				if (color == ccColor3B{ 255,255,255 })	letter->setColor({ 15, 15, 127 });
+
+				if (color == ccColor3B{ 255,255,255 }) letter->setColor({ 15, 15, 127 });
 				else if (color == ccColor3B{ 255, 0, 255 }) letter->setColor({ 76, 0, 76 });
 				else if (color == ccColor3B{ 255, 90, 90 }) letter->setColor({ 76, 0, 0 });
 				else if (color == ccColor3B{ 255, 165, 75 }) letter->setColor({ 76, 38, 18 });
