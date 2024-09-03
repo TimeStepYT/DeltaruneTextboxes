@@ -6,6 +6,8 @@ You can skip the text by pressing X or clicking/tapping on the screen!
 
 Apply using the Geode mod loader!
 
+<img src="resources/screenshot.jpg" alt="[This should show a screenshot]">
+
 ## Sources:
 - Fonts:
 	- [Determination Extended](https://fontstruct.com/fontstructions/show/2460153/determination-40-7)

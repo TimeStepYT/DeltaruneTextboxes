@@ -1,20 +1,21 @@
 ### v1.1.4
 - A little bit of cleanup
 - Crashfix
+- Choices now show two lines of previous text instead of just one
 
-### v1.1.3
-- Finally fixed choices not showing up
-- Mod comments support
+### v1.1.3 (never released)
+- Finally fixed choices not showing up (thanks prevter for having this bug and helping me fix it)
+- Mod comments support (kinda)
 
 ### v1.1.2
 - Fix star not fully disappearing
 - Prevent the first line from being empty
 - Animated corner pixels :D
 
-### v1.1.1
+### v1.1.1 (never released)
 - Crashfix
 
-### v1.1.0
+### v1.1.0 (never released)
 - Fix text being cut off on wider screens while having restrict width on
 - Fix weirdness with Prism Menu
 - Fix weirdness with Death Tracker

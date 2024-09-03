@@ -36,6 +36,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
 		FMOD::Sound* sound;
+		std::unordered_map<std::string, std::string> nameToFile;
+		std::unordered_map<std::string, std::string> nameToSound;
 	};
 	void animateBG(float);
 	void changeBG();
@@ -45,6 +47,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void changeLook();
 	void decideToBlockKeys();
 	void show() override;
+	void initMaps();
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();

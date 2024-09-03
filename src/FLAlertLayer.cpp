@@ -7,6 +7,38 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 	return static_cast<float>(rand() % static_cast<int>(range * 100 + 1)) / 100.f - (range / 2.f);
 }
 
+void DeltaruneAlertLayer::initMaps() {
+	auto& nameToFile = m_fields->nameToFile;
+	auto& nameToSound = m_fields->nameToSound;
+
+	nameToFile["Default"] = "SND_TXT1";
+	nameToFile["Typewriter"] = "SND_TXT2";
+	nameToFile["Toriel"] = "snd_txttor";
+	nameToFile["Sans"] = "snd_txtsans";
+	nameToFile["Papyrus"] = "snd_txtpap";
+	nameToFile["Undyne"] = "snd_txtund";
+	nameToFile["Alphys"] = "snd_txtal";
+	nameToFile["Asgore"] = "snd_txtasg";
+	nameToFile["Asriel"] = "snd_txtasr";
+	nameToFile["Susie"] = "snd_txtsus";
+	nameToFile["Ralsei"] = "snd_txtral";
+	nameToFile["Lancer"] = "snd_txtlan";
+	nameToFile["Noelle"] = "snd_txtnoe";
+	nameToFile["Berdly"] = "snd_txtber";
+	nameToFile["Spamton"] = "snd_txtspam";
+	nameToFile["Spamton NEO"] = "snd_txtspam2";
+	nameToFile["Jevil"] = "snd_txtjok";
+	nameToFile["Queen"] = "snd_txtq";
+
+	nameToSound["The Mechanic"] = "Alphys";
+	nameToSound["The Shopkeeper"] = "Spamton";
+	nameToSound["Scratch"] = "Lancer";
+	nameToSound["Potbor"] = "Spamton NEO";
+	nameToSound["Diamond Shopkeeper"] = "Papyrus";
+	nameToSound["The Keymaster"] = "Susie";
+
+}
+
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
 	float& screenSize = m_fields->screenSize;
 	if (screenSize >= 569 && !m_fields->dontRestrictWidth)
@@ -19,16 +51,19 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
-	if (Loader::get()->isModLoaded("firee.prism")) {
+	if (Loader::get()->isModLoaded("firee.prism")) { // probably the easiest way to detect a Prism Menu alert :3
 		if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
 			m_fields->incompatible = true;
 			return true;
 		}
 	}
 
+
 	auto& textArea = m_fields->textArea;
 	auto& bg = m_fields->bg;
 	auto& titleNode = m_fields->title;
+
+	initMaps(); // for sounds
 
 	this->m_noElasticity = true;
 
@@ -220,7 +255,7 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 			progressText();
 		return;
 	}
-	else if (key == enumKeyCodes::KEY_X || key == enumKeyCodes::KEY_Shift || key == enumKeyCodes::CONTROLLER_B) {
+	else if (key == enumKeyCodes::KEY_X || key == enumKeyCodes::KEY_Space || key == enumKeyCodes::CONTROLLER_B) {
 		skipText();
 		return;
 	}
@@ -321,46 +356,37 @@ void DeltaruneAlertLayer::progressText() {
 		}
 		else if (btnSelected != 0) {
 			done = true;
-			if (btnSelected == 1)
-				FLAlertLayer::onBtn1(btn1);
-			else if (btnSelected == 2)
-				FLAlertLayer::onBtn2(btn2);
+			if (btnSelected == 1) FLAlertLayer::onBtn1(btn1);
+			else if (btnSelected == 2) FLAlertLayer::onBtn2(btn2);
 			return;
 		}
 	}
+	// Don't progress if there's only a choice left!
 	if (getLinesLeft() < 3 && m_button2)
 		return;
 
-	// move EVERYTHING up
-	
-	int offset;
-	
-	m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-	
-	if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
-	
+	// Move EVERYTHING up
 
+	int offset;
+	m_mainLayer->getChildByID("star"_spr)->setVisible(false);
+	if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
 
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
 	m_fields->rollingLine = 0;
 
-
 	if (getLinesLeft() > 3)
 		offset = 3;
 	else if (getLinesLeft() == 3)
-		offset = 2;
-
+		offset = 1;
 
 	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
-
-
 	while (true) {
 		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + offset);
 		if (!topLine) break;
 		std::string topLineString = topLine->getString();
 		std::string noSpaceTopLineString = "";
-		std::for_each(topLineString.begin(), topLineString.end(), [&](char c) {
+		std::for_each(topLineString.begin(), topLineString.end(), [&noSpaceTopLineString](char c) {
 			if (c != ' ') noSpaceTopLineString += c;
 			});
 		if (noSpaceTopLineString != "") break;
@@ -369,20 +395,16 @@ void DeltaruneAlertLayer::progressText() {
 		if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
 	}
 
-
 	linesProgressed += offset;
 	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * offset);
-	if (gradientOverlay)
-		gradientOverlay->setPositionY(textArea->getPositionY());
-	if (shadow)
-		shadow->setPositionY(textArea->getPositionY() - 1);
-
+	if (gradientOverlay) gradientOverlay->setPositionY(textArea->getPositionY());
+	if (shadow) shadow->setPositionY(textArea->getPositionY() - 1);
 
 	showButtons();
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
-	log::info("Finished");
 }
+
 void DeltaruneAlertLayer::rollText(float dt) {
 	int& waitQueue = m_fields->waitQueue;
 	int& linesProgressed = m_fields->linesProgressed;
@@ -454,44 +476,30 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		characterCount = 0;
 		rollingLine++;
 	}
-	if (playSound) {
-		if (playedSound) {
-			playedSound = false;
-			return;
-		}
-		float pitch = 1;
-		playedSound = true;
-		std::string sound = "";
-		if (sound == "Default") sound = "SND_TXT1";
-		else if (sound == "Typewriter") sound = "SND_TXT2";
-		else if (sound == "Toriel") sound = "snd_txttor";
-		else if (sound == "Sans") sound = "snd_txtsans";
-		else if (sound == "Papyrus") sound = "snd_txtpap";
-		else if (sound == "Undyne") sound = "snd_txtund";
-		else if (sound == "Alphys") sound = "snd_txtal";
-		else if (sound == "Asgore") sound = "snd_txtasg";
-		else if (sound == "Asriel") sound = "snd_txtasr";
-		else if (sound == "Susie") sound = "snd_txtsus";
-		else if (sound == "Ralsei") sound = "snd_txtral";
-		else if (sound == "Lancer") sound = "snd_txtlan";
-		else if (sound == "Noelle") sound = "snd_txtnoe";
-		else if (sound == "Berdly") sound = "snd_txtber";
-		else if (sound == "Spamton") sound = "snd_txtspam";
-		else if (sound == "Spamton NEO") sound = "snd_txtspam2";
-		else if (sound == "Jevil") sound = "snd_txtjok";
-		else if (sound == "Queen") {
-			sound = "snd_txtq";
-			pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
-		}
-		std::string path = fmt::format("{}/{}.wav", Mod::get()->getResourcesDir().string(), sound);
-		auto& system = m_fields->system;
-		auto& fmodSound = m_fields->sound;
-		auto& channel = m_fields->channel;
 
-		system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &fmodSound);
-		system->playSound(fmodSound, nullptr, false, &channel);
-		channel->setPitch(pitch);
-		channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
+	auto nameToFile = m_fields->nameToFile;
+	std::string const textSound = m_fields->textSound;
+	std::string const resFolder = Mod::get()->getResourcesDir().string();
+	std::string path = fmt::format("{}/{}.wav", resFolder, nameToFile[textSound]);
+	
+	if (nameToFile.find(textSound) == nameToFile.end()) return;
+
+	if (!playSound || playedSound) {
+		playedSound = false;
+		return;
 	}
-	else playedSound = false;
+	float pitch = 1;
+	playedSound = true;
+
+	auto& system = m_fields->system;
+	auto& channel = m_fields->channel;
+	auto& sound = m_fields->sound;
+
+	if (textSound == "Queen")
+		pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
+
+	system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &sound);
+	system->playSound(sound, nullptr, false, &channel);
+	channel->setPitch(pitch);
+	channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
 }
