@@ -1,6 +1,11 @@
+### v1.1.4
+- A little bit of cleanup
+- Crashfix
+
 ### v1.1.3
 - Finally fixed choices not showing up
 - Mod comments support
+
 ### v1.1.2
 - Fix star not fully disappearing
 - Prevent the first line from being empty

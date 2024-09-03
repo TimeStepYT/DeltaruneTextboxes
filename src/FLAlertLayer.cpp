@@ -31,13 +31,14 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	auto& titleNode = m_fields->title;
 
 	this->m_noElasticity = true;
+
 	m_fields->btn1 = m_button1 ? this->m_button1->getParent() : nullptr;
 	m_fields->btn2 = m_button2 ? this->m_button2->getParent() : nullptr;
 
 	textArea = m_mainLayer->getChildByID("content-text-area");
 	bg = m_mainLayer->getChildByID("background");
 	titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
-	Loader::get()->queueInMainThread([&] {
+	Loader::get()->queueInMainThread([bg, titleNode, textArea, this] {
 		if (m_fields->incompatible) return;
 		if (m_fields->showing) return;
 
@@ -81,7 +82,6 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 		FLAlertLayer::onBtn2(sender);
 		return;
 	}
-	log::info("compatible");
 	if (!m_fields->done) {
 		progressText();
 		return;
@@ -135,10 +135,10 @@ void DeltaruneAlertLayer::show() {
 
 	if (Loader::get()->isModLoaded("user95401.geode-mod-comments") && (title == "Create Comment" || this->getID() == "finish")) {
 		this->setVisible(false);
-		Loader::get()->queueInMainThread([&] {
+		Loader::get()->queueInMainThread([this] {
 			this->setVisible(true);
 			if (m_buttonMenu->getChildByID("input")) {
-				incompatible = true;
+				m_fields->incompatible = true;
 				return;
 			}
 			decideToBlockKeys();
@@ -291,6 +291,11 @@ void DeltaruneAlertLayer::skipText() {
 	}
 	if (doneRolling) showButtons();
 }
+// int step = 0; // funny way to get which line caused the issue on mobile
+// void loggingStep() {
+// 	log::info("{}", step);
+// 	step++;
+// }
 void DeltaruneAlertLayer::progressText() {
 	if (!m_mainLayer) return;
 	if (!m_buttonMenu) return;
@@ -304,6 +309,7 @@ void DeltaruneAlertLayer::progressText() {
 	int& btnSelected = m_fields->btnSelected;
 	int& linesProgressed = m_fields->linesProgressed;
 	bool& done = m_fields->done;
+	bool& noShadow = m_fields->noShadow;
 
 	if (!textArea) return;
 
@@ -326,20 +332,29 @@ void DeltaruneAlertLayer::progressText() {
 		return;
 
 	// move EVERYTHING up
+	
 	int offset;
+	
 	m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-	m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
+	
+	if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
+	
+
 
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	m_fields->characterCount = 0;
 	m_fields->rollingLine = 0;
+
 
 	if (getLinesLeft() > 3)
 		offset = 3;
 	else if (getLinesLeft() == 3)
 		offset = 2;
 
+
 	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
+
+
 	while (true) {
 		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + offset);
 		if (!topLine) break;
@@ -351,8 +366,10 @@ void DeltaruneAlertLayer::progressText() {
 		if (noSpaceTopLineString != "") break;
 		offset++;
 		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
-		if (!m_fields->noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+		if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
 	}
+
+
 	linesProgressed += offset;
 	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * offset);
 	if (gradientOverlay)
@@ -360,9 +377,11 @@ void DeltaruneAlertLayer::progressText() {
 	if (shadow)
 		shadow->setPositionY(textArea->getPositionY() - 1);
 
+
 	showButtons();
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
+	log::info("Finished");
 }
 void DeltaruneAlertLayer::rollText(float dt) {
 	int& waitQueue = m_fields->waitQueue;
