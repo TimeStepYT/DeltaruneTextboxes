@@ -63,7 +63,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 
-	#if defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUT)
+	#if defined(GEODE_IS_MACOS) || defined(GEODE_IS_ANDROID) || defined(DEBUG_MAC_INPUT)
 	void keyDown(enumKeyCodes) override;
 	#else 
 	void initCustomKeybinds();
