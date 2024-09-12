@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.1.5-beta.1",
+    "version": "v1.1.5-beta.2",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -27,6 +27,7 @@
     ],
     "resources": {
         "sprites": [
+            "resources/undertaleSquare.png",
             "resources/deltaruneSquare_0.png",
             "resources/deltaruneSquare_1.png",
             "resources/deltaruneSquare_2.png",
@@ -104,8 +105,15 @@
             "default": false
         },
         "noAnimation": {
+            "enable-if": "!setting:undertaleBG",
             "name": "No Animation",
             "description": "<cr>Disables</c> the <cj>animated background</c>. <cy>(the colors of the corners change)</c>",
+            "type": "bool",
+            "default": false
+        },
+        "undertaleBG": {
+            "name": "Undertale Background",
+            "description": "<cj>Changes the background</c> of the textbox to the <cr>Undertale</c> one",
             "type": "bool",
             "default": false
         },

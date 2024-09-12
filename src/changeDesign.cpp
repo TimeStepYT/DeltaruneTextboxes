@@ -45,15 +45,19 @@ void DeltaruneAlertLayer::changeBG() {
 	auto& bg = m_fields->bg;
 	auto const screenSize = m_fields->screenSize;
 	auto& character = m_fields->characterSprite;
+	auto undertaleBG = Mod::get()->getSettingValue<bool>("undertaleBG");
 	bg->removeFromParentAndCleanup(true);
-	bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
+	if (undertaleBG)
+		bg = CCScale9Sprite::create("undertaleSquare.png"_spr);
+	else
+		bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
 	bg->setContentHeight(140);
 	bg->setContentWidth(screenSize);
 	bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
 	bg->setID("background");
 	bg->setZOrder(-1);
-	
-	if (!Mod::get()->getSettingValue<bool>("noAnimation"))
+
+	if (!Mod::get()->getSettingValue<bool>("noAnimation") && !undertaleBG)
 		schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
 
 	if (m_fields->dialog) {
