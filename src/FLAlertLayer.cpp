@@ -288,7 +288,7 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 void DeltaruneAlertLayer::initCustomKeybinds() {
 	if (m_fields->incompatible) return;
 
-	this->template addEventListener<keybinds::InvokeBindFilter>([=](keybinds::InvokeBindEvent* event) {
+	this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
 		if (event->isDown()) {
 			if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
 				return ListenerResult::Propagate;

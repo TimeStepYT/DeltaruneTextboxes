@@ -1,5 +1,6 @@
 #include "include.h"
 
+#if !defined(GEODE_IS_MACOS) && !defined(DEBUG_MAC_INPUTS)
 $execute{
 	keybinds::BindManager::get()->registerBindable(
 		{
@@ -38,7 +39,7 @@ $execute{
 		}
 	);
 }
-
+#endif
 class $modify(MyHookLol, CCKeyboardDispatcher) {
 	// Needed because BetterInfo has special FLAlertLayers that duplicate for some reason
 	bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool idk) {
