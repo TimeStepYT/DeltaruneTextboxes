@@ -1,7 +1,7 @@
 ### v1.1.5
-[x] Custom Keybinds support for anything but mac because it doesn't work yet apparently
-[x] Animated Background toggler added!
-[ ] Setting to change to Undertale background added!
+- Custom Keybinds support for Windows (other platforms don't work yet)
+- Animated Background toggler added!
+- Setting to change to Undertale background added!
 
 ### v1.1.4
 - A little bit of cleanup
