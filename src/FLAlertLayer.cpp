@@ -67,12 +67,15 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 
 	this->m_noElasticity = true;
 
-	m_fields->btn1 = m_button1 ? this->m_button1->getParent() : nullptr;
-	m_fields->btn2 = m_button2 ? this->m_button2->getParent() : nullptr;
+	m_fields->btn1 = m_button1 ? static_cast<CCMenuItemSpriteExtra*>(m_button1->getParent()) : nullptr;
+	m_fields->btn2 = m_button2 ? static_cast<CCMenuItemSpriteExtra*>(m_button2->getParent()) : nullptr;
 
 	textArea = m_mainLayer->getChildByID("content-text-area");
 	bg = m_mainLayer->getChildByID("background");
 	titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
+#if !defined(GEODE_IS_MACOS) && !defined(DEBUG_MAC_INPUT)
+	initCustomKeybinds();
+#endif
 	Loader::get()->queueInMainThread([bg, titleNode, textArea, this] {
 		if (m_fields->incompatible) return;
 		if (m_fields->showing) return;
@@ -196,6 +199,20 @@ void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
 	if (!text) return;
 	heart->setPositionX(m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5);
 }
+
+void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
+	auto label = getChildOfType<CCLabelBMFont>(buttonSprite, 0);
+	if (!label) {
+		log::info("Where the fuck is the label?");
+		return;
+	}
+	if (btn->isSelected()) {
+		label->setColor(ccColor3B{ 255, 255, 0 });
+		m_fields->btnSelected = btnSelected;
+		setHeartPosition(btn);
+	}
+	else label->setColor(ccColor3B{ 255,255,255 });
+}
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	if (m_fields->incompatible) return FLAlertLayer::ccTouchBegan(touch, event);
 
@@ -210,91 +227,119 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	auto& btn2 = m_fields->btn2;
 	int& btnSelected = m_fields->btnSelected;
 
-	if (!m_mainLayer) return ret;
-	if (!m_buttonMenu) return ret;
-	if (!btn1) return ret;
-	if (!btn2) return ret;
-	CCArrayExt<CCMenuItemSpriteExtra*> buttons = this->m_buttonMenu->getChildren();
-	bool selected = false;
-	for (auto button : buttons) {
-		if (button->isSelected()) {
-			selected = true;
-		}
+	if (!btn1) {
+		log::info("No btn1");
+		return ret;
 	}
-	for (auto button : buttons) {
-		auto parent = static_cast<CCNode*>(button->getChildren()->objectAtIndex(0));
-		CCArrayExt<CCNode*> parts = parent->getChildren();
-		for (auto part : parts) {
-			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
-				if (button->isSelected()) {
-					label->setColor(ccColor3B{ 255, 255, 0 });
-					if (button == btn1) {
-						btnSelected = 1;
-						setHeartPosition(btn1);
-					}
-					else if (button == btn2) {
-						btnSelected = 2;
-						setHeartPosition(btn2);
-					}
-				}
-				else if (selected) {
-					label->setColor(ccColor3B{ 255,255,255 });
-				}
-			}
-		}
+	if (!btn2) {
+		log::info("No btn2");
+		return ret;
 	}
+
+	if (!btn1->isSelected() && !btn2->isSelected()) {
+		log::info("None of the buttons are clicked");
+		return ret;
+	}
+	log::info("No problems in ccTouchBegan!");
+	clickedOnButton(btn1, m_button1, 1);
+	clickedOnButton(btn2, m_button2, 2);
 	return ret;
 }
+#if defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUT) // custom keybinds doesn't work on macos currently
 void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 	if (m_fields->incompatible) {
 		FLAlertLayer::keyDown(key);
 		return;
 	}
-	if (key == enumKeyCodes::KEY_Z || key == enumKeyCodes::KEY_Y /*screw QWERTZ*/ || key == enumKeyCodes::CONTROLLER_A) {
+	if (key == KEY_Z || key == KEY_Y /*screw QWERTZ*/) {
 		if (m_fields->rolledPage)
 			progressText();
 		return;
 	}
-	else if (key == enumKeyCodes::KEY_X || key == enumKeyCodes::KEY_Space || key == enumKeyCodes::CONTROLLER_B) {
+	else if (key == KEY_X || key == KEY_Space) {
 		skipText();
 		return;
 	}
-	else if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Left || key == enumKeyCodes::KEY_Right) {
+	else if (key == KEY_ArrowLeft || key == KEY_ArrowRight || key == KEY_Left || key == KEY_Right) {
 		if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
 			FLAlertLayer::keyDown(key);
 			return;
 		}
 
 		int& btnSelected = m_fields->btnSelected;
-		CCArrayExt<CCNode*> partsBtn1 = m_button1->getChildren();
-		for (auto part : partsBtn1) {
-			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
-				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
-					btnSelected = 1;
-					label->setColor(ccColor3B{ 255,255,0 });
-					setHeartPosition(m_fields->btn1);
-				}
-				else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
-					label->setColor(ccColor3B{ 255,255,255 });
-				}
-			}
+		auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
+		auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+		if (key == KEY_ArrowLeft || key == KEY_Left) {
+			btnSelected = 1;
+			label1->setColor(ccColor3B{ 255,255,0 });
+			setHeartPosition(m_fields->btn1);
+			label2->setColor(ccColor3B{ 255,255,255 });
 		}
-		CCArrayExt<CCNode*> partsBtn2 = m_button2->getChildren();
-		for (auto part : partsBtn2) {
-			if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
-				if (key == enumKeyCodes::KEY_ArrowLeft || key == enumKeyCodes::KEY_Left) {
-					label->setColor(ccColor3B{ 255,255,255 });
-				}
-				else if (key == enumKeyCodes::KEY_ArrowRight || key == enumKeyCodes::KEY_Right) {
-					btnSelected = 2;
-					label->setColor(ccColor3B{ 255,255,0 });
-					setHeartPosition(m_fields->btn2);
-				}
-			}
+		else if (key == KEY_ArrowRight || key == KEY_Right) {
+			btnSelected = 2;
+			label2->setColor(ccColor3B{ 255,255,0 });
+			setHeartPosition(m_fields->btn2);
+			label1->setColor(ccColor3B{ 255,255,255 });
 		}
 	}
 	else FLAlertLayer::keyDown(key);
 }
+#else
+void DeltaruneAlertLayer::initCustomKeybinds() {
+	if (m_fields->incompatible) return;
+
+	this->template addEventListener<keybinds::InvokeBindFilter>([=](keybinds::InvokeBindEvent* event) {
+		if (event->isDown()) {
+			if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
+				return ListenerResult::Propagate;
+			}
+
+			int& btnSelected = m_fields->btnSelected;
+			btnSelected = 1;
+			auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
+			auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+			label1->setColor(ccColor3B{ 255,255,0 });
+			setHeartPosition(m_fields->btn1);
+			label2->setColor(ccColor3B{ 255,255,255 });
+			return ListenerResult::Stop;
+		}
+		return ListenerResult::Propagate;
+		}, "left"_spr);
+	this->template addEventListener<keybinds::InvokeBindFilter>([=](keybinds::InvokeBindEvent* event) {
+		if (event->isDown()) {
+			if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
+				return ListenerResult::Propagate;
+			}
+
+			int& btnSelected = m_fields->btnSelected;
+			btnSelected = 2;
+			auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
+			auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+			label2->setColor(ccColor3B{ 255,255,0 });
+			setHeartPosition(m_fields->btn2);
+			label1->setColor(ccColor3B{ 255,255,255 });
+			return ListenerResult::Stop;
+		}
+		return ListenerResult::Propagate;
+		}, "right"_spr);
+	this->template addEventListener<keybinds::InvokeBindFilter>([=](keybinds::InvokeBindEvent* event) {
+		if (event->isDown()) {
+			if (m_fields->rolledPage) {
+				progressText();
+				return ListenerResult::Stop;
+			}
+		}
+		return ListenerResult::Propagate;
+		}, "progress"_spr);
+	this->template addEventListener<keybinds::InvokeBindFilter>([=](keybinds::InvokeBindEvent* event) {
+		if (event->isDown()) {
+			skipText();
+			return ListenerResult::Stop;
+		}
+		return ListenerResult::Propagate;
+		}, "skip"_spr);
+}
+#endif
 void DeltaruneAlertLayer::skipText() {
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 	auto& clippingNode = m_fields->textAreaClippingNode;
@@ -326,11 +371,7 @@ void DeltaruneAlertLayer::skipText() {
 	}
 	if (doneRolling) showButtons();
 }
-// int step = 0; // funny way to get which line caused the issue on mobile
-// void loggingStep() {
-// 	log::info("{}", step);
-// 	step++;
-// }
+
 void DeltaruneAlertLayer::progressText() {
 	if (!m_mainLayer) return;
 	if (!m_buttonMenu) return;
@@ -481,7 +522,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
 	std::string const textSound = m_fields->textSound;
 	std::string const resFolder = Mod::get()->getResourcesDir().string();
 	std::string path = fmt::format("{}/{}.wav", resFolder, nameToFile[textSound]);
-	
+
 	if (nameToFile.find(textSound) == nameToFile.end()) return;
 
 	if (!playSound || playedSound) {

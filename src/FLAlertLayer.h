@@ -2,45 +2,47 @@
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
+		bool clickedChoice = false;
 		bool reverseAnim = false;
 		bool showing = false;
 		bool incompatible = false;
 		bool dialog = false;
 		bool noShadow = false;
-		CCSpriteGrayscale* characterSprite;
 		bool doneRolling = false;
 		bool rolledPage = false;
+		bool playedSound = false;
+		bool done = false;
+		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
+		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
+		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		int waitQueue = 0;
 		int frame = 0;
 		int rollingLine = 0;
 		int linesProgressed = 0;
-		bool playedSound = false;
 		int characterCount = 0;
-		bool done = false;
-		std::string text = "";
-		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
-		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		int textSize = 36;
 		int btnSelected = 0;
-		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
-		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
-		CCNode* btn1;
-		CCNode* btn2;
+		CCMenuItemSpriteExtra* btn1;
+		CCMenuItemSpriteExtra* btn2;
 		CCNode* textAreaClippingNode;
 		CCNode* textArea;
 		CCNode* gradientOverlay;
 		CCNode* shadow;
 		CCNode* bg;
 		CCSprite* heart;
+		CCSpriteGrayscale* characterSprite;
 		CCLabelBMFont* title;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
 		FMOD::Sound* sound;
+		std::string text = "";
+		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
 		std::unordered_map<std::string, std::string> nameToFile;
 		std::unordered_map<std::string, std::string> nameToSound;
 	};
 	void animateBG(float);
 	void changeBG();
+	void changeSingleButton(CCMenuItemSpriteExtra*, ButtonSprite*);
 	void changeButtons();
 	void changeTitle();
 	void changeText();
@@ -58,6 +60,12 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
+	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
+
+	#if defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUT)
 	void keyDown(enumKeyCodes) override;
+	#else 
+	void initCustomKeybinds();
+	#endif
 };
