@@ -339,6 +339,7 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
 		return ListenerResult::Propagate;
 		}, "skip"_spr);
 }
+
 #endif
 void DeltaruneAlertLayer::skipText() {
 	unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
