@@ -22,7 +22,7 @@
         {
             "id": "geode.custom-keybinds",
             "version": ">=v1.7.1",
-            "platforms": ["android64", "android32", "win"]
+            "platforms": ["win"]
         }
     ],
     "resources": {
