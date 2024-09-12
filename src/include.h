@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 
 #include <Geode/fmod/fmod.hpp>
+#include <geode.custom-keybinds/include/Keybinds.hpp>
 
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>

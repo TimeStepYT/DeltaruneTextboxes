@@ -52,7 +52,9 @@ void DeltaruneAlertLayer::changeBG() {
 	bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
 	bg->setID("background");
 	bg->setZOrder(-1);
-	schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
+	
+	if (!Mod::get()->getSettingValue<bool>("noAnimation"))
+		schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
 
 	if (m_fields->dialog) {
 		character->setZOrder(bg->getZOrder() + 1);
@@ -63,7 +65,16 @@ void DeltaruneAlertLayer::changeBG() {
 	}
 	m_mainLayer->addChild(bg);
 }
-
+void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite) {
+	btn->m_animationEnabled = false;
+	auto buttonTexture = getChildOfType<CCScale9Sprite>(buttonSprite, 0);
+	if (buttonTexture) buttonTexture->setVisible(false);
+	auto label = getChildOfType<CCLabelBMFont>(buttonSprite, 0);
+	if (label) {
+		label->setFntFile("Determination.fnt"_spr);
+		label->setScale(1);
+	}
+}
 void DeltaruneAlertLayer::changeButtons() {
 	if (!m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
@@ -85,22 +96,12 @@ void DeltaruneAlertLayer::changeButtons() {
 	m_mainLayer->addChild(heart);
 	m_fields->heart = heart;
 
-	for (auto button : buttons) {
-		auto confirmedButton = typeinfo_cast<CCMenuItemSpriteExtra*>(button);
-		if (button != confirmedButton) continue;
-		static_cast<CCMenuItemSpriteExtra*>(button)->m_animationEnabled = false;
-		CCArrayExt<CCNode*> parts = static_cast<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren();
-		for (auto part : parts) {
-			if (auto buttonTexture = typeinfo_cast<CCScale9Sprite*>(part)) {
-				buttonTexture->setVisible(false);
-			}
-			else if (auto label = typeinfo_cast<CCLabelBMFont*>(part)) {
-				label->setFntFile("Determination.fnt"_spr);
-				label->setScale(1);
-			}
-		}
-	}
+	changeSingleButton(m_fields->btn1, m_button1);
+	changeSingleButton(m_fields->btn2, m_button2);
 }
+
+
+
 void DeltaruneAlertLayer::changeTitle() {
 	CCLabelBMFont*& title = m_fields->title;
 	auto& bg = m_fields->bg;
