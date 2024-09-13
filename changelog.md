@@ -1,5 +1,5 @@
 ### v1.1.5
-- Custom Keybinds support for Windows (other platforms don't work yet)
+- Custom Keybinds support for Windows and Android (mac doesn't have it)
 - Animated Background toggler added!
 - Setting to change to Undertale background added!
 - Fixed crash for the type of dialog box that has multiple parts to it without exiting
