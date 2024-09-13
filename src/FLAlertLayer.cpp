@@ -204,7 +204,7 @@ void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
 void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
 	auto label = getChildOfType<CCLabelBMFont>(buttonSprite, 0);
 	if (!label) {
-		log::info("Where the fuck is the label?");
+		// log::info("Where the fuck is the label?");
 		return;
 	}
 	if (btn->isSelected()) {
@@ -229,19 +229,19 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	int& btnSelected = m_fields->btnSelected;
 
 	if (!btn1) {
-		log::info("No btn1");
+		// log::info("No btn1");
 		return ret;
 	}
 	if (!btn2) {
-		log::info("No btn2");
+		// log::info("No btn2");
 		return ret;
 	}
 
 	if (!btn1->isSelected() && !btn2->isSelected()) {
-		log::info("None of the buttons are clicked");
+		// log::info("None of the buttons are clicked");
 		return ret;
 	}
-	log::info("No problems in ccTouchBegan!");
+	// log::info("No problems in ccTouchBegan!");
 	clickedOnButton(btn1, m_button1, 1);
 	clickedOnButton(btn2, m_button2, 2);
 	return ret;
