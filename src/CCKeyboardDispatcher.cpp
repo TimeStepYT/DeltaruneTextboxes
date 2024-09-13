@@ -52,13 +52,13 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 			else if (key == KEY_Escape)
 				blockKeys = false;
 		}
-		else if (down && key == KEY_G) {
-			auto level = GameLevelManager::get()->getMainLevel(3001, false);
-			GameManager::get()->m_sceneEnum = 12;
-			auto pl = PlayLayer::scene(level, false, false);
-			cocos2d::CCDirector::get()->replaceScene(
-				cocos2d::CCTransitionFade::create(0.5f, pl)
-			);
+		// else if (down && key == KEY_G) {
+			// auto level = GameLevelManager::get()->getMainLevel(3001, false);
+			// GameManager::get()->m_sceneEnum = 12;
+			// auto pl = PlayLayer::scene(level, false, false);
+			// cocos2d::CCDirector::get()->replaceScene(
+			// 	cocos2d::CCTransitionFade::create(0.5f, pl)
+			// );
 			// 	CCArray* objs = new CCArray();
 			// 	objs->addObject(DialogObject::create("Scratch", "fart\nUh oh", 25, 1, false, ccc3(0, 255, 255)));
 			// 	objs->addObject(DialogObject::create("The funny monkley", "stinky!", 26, 1, false, ccc3(0, 155, 155)));
@@ -66,7 +66,7 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 			// 	objs->addObject(DialogObject::create("Ned", "funny poopy!", 6, 1, false, ccc3(0, 155, 155)));
 			// 	objs->addObject(DialogObject::create("Smongus", "Sorry you had to... read this.", 21, 1, false, ccc3(0, 155, 155)));
 			// 	DialogLayer::createWithObjects(objs, 2);
-		}
+		// }
 		return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, idk);
 	}
 };
