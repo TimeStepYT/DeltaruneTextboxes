@@ -396,7 +396,7 @@ void DeltaruneAlertLayer::progressText() {
 		if (!m_button2) {
 			done = true;
 			FLAlertLayer::onBtn1(btn1);
-			this->m_fields->dialogLayer->onClose();
+			if (dialog) this->m_fields->dialogLayer->onClose();
 			return;
 		}
 		else if (btnSelected != 0) {

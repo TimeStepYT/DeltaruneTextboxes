@@ -1,4 +1,7 @@
-### v1.1.5
+### v1.1.6
+- very quick crashfix
+
+### v1.1.5 (never released)
 - Custom Keybinds support for Windows and Android (mac doesn't have it)
 - Animated Background toggler added!
 - Setting to change to Undertale background added!
