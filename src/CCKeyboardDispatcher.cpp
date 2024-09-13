@@ -1,7 +1,4 @@
 #include "include.h"
-#include <Geode/modify/MenuLayer.hpp>
-#include <Geode/modify/SecretLayer2.hpp>
-#include <Geode/modify/SecretLayer3.hpp>
 
 #if !defined(GEODE_IS_MACOS) && !defined(GEODE_IS_ANDROID) && !defined(DEBUG_MAC_INPUTS)
 $execute{
@@ -53,12 +50,6 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 				blockKeys = false;
 		}
 		// else if (down && key == KEY_G) {
-			// auto level = GameLevelManager::get()->getMainLevel(3001, false);
-			// GameManager::get()->m_sceneEnum = 12;
-			// auto pl = PlayLayer::scene(level, false, false);
-			// cocos2d::CCDirector::get()->replaceScene(
-			// 	cocos2d::CCTransitionFade::create(0.5f, pl)
-			// );
 			// 	CCArray* objs = new CCArray();
 			// 	objs->addObject(DialogObject::create("Scratch", "fart\nUh oh", 25, 1, false, ccc3(0, 255, 255)));
 			// 	objs->addObject(DialogObject::create("The funny monkley", "stinky!", 26, 1, false, ccc3(0, 155, 155)));
@@ -68,11 +59,5 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 			// 	DialogLayer::createWithObjects(objs, 2);
 		// }
 		return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, idk);
-	}
-};
-
-class $modify(MenuLayer) {
-	void onMoreGames(CCObject * sender) {
-		CCDirector::sharedDirector()->pushScene(SecretLayer2::scene());
 	}
 };
