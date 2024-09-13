@@ -2,6 +2,8 @@
 - Custom Keybinds support for Windows (other platforms don't work yet)
 - Animated Background toggler added!
 - Setting to change to Undertale background added!
+- Fixed crash for the type of dialog box that has multiple parts to it without exiting
+- Reworked how DialogLayers get changed into FLAlertLayers
 
 ### v1.1.4
 - A little bit of cleanup

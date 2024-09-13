@@ -1,5 +1,5 @@
 {
-    "geode": "3.5.0",
+    "geode": "3.6.0",
     "gd": {
         "win": "2.206",
         "android": "2.206",
@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.1.5-beta.2",
+    "version": "v1.1.5-beta.4",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -105,7 +105,6 @@
             "default": false
         },
         "noAnimation": {
-            "enable-if": "!setting:undertaleBG",
             "name": "No Animation",
             "description": "<cr>Disables</c> the <cj>animated background</c>. <cy>(the colors of the corners change)</c>",
             "type": "bool",

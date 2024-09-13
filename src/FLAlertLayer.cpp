@@ -116,6 +116,7 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
 }
 
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
+	bool dialog = m_fields->dialog;
 	if (m_fields->incompatible) {
 		FLAlertLayer::onBtn2(sender);
 		return;
@@ -126,12 +127,11 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 	}
 	int& btnSelected = m_fields->btnSelected;
 	if (btnSelected == 0) return;
-	if (btnSelected == 2)
-		FLAlertLayer::onBtn2(sender);
-	else if (btnSelected == 1)
-		FLAlertLayer::onBtn1(sender);
+	if (btnSelected == 2) FLAlertLayer::onBtn2(sender);
+	else if (btnSelected == 1) FLAlertLayer::onBtn1(sender);
 }
 void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
+	bool dialog = m_fields->dialog;
 	if (m_fields->incompatible) {
 		FLAlertLayer::onBtn1(sender);
 		return;
@@ -143,6 +143,7 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 	blockKeys = false;
 	FLAlertLayer::onBtn1(sender);
 }
+
 int DeltaruneAlertLayer::getLinesLeft() {
 	auto& textArea = m_fields->textArea;
 	if (!m_fields->textAreaClippingNode) return 0;
@@ -391,9 +392,11 @@ void DeltaruneAlertLayer::progressText() {
 	if (!textArea) return;
 
 	if (getLinesLeft() <= 3) {
+		bool dialog = m_fields->dialog;
 		if (!m_button2) {
 			done = true;
 			FLAlertLayer::onBtn1(btn1);
+			this->m_fields->dialogLayer->onClose();
 			return;
 		}
 		else if (btnSelected != 0) {
@@ -423,6 +426,7 @@ void DeltaruneAlertLayer::progressText() {
 		offset = 1;
 
 	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
+	bool emptyLinesRemoved = false;
 	while (true) {
 		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + offset);
 		if (!topLine) break;
@@ -435,6 +439,29 @@ void DeltaruneAlertLayer::progressText() {
 		offset++;
 		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
 		if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+		emptyLinesRemoved = true;
+	}
+
+	auto& characters = m_fields->characterSpriteNames;
+	int& dialogCount = m_fields->dialogCount;
+	if (emptyLinesRemoved && characters.size() > 1) {
+		dialogCount++;
+		auto& spriteName = characters[dialogCount];
+		auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
+		auto newChar = CCSpriteGrayscale::create(spriteName);
+		auto title = m_fields->titles[dialogCount];
+		auto& nameToSound = m_fields->nameToSound;
+		m_fields->title->setString(title.c_str());
+		newChar->setPosition(prevChar->getPosition());
+		newChar->setZOrder(prevChar->getZOrder());
+		m_fields->characterSprite = newChar;
+		m_mainLayer->removeChildByID("character-sprite"_spr);
+		m_mainLayer->addChild(newChar);
+		newChar->setID("character-sprite"_spr);
+		if (nameToSound.find(title.c_str()) != nameToSound.end())
+			m_fields->textSound = nameToSound[title.c_str()];
+		else
+			m_fields->textSound = "Default";
 	}
 
 	linesProgressed += offset;
