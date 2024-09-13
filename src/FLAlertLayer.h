@@ -22,6 +22,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int characterCount = 0;
 		int textSize = 36;
 		int btnSelected = 0;
+		int dialogCount = 0;
 		CCMenuItemSpriteExtra* btn1;
 		CCMenuItemSpriteExtra* btn2;
 		CCNode* textAreaClippingNode;
@@ -30,11 +31,14 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* shadow;
 		CCNode* bg;
 		CCSprite* heart;
-		CCSpriteGrayscale* characterSprite;
 		CCLabelBMFont* title;
+		CCSpriteGrayscale* characterSprite;
+		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
 		FMOD::Sound* sound;
+		std::vector<std::string> characterSpriteNames;
+		std::vector<std::string> titles;
 		std::string text = "";
 		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
 		std::unordered_map<std::string, std::string> nameToFile;
