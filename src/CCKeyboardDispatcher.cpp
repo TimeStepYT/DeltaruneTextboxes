@@ -1,6 +1,6 @@
 #include "include.h"
 
-#if !defined(GEODE_IS_MACOS) && !defined(GEODE_IS_ANDROID) && !defined(DEBUG_MAC_INPUTS)
+#if !OLD_INPUTS
 $execute{
 	keybinds::BindManager::get()->registerBindable(
 		{
