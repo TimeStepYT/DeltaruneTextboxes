@@ -246,7 +246,7 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	clickedOnButton(btn2, m_button2, 2);
 	return ret;
 }
-#if defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32)
+#if (defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
 void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 	if (m_fields->incompatible) {
 		FLAlertLayer::keyDown(key);

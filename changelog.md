@@ -1,3 +1,6 @@
+### v1.1.7
+- removed custom keybinds support for Android 32bit since it crashes the game
+
 ### v1.1.6
 - very quick crashfix
 
