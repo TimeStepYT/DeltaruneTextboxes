@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 
-#define OLD_INPUTS defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS)
+#define OLD_INPUTS defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32)
 
 #include <Geode/fmod/fmod.hpp>
 #if !OLD_INPUTS
