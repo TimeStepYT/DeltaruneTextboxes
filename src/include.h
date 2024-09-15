@@ -1,9 +1,7 @@
 #include <Geode/Geode.hpp>
 
-#define OLD_INPUTS defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32)
-
 #include <Geode/fmod/fmod.hpp>
-#if !OLD_INPUTS
+#if !(defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
 #include <geode.custom-keybinds/include/Keybinds.hpp>
 #endif
 #include <Geode/modify/FLAlertLayer.hpp>
