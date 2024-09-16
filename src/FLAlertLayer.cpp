@@ -1,5 +1,5 @@
-#include "include.h"
 #include "FLAlertLayer.h"
+#include "DialogLayer.h"
 
 bool blockKeys = false;
 
@@ -131,7 +131,6 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
 	else if (btnSelected == 1) FLAlertLayer::onBtn1(sender);
 }
 void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
-	bool dialog = m_fields->dialog;
 	if (m_fields->incompatible) {
 		FLAlertLayer::onBtn1(sender);
 		return;
@@ -374,6 +373,27 @@ void DeltaruneAlertLayer::skipText() {
 	if (doneRolling) showButtons();
 }
 
+int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
+	auto& textArea = m_fields->textArea;
+	auto& linesProgressed = m_fields->linesProgressed;
+	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
+	int lines = 0;
+	while (true) {
+		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + lines + offset);
+		if (!topLine) break;
+		std::string topLineString = topLine->getString();
+		std::string noSpaceTopLineString = "";
+		std::for_each(topLineString.begin(), topLineString.end(), [&noSpaceTopLineString](char c) {
+			if (c != ' ') noSpaceTopLineString += c;
+			});
+		if (noSpaceTopLineString != "") break;
+		lines++;
+		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
+		if (!Mod::get()->getSettingValue<bool>("noShadow")) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+	}
+	return lines;
+}
+
 void DeltaruneAlertLayer::progressText() {
 	if (!m_mainLayer) return;
 	if (!m_buttonMenu) return;
@@ -393,11 +413,12 @@ void DeltaruneAlertLayer::progressText() {
 
 	if (getLinesLeft() <= 3) {
 		if (!m_button2) {
-			bool dialog = m_fields->dialog;
-			DialogLayer* dialogLayer = m_fields->dialogLayer;
+			auto dialogLayer = m_fields->dialogLayer;
 			done = true;
+			if (m_fields->dialog && dialogLayer) {
+				dialogLayer->onClose();
+			}
 			FLAlertLayer::onBtn1(btn1);
-			if (dialog && dialogLayer) dialogLayer->onClose();
 			return;
 		}
 		else if (btnSelected != 0) {
@@ -426,26 +447,12 @@ void DeltaruneAlertLayer::progressText() {
 	else if (getLinesLeft() == 3)
 		offset = 1;
 
-	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
-	bool emptyLinesRemoved = false;
-	while (true) {
-		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + offset);
-		if (!topLine) break;
-		std::string topLineString = topLine->getString();
-		std::string noSpaceTopLineString = "";
-		std::for_each(topLineString.begin(), topLineString.end(), [&noSpaceTopLineString](char c) {
-			if (c != ' ') noSpaceTopLineString += c;
-			});
-		if (noSpaceTopLineString != "") break;
-		offset++;
-		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
-		if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
-		emptyLinesRemoved = true;
-	}
+	int emptyLines = emptyLinesAmount(offset);
+	offset += emptyLines;
 
 	auto& characters = m_fields->characterSpriteNames;
 	int& dialogCount = m_fields->dialogCount;
-	if (emptyLinesRemoved && characters.size() > 1) {
+	if (characters.size() > 1) {
 		dialogCount++;
 		auto& spriteName = characters[dialogCount];
 		auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
@@ -483,70 +490,84 @@ void DeltaruneAlertLayer::rollText(float dt) {
 	bool& playedSound = m_fields->playedSound;
 	bool& doneRolling = m_fields->doneRolling;
 	bool& rolledPage = m_fields->rolledPage;
+	float& lostTime = m_fields->lostTime;
+	float const pause = Mod::get()->getSettingValue<double>("textRollingPause") / 30;
 
-	if (waitQueue != 0) {
-		waitQueue--;
-		playedSound = false;
-		return;
-	}
-	CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
-	if (rollingLine == 3) {
-		unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-		rolledPage = true;
-		return;
-	}
-	else rolledPage = false;
+	if (dt - pause > pause)
+		lostTime += dt - pause;
 
-	bool newLine = false;
 	bool playSound = true;
-	for (auto textArea : textAreas) {
-		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
-		int i = linesProgressed + rollingLine;
-		if (i < lines.size() && i < linesProgressed + 3) {
-			auto line = lines[i];
-			CCArrayExt<CCNode*> letters = line->getChildren();
-			auto letter = letters[characterCount];
-			if (letter->isVisible()) {
+
+	for (bool firstRun = true; lostTime >= pause || firstRun;) {
+		bool newLine = false;
+		firstRun = false;
+		if (waitQueue != 0) {
+			waitQueue--;
+			playedSound = false;
+			if (lostTime >= pause && !firstRun) {
+				lostTime -= pause;
+			}
+			continue;
+		}
+		CCArrayExt<TextArea*> textAreas = m_fields->textAreaClippingNode->getChildren();
+		if (rollingLine == 3) {
+			unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+			rolledPage = true;
+			return;
+		}
+		else rolledPage = false;
+
+		for (auto textArea : textAreas) {
+			CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
+			int currentLine = linesProgressed + rollingLine;
+			if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
+				auto line = lines[currentLine];
+				CCArrayExt<CCNode*> letters = line->getChildren();
+				auto letter = letters[characterCount];
+				if (letter->isVisible()) {
+					unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+					doneRolling = true;
+					rolledPage = true;
+					showButtons();
+					return;
+				}
+				letter->setVisible(true);
+				switch (line->getString()[characterCount]) {
+					case ' ':
+						playSound = false;
+						break;
+					case '.': [[fallthrough]];
+					case ',': [[fallthrough]];
+					case ':': [[fallthrough]];
+					case ';': [[fallthrough]];
+					case '?': [[fallthrough]];
+					case '!':
+						waitQueue = 2;
+						break;
+					default:
+						break;
+				}
+				if (characterCount == line->getChildrenCount() - 1) {
+					newLine = true;
+				}
+			}
+			else {
 				unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 				doneRolling = true;
 				rolledPage = true;
 				showButtons();
 				return;
 			}
-			letter->setVisible(true);
-			switch (line->getString()[characterCount]) {
-				case ' ':
-					playSound = false;
-					break;
-				case '.': [[fallthrough]];
-				case ',': [[fallthrough]];
-				case ':': [[fallthrough]];
-				case ';': [[fallthrough]];
-				case '?': [[fallthrough]];
-				case '!':
-					waitQueue = 2;
-					break;
-				default:
-					break;
-			}
-			if (characterCount == line->getChildrenCount() - 1) {
-				newLine = true;
-			}
 		}
-		else {
-			unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-			doneRolling = true;
-			rolledPage = true;
-			showButtons();
-			return;
+		characterCount++;
+		if (newLine) {
+			characterCount = 0;
+			rollingLine++;
+		}
+		if (lostTime >= pause && !firstRun) {
+			lostTime -= pause;
 		}
 	}
-	characterCount++;
-	if (newLine) {
-		characterCount = 0;
-		rollingLine++;
-	}
-
 	auto nameToFile = m_fields->nameToFile;
 	std::string const textSound = m_fields->textSound;
 	std::string const resFolder = Mod::get()->getResourcesDir().string();
