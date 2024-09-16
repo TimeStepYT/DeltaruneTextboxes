@@ -42,18 +42,21 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 		}
 	}
 	m_fields->alert = unmodifiedAlert;
-
 	alert->m_fields->dialog = true;
 	alert->m_fields->dialogLayer = this;
 
-	Loader::get()->queueInMainThread([=]{
+	Loader::get()->queueInMainThread([=] {
 		this->setVisible(false);
-	});
+		if (!this->getParent()) {
+			alert->addChild(this);
+		}
+		});
 
 	alert->show();
 	return true;
 }
 void DeltaruneDialogLayer::displayNextObject() {
+	DialogLayer::displayNextObject();
 	this->setVisible(false);
 }
 void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
@@ -63,5 +66,4 @@ void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
 bool DeltaruneDialogLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	return false;
 }
-void DeltaruneDialogLayer::keyDown(enumKeyCodes key) {
-}
+void DeltaruneDialogLayer::keyDown(enumKeyCodes key) {}

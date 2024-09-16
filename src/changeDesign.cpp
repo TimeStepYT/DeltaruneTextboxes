@@ -104,14 +104,12 @@ void DeltaruneAlertLayer::changeButtons() {
 	changeSingleButton(m_fields->btn2, m_button2);
 }
 
-
-
 void DeltaruneAlertLayer::changeTitle() {
 	CCLabelBMFont*& title = m_fields->title;
 	auto& bg = m_fields->bg;
-	title->setAnchorPoint(CCPoint{ 0, 0.5 });
+	title->setAnchorPoint(CCPoint{ 0, 0 });
 	title->setFntFile("Determination.fnt"_spr);
-	title->setPosition(CCPoint{ bg->getPositionX() - bg->getContentWidth() / 2 + 24, 145 });
+	title->setPosition(CCPoint{ bg->getPositionX() - bg->getContentWidth() / 2 + 24, 138 });
 }
 void DeltaruneAlertLayer::changeText() {
 	auto& textArea = m_fields->textArea;
@@ -264,7 +262,6 @@ void DeltaruneAlertLayer::changeText() {
 	}
 	m_mainLayer->addChild(star);
 	if (!noShadow) m_mainLayer->addChild(starShadow);
-
 	auto rect = CCLayerColor::create({ 0,0,0,0 }, bg->getContentWidth(), bg->getContentHeight() - 20);
 	auto clippingNode = CCClippingNode::create(rect);
 	clippingNode->setID("content-text-area"_spr);
@@ -279,6 +276,12 @@ void DeltaruneAlertLayer::changeText() {
 	m_fields->gradientOverlay = newDescGrad;
 	m_fields->shadow = newDescShad;
 	float pause = Mod::get()->getSettingValue<double>("textRollingPause");
+
+	m_fields->linesProgressed += emptyLinesAmount();
+	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * m_fields->linesProgressed);
+	if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
+	if (newDescShad) newDescShad->setPositionY(textArea->getPositionY() - 1);
+
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 void DeltaruneAlertLayer::changeLook() {

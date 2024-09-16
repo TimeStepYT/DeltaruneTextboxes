@@ -50,13 +50,13 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 				blockKeys = false;
 		}
 		// else if (down && key == KEY_G) {
-			// 	CCArray* objs = new CCArray();
-			// 	objs->addObject(DialogObject::create("Scratch", "fart\nUh oh", 25, 1, false, ccc3(0, 255, 255)));
-			// 	objs->addObject(DialogObject::create("The funny monkley", "stinky!", 26, 1, false, ccc3(0, 155, 155)));
-			// 	objs->addObject(DialogObject::create("Glungus", "poopy!", 28, 1, false, ccc3(0, 155, 155)));
-			// 	objs->addObject(DialogObject::create("Ned", "funny poopy!", 6, 1, false, ccc3(0, 155, 155)));
-			// 	objs->addObject(DialogObject::create("Smongus", "Sorry you had to... read this.", 21, 1, false, ccc3(0, 155, 155)));
-			// 	DialogLayer::createWithObjects(objs, 2);
+			// CCArray* objs = new CCArray();
+			// objs->addObject(DialogObject::create("Scratch", "fart\nUh oh", 25, 1, false, ccc3(0, 255, 255)));
+			// objs->addObject(DialogObject::create("The funny\nmonkley", "stinky!", 26, 1, false, ccc3(0, 155, 155)));
+			// objs->addObject(DialogObject::create("Glungus", "poopy!", 28, 1, false, ccc3(0, 155, 155)));
+			// objs->addObject(DialogObject::create("Ned", "funny poopy!", 6, 1, false, ccc3(0, 155, 155)));
+			// objs->addObject(DialogObject::create("Smongus", "Sorry you had to... read this.", 21, 1, false, ccc3(0, 155, 155)));
+			// auto layer = DialogLayer::createWithObjects(objs, 2);
 		// }
 		return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, idk);
 	}

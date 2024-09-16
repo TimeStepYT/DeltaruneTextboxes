@@ -1,5 +1,5 @@
 {
-    "geode": "3.6.1",
+    "geode": "3.7.1",
     "gd": {
         "win": "2.206",
         "android": "2.206",
@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.1.7",
+    "version": "v1.1.8",
     "developer": "TimeStepYT",
     "description": "Makes FLAlertLayers look like textboxes from Deltarune",
     "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
@@ -121,7 +121,11 @@
             "type": "float",
             "min": 0,
             "max": 5,
-            "default": 1,
+            "default": 0.8,
+            "control": {
+                "arrow-step": 0.1,
+                "big-arrow-step": 1
+            },
             "description": "How many <cy>30th</c>s of a second it should <cj>pause</c> between characters for the <cg>rolling effect</c>"
         },
         "textSound": {

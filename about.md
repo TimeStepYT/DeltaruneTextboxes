@@ -6,6 +6,8 @@ You can <cj>advance</c> the text by pressing <cy>Z</c>, <cy>Enter</c> or by </cy
 
 You can <cj>skip</c> the text by pressing <cy>X</c>, <cy>Space</c> or by <cy>tapping</c>/<cy>clicking</c> while the text rolls out!
 
+If you're <c>able</c> to use the <cj>Custom Keybinds</c> mod, then you can <cj>reconfigure</c> these buttons!
+
 ![[This should be a screenshot]](timestepyt.deltarune_textboxes/screenshot.jpg&scale:0.5)
 
 If you want to suggest a feature, create an issue on github or ping me on discord (@timestepyt)

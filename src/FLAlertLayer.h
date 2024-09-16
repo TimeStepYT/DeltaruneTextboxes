@@ -15,6 +15,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
+		float lostTime = 0;
 		int waitQueue = 0;
 		int frame = 0;
 		int rollingLine = 0;
@@ -55,11 +56,13 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void show() override;
 	void initMaps();
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
+	void handleLetters(TextArea*, bool&, bool&);
 	void rollText(float);
 	void showButtons();
 	void setHeartPosition(CCNode*);
 	int getLinesLeft();
 	void skipText();
+	int emptyLinesAmount(int = 0);
 	void progressText();
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);

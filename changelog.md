@@ -1,8 +1,14 @@
+### v1.1.8
+- Text rolling pause is no longer limited to frame rate!
+- Fixed title positioning for titles that are multiple lines long
+- Fixed a crash for special type of DialogLayer that I thought I have already fixed
+- Now removing empty lines that are on the top of the textbox when opened
+
 ### v1.1.7
-- removed custom keybinds support for Android 32bit since it crashes the game
+- Removed custom keybinds support for Android 32bit since it crashes the game
 
 ### v1.1.6
-- very quick crashfix
+- Very quick crashfix
 
 ### v1.1.5 (never released)
 - Custom Keybinds support for Windows and Android (mac doesn't have it)
@@ -18,23 +24,23 @@
 
 ### v1.1.3 (never released)
 - Finally fixed choices not showing up (thanks prevter for having this bug and helping me fix it)
-- Mod comments support (kinda)
+- Mod comments supported (kinda)
 
 ### v1.1.2
-- Fix star not fully disappearing
-- Prevent the first line from being empty
+- Fixed star not fully disappearing
+- Prevented the first line from being empty
 - Animated corner pixels :D
 
 ### v1.1.1 (never released)
 - Crashfix
 
 ### v1.1.0 (never released)
-- Fix text being cut off on wider screens while having restrict width on
-- Fix weirdness with Prism Menu
-- Fix weirdness with Death Tracker
-- Fix buttons not showing up (maybe?)
-- Add drop shadow to text
-- Add star to non dialog as well
+- Fixed text being cut off on wider screens while having restrict width on
+- Fixed weirdness with Prism Menu
+- Fixed weirdness with Death Tracker
+- Fixed buttons not showing up (maybe?)
+- Added drop shadow to text
+- Added star to non dialog as well
 
 ### v1.0.0
 - Different character text sounds and fonts
