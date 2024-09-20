@@ -454,20 +454,22 @@ void DeltaruneAlertLayer::progressText() {
 
 	auto& characters = m_fields->characterSpriteNames;
 	int& dialogCount = m_fields->dialogCount;
-	if (characters.size() > 1) {
+	bool progressDialog = emptyLines > 0 && characters.size() > 1;
+	if (progressDialog) {
 		dialogCount++;
 		auto& spriteName = characters[dialogCount];
 		auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
 		auto newChar = CCSpriteGrayscale::create(spriteName);
-		auto title = m_fields->titles[dialogCount];
-		auto& nameToSound = m_fields->nameToSound;
-		m_fields->title->setString(title.c_str());
 		newChar->setPosition(prevChar->getPosition());
 		newChar->setZOrder(prevChar->getZOrder());
 		m_fields->characterSprite = newChar;
-		m_mainLayer->removeChildByID("character-sprite"_spr);
-		m_mainLayer->addChild(newChar);
 		newChar->setID("character-sprite"_spr);
+		m_mainLayer->addChild(newChar);
+
+		auto title = m_fields->titles[dialogCount];
+		auto& nameToSound = m_fields->nameToSound;
+		m_fields->title->setString(title.c_str());
+		m_mainLayer->removeChildByID("character-sprite"_spr);
 		if (nameToSound.find(title.c_str()) != nameToSound.end())
 			m_fields->textSound = nameToSound[title.c_str()];
 		else

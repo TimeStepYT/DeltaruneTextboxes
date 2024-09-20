@@ -1,3 +1,6 @@
+### v1.2.0
+- Fixed a crash that happens if a DialogLayer scrolled without finishing the dialog first
+
 ### v1.1.9
 - Fixed a crash when not having shadows on (or Sans or Papyrus font)
 - Fixed some text tags showing with Papyrus font
