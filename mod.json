@@ -8,10 +8,12 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.1.8",
+    "version": "v1.1.9",
     "developer": "TimeStepYT",
-    "description": "Makes FLAlertLayers look like textboxes from Deltarune",
-    "repository": "https://github.com/Reinmmar/DeltaruneTextboxes",
+    "description": "Makes Popups look like Deltarune",
+    "links": {
+        "source": "https://github.com/Reinmmar/DeltaruneTextboxes"
+    },
     "tags": ["customization"],
     "dependencies": [
         {
@@ -22,7 +24,8 @@
         {
             "id": "geode.custom-keybinds",
             "version": ">=v1.7.1",
-            "platforms": ["win", "android64"]
+            "platforms": ["win", "android64"],
+            "importance": "required"
         }
     ],
     "resources": {
@@ -38,15 +41,21 @@
         "fonts": {
             "Determination": {
                 "size": 78,
-                "path": "resources/determination-extended.ttf"
+                "path": "resources/determination-extended.ttf",
+                "charset": "32-126,8226",
+                "outline": 0
             },
             "ComicSans": {
                 "size": 78,
-                "path": "resources/comic-sans-pixel.ttf"
+                "path": "resources/comic-sans-pixel.ttf",
+                "charset": "32-126,8226",
+                "outline": 0
             },
             "Papyrus": {
                 "size": 78,
-                "path": "resources/papyrus-pixel.ttf"
+                "path": "resources/papyrus-pixel.ttf",
+                "charset": "32-126,8226",
+                "outline": 0
             }
         },
         "files": [
@@ -90,7 +99,7 @@
             "type": "bool",
             "default": false,
             "description": "Disables <cy>clicking</c> to progress textboxes",
-            "platforms": ["win", "macos"]
+            "platforms": ["win", "mac"]
         },
         "noGradientOverlay": {
             "name": "Disable gradient",

@@ -382,14 +382,16 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + lines + offset);
 		if (!topLine) break;
 		std::string topLineString = topLine->getString();
-		std::string noSpaceTopLineString = "";
-		std::for_each(topLineString.begin(), topLineString.end(), [&noSpaceTopLineString](char c) {
-			if (c != ' ') noSpaceTopLineString += c;
+		bool empty = std::ranges::all_of(topLineString, [](unsigned char c) {
+			return std::isspace(c);
 			});
-		if (noSpaceTopLineString != "") break;
+		if (!empty) break;
 		lines++;
-		m_mainLayer->getChildByID("star"_spr)->setVisible(true);
-		if (!Mod::get()->getSettingValue<bool>("noShadow")) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(true);
+		auto star = m_mainLayer->getChildByID("star"_spr);
+		auto starShadow = m_mainLayer->getChildByID("starShadow"_spr);
+		if (star) star->setVisible(true);
+		if (starShadow)
+			starShadow->setVisible(true);
 	}
 	return lines;
 }

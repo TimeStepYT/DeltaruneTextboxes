@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(DeltaruneTextboxes VERSION 1.1.8)
+project(DeltaruneTextboxes VERSION 1.1.9)
 
 add_library(${PROJECT_NAME} SHARED
     src/FLAlertLayer.cpp
