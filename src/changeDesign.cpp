@@ -1,12 +1,18 @@
 #include "include.h"
 #include "FLAlertLayer.h"
 
+template<class T>
+bool vectorContains(std::vector<T> vector, T value) {
+	return std::find(vector.begin(), vector.end(), value) != vector.end();
+}
+
 void capitalize(std::string& str) {
 	bool disable = false;
+	auto nextFilter = std::vector<char>{ 'c', 'd', '/', 'i', 's' };
 	for (char& c : str) {
 		char next = *(&c + 1);
 		if (c == '<') {
-			if (next == 'c' || next == 'd' || next == '/') {
+			if (vectorContains(nextFilter, next)) {
 				disable = true;
 				continue;
 			}
