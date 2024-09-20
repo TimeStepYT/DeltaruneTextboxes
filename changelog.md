@@ -1,5 +1,6 @@
 ### v1.1.9
 - Fixed a crash when not having shadows on (or Sans or Papyrus font)
+- Fixed some text tags showing with Papyrus font
 
 ### v1.1.8
 - Text rolling pause is no longer limited to frame rate!
