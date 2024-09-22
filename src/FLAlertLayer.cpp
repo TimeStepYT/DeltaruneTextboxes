@@ -379,19 +379,26 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
 	int lines = 0;
 	while (true) {
-		auto topLine = (CCLabelBMFont*) fontNode->getChildren()->objectAtIndex(linesProgressed + lines + offset);
+		if (linesProgressed + lines + offset >= fontNode->getChildrenCount()) break;
+
+		auto topLineNode = fontNode->getChildren()->objectAtIndex(linesProgressed + lines + offset);
+		auto topLine = static_cast<CCLabelBMFont*>(topLineNode);
+		if (!topLineNode) break;
 		if (!topLine) break;
+
 		std::string topLineString = topLine->getString();
 		bool empty = std::ranges::all_of(topLineString, [](unsigned char c) {
 			return std::isspace(c);
 			});
 		if (!empty) break;
+		
 		lines++;
+
 		auto star = m_mainLayer->getChildByID("star"_spr);
 		auto starShadow = m_mainLayer->getChildByID("starShadow"_spr);
+
 		if (star) star->setVisible(true);
-		if (starShadow)
-			starShadow->setVisible(true);
+		if (starShadow) starShadow->setVisible(true);
 	}
 	return lines;
 }
@@ -413,7 +420,7 @@ void DeltaruneAlertLayer::progressText() {
 
 	if (!textArea) return;
 
-	if (getLinesLeft() <= 3) {
+	if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
 		if (!m_button2) {
 			auto dialogLayer = m_fields->dialogLayer;
 			done = true;
