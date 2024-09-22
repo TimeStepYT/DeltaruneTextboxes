@@ -1,7 +1,11 @@
+### v1.2.1
+- Fixed a crash that sometimes happened when the top line of the textbox didn't exist
+- Made it impossible for the textbox to end with an empty box
+
 ### v1.2.0
 - Fixed a crash that happens if a DialogLayer scrolled without finishing the dialog first
 
-### v1.1.9
+### v1.1.9 (never released)
 - Fixed a crash when not having shadows on (or Sans or Papyrus font)
 - Fixed some text tags showing with Papyrus font
 
