@@ -1,3 +1,6 @@
+### v1.2.2
+- Changed the github repo link because I finally changed my username
+
 ### v1.2.1
 - Fixed a crash that sometimes happened when the top line of the textbox didn't exist
 - Made it impossible for the textbox to end with an empty box

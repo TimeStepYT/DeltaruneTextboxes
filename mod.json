@@ -8,11 +8,11 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.2.1",
+    "version": "v1.2.2",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {
-        "source": "https://github.com/Reinmmar/DeltaruneTextboxes"
+        "source": "https://github.com/TimeStepYT/DeltaruneTextboxes"
     },
     "tags": ["customization"],
     "dependencies": [
