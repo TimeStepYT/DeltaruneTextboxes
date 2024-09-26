@@ -438,7 +438,7 @@ void DeltaruneAlertLayer::progressText() {
 		}
 	}
 	// Don't progress if there's only a choice left!
-	if (getLinesLeft() < 3 && m_button2)
+	if (getLinesLeft() - emptyLinesAmount(3) < 3 && m_button2)
 		return;
 
 	// Move EVERYTHING up
