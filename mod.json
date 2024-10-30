@@ -1,5 +1,5 @@
 {
-    "geode": "3.7.1",
+    "geode": "3.9.0",
     "gd": {
         "win": "2.206",
         "android": "2.206",
@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.2.2",
+    "version": "v1.2.3",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {

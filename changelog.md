@@ -1,3 +1,7 @@
+### v1.2.3
+- Switch from getChildOfType to getChildByType because of it getting deprecated
+- Fixed popups from user95401 mods creating weird Deltarune-GD crossbreeds
+
 ### v1.2.2
 - Changed the github repo link because I finally changed my username
 

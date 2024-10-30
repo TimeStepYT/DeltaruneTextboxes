@@ -77,9 +77,9 @@ void DeltaruneAlertLayer::changeBG() {
 }
 void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite) {
 	btn->m_animationEnabled = false;
-	auto buttonTexture = getChildOfType<CCScale9Sprite>(buttonSprite, 0);
+	auto buttonTexture = buttonSprite->getChildByType<CCScale9Sprite>(0);
 	if (buttonTexture) buttonTexture->setVisible(false);
-	auto label = getChildOfType<CCLabelBMFont>(buttonSprite, 0);
+	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
 	if (label) {
 		label->setFntFile("Determination.fnt"_spr);
 		label->setScale(1);
