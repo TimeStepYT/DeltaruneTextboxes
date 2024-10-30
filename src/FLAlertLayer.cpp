@@ -51,13 +51,16 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
-	if (Loader::get()->isModLoaded("firee.prism")) { // probably the easiest way to detect a Prism Menu alert :3
-		if (desc == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") {
-			m_fields->incompatible = true;
-			return true;
-		}
-	}
 
+	bool const isEmpty = std::ranges::all_of(desc, [](unsigned char c) {
+		return std::isspace(c);
+		});
+	bool const prismLoaded = Loader::get()->isModLoaded("firee.prism");
+	std::string prismString = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // probably the easiest way to detect a Prism Menu alert :3
+	if ((prismLoaded && desc == prismString) || isEmpty) {
+		m_fields->incompatible = true;
+		return true;
+	}
 
 	auto& textArea = m_fields->textArea;
 	auto& bg = m_fields->bg;
@@ -201,7 +204,7 @@ void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
 }
 
 void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
-	auto label = getChildOfType<CCLabelBMFont>(buttonSprite, 0);
+	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
 	if (!label) {
 		// log::info("Where the fuck is the label?");
 		return;
@@ -267,8 +270,8 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 		}
 
 		int& btnSelected = m_fields->btnSelected;
-		auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
-		auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+		auto label1 = m_button1->getChildByType<CCLabelBMFont>(0);
+		auto label2 = m_button2->getChildByType<CCLabelBMFont>(0);
 		if (key == KEY_ArrowLeft || key == KEY_Left) {
 			btnSelected = 1;
 			label1->setColor(ccColor3B{ 255,255,0 });
@@ -296,8 +299,8 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
 
 			int& btnSelected = m_fields->btnSelected;
 			btnSelected = 1;
-			auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
-			auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+			auto label1 = m_button1->getChildByType<CCLabelBMFont>(0);
+			auto label2 = m_button2->getChildByType<CCLabelBMFont>(0);
 			label1->setColor(ccColor3B{ 255,255,0 });
 			setHeartPosition(m_fields->btn1);
 			label2->setColor(ccColor3B{ 255,255,255 });
@@ -313,8 +316,8 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
 
 			int& btnSelected = m_fields->btnSelected;
 			btnSelected = 2;
-			auto label1 = getChildOfType<CCLabelBMFont>(m_button1, 0);
-			auto label2 = getChildOfType<CCLabelBMFont>(m_button2, 0);
+			auto label1 = m_button1->getChildByType<CCLabelBMFont>(0);
+			auto label2 = m_button2->getChildByType<CCLabelBMFont>(0);
 			label2->setColor(ccColor3B{ 255,255,0 });
 			setHeartPosition(m_fields->btn2);
 			label1->setColor(ccColor3B{ 255,255,255 });
@@ -391,7 +394,7 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 			return std::isspace(c);
 			});
 		if (!empty) break;
-		
+
 		lines++;
 
 		auto star = m_mainLayer->getChildByID("star"_spr);
