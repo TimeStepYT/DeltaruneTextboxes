@@ -52,7 +52,8 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
 
-	bool const isEmpty = std::ranges::all_of(desc, [](unsigned char c) {
+	std::string const descString = desc; // stupid android
+	bool const isEmpty = std::ranges::all_of(descString, [](unsigned char c) {
 		return std::isspace(c);
 		});
 	bool const prismLoaded = Loader::get()->isModLoaded("firee.prism");
