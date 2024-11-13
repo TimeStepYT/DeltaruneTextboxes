@@ -45,7 +45,7 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 	alert->m_fields->dialog = true;
 	alert->m_fields->dialogLayer = this;
 
-	Loader::get()->queueInMainThread([=] {
+	Loader::get()->queueInMainThread([=, this] {
 		this->setVisible(false);
 		if (!this->getParent()) {
 			alert->addChild(this);
