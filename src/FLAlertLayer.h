@@ -33,7 +33,11 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* bg;
 		CCSprite* heart;
 		CCLabelBMFont* title;
+#ifdef COLORED_SPRITES
+		CCSprite* characterSprite;
+#else
 		CCSpriteGrayscale* characterSprite;
+#endif
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
@@ -70,9 +74,9 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 
-	#if (defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
+#if (defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
 	void keyDown(enumKeyCodes) override;
-	#else 
+#else 
 	void initCustomKeybinds();
-	#endif
+#endif
 };
