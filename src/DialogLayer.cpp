@@ -27,13 +27,21 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 
 	if (dialogObject) {
 		auto texture = m_characterSprite->getTexture();
+#ifdef COLORED_SPRITES
+		auto sprite = CCSprite::createWithTexture(texture);
+#else
 		auto sprite = CCSpriteGrayscale::createWithTexture(texture);
+#endif
 		alert->m_fields->characterSprite = sprite;
 	}
 	else {
 		auto firstObj = static_cast<DialogObject*>(objects->objectAtIndex(0));
 		std::string textureName = fmt::format("dialogIcon_{:03}.png", firstObj->m_characterFrame);
+#ifdef COLORED_SPRITES
+		alert->m_fields->characterSprite = CCSprite::create(textureName);
+#else
 		alert->m_fields->characterSprite = CCSpriteGrayscale::create(textureName);
+#endif
 		for (int i = 0; i < objects->count(); i++) {
 			auto diaObj = static_cast<DialogObject*>(objects->objectAtIndex(i));
 			textureName = fmt::format("dialogIcon_{:03}.png", diaObj->m_characterFrame);

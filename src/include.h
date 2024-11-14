@@ -1,5 +1,9 @@
 #include <Geode/Geode.hpp>
 
+#ifdef GEODE_IS_MACOS
+#define COLORED_SPRITES 1
+#endif
+
 #include <Geode/fmod/fmod.hpp>
 #if !(defined(GEODE_IS_MACOS) || defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
 #include <geode.custom-keybinds/include/Keybinds.hpp>

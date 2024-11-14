@@ -1,3 +1,7 @@
+### v1.2.4
+- Port to 2.2074 and Geode 4.0.0
+- Mac is back to colored dialog portraits until the bindings are found again
+
 ### v1.2.3
 - Switch from getChildOfType to getChildByType because of it getting deprecated
 - Fixed popups from user95401 mods creating weird Deltarune-GD crossbreeds
