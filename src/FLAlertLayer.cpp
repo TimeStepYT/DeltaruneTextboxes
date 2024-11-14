@@ -471,7 +471,7 @@ void DeltaruneAlertLayer::progressText() {
 		auto& spriteName = characters[dialogCount];
 #ifdef COLORED_SPRITES
 		auto prevChar = (CCSprite*) m_mainLayer->getChildByID("character-sprite"_spr);
-		auto newChar = CCSprite::create(spriteName);
+		auto newChar = CCSprite::create(spriteName.c_str());
 #else
 		auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
 		auto newChar = CCSpriteGrayscale::create(spriteName);
