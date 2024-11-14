@@ -38,7 +38,7 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 		auto firstObj = static_cast<DialogObject*>(objects->objectAtIndex(0));
 		std::string textureName = fmt::format("dialogIcon_{:03}.png", firstObj->m_characterFrame);
 #ifdef COLORED_SPRITES
-		alert->m_fields->characterSprite = CCSprite::create(textureName);
+		alert->m_fields->characterSprite = CCSprite::create(textureName.c_str());
 #else
 		alert->m_fields->characterSprite = CCSpriteGrayscale::create(textureName);
 #endif
