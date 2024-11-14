@@ -429,7 +429,7 @@ void DeltaruneAlertLayer::progressText() {
 			auto dialogLayer = m_fields->dialogLayer;
 			done = true;
 			if (m_fields->dialog && dialogLayer) {
-				dialogLayer->onClose();
+				dialogLayer->keyBackClicked();
 			}
 			FLAlertLayer::onBtn1(btn1);
 			return;
