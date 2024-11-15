@@ -1,3 +1,6 @@
+### v1.2.5
+- Update to Geode 4.0.0-beta.1
+
 ### v1.2.4
 - Port to 2.2074 and Geode 4.0.0
 - Mac is back to colored dialog portraits until the bindings are found again
