@@ -1,3 +1,7 @@
+### v1.2.6
+- Reenabled grayscale dialog portraits on mac
+- Added the option to switch between grayscale and colored dialog portraits
+
 ### v1.2.5
 - Update to Geode 4.0.0-beta.1
 

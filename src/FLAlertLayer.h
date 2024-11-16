@@ -33,11 +33,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* bg;
 		CCSprite* heart;
 		CCLabelBMFont* title;
-#ifdef COLORED_SPRITES
 		CCSprite* characterSprite;
-#else
-		CCSpriteGrayscale* characterSprite;
-#endif
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;

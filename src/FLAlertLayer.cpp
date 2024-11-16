@@ -469,18 +469,25 @@ void DeltaruneAlertLayer::progressText() {
 	if (progressDialog) {
 		dialogCount++;
 		auto& spriteName = characters[dialogCount];
-#ifdef COLORED_SPRITES
-		auto prevChar = (CCSprite*) m_mainLayer->getChildByID("character-sprite"_spr);
-		auto newChar = CCSprite::create(spriteName.c_str());
-#else
-		auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
-		auto newChar = CCSpriteGrayscale::create(spriteName);
-#endif
-		newChar->setPosition(prevChar->getPosition());
-		newChar->setZOrder(prevChar->getZOrder());
-		m_fields->characterSprite = newChar;
-		newChar->setID("character-sprite"_spr);
-		m_mainLayer->addChild(newChar);
+		if (Mod::get()->getSettingValue<bool>("coloredPortraits")) {
+			auto prevChar = (CCSprite*) m_mainLayer->getChildByID("character-sprite"_spr);
+			auto newChar = CCSprite::create(spriteName.c_str());
+			newChar->setPosition(prevChar->getPosition());
+			newChar->setZOrder(prevChar->getZOrder());
+			m_fields->characterSprite = newChar;
+			newChar->setID("character-sprite"_spr);
+			m_mainLayer->addChild(newChar);
+		}
+		else {
+			auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
+			auto newChar = CCSpriteGrayscale::create(spriteName);
+			newChar->setPosition(prevChar->getPosition());
+			newChar->setZOrder(prevChar->getZOrder());
+			m_fields->characterSprite = newChar;
+			newChar->setID("character-sprite"_spr);
+			m_mainLayer->addChild(newChar);
+		}
+
 
 		auto title = m_fields->titles[dialogCount];
 		auto& nameToSound = m_fields->nameToSound;

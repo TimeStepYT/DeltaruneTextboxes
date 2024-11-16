@@ -146,6 +146,7 @@ void DeltaruneAlertLayer::changeText() {
 			sound = nameToSound[titleString];
 		else
 			sound = "Default";
+
 		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
 	}
 	star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
