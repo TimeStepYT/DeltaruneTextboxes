@@ -1,4 +1,7 @@
-### v1.2.6
+### v1.2.7
+- Fixed a crash that sometimes happened when speaking to the shopkeeper (and maybe other characters)
+
+### v1.2.6 (never released)
 - Reenabled grayscale dialog portraits on mac
 - Added the option to switch between grayscale and colored dialog portraits
 
