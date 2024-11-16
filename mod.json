@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.2.5",
+    "version": "v1.2.6",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {
@@ -100,6 +100,12 @@
             "default": false,
             "description": "Disables <cy>clicking</c> to progress textboxes",
             "platforms": ["win", "mac"]
+        },
+        "coloredPortraits": {
+            "name": "Colored Portraits",
+            "type": "bool",
+            "default": false,
+            "description": "<cr>Disables</c> the <cy>grayscale</c> effect on the <cj>dialog portraits</c>."
         },
         "noGradientOverlay": {
             "name": "Disable gradient",
