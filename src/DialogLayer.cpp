@@ -3,7 +3,7 @@
 
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
 	CCArray* objects = CCArray::create();
-	objects->addObjectsFromArray(objectsOriginal);
+	if (objectsOriginal) objects->addObjectsFromArray(objectsOriginal);
 	if (!DialogLayer::init(dialogObject, objectsOriginal, p2)) return false;
 
 	m_fields->dialogObject = dialogObject;
