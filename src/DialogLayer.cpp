@@ -2,7 +2,6 @@
 #include "FLAlertLayer.h"
 
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, int p2) {
-	if (!DialogLayer::init(dialogObject, objects, p2)) return false;
 	m_fields->dialogObject = dialogObject;
 	std::string character;
 	char const* title;
@@ -13,15 +12,18 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 		title = character.c_str();
 	}
 	else {
+		log::info("{}", objects);
 		character = static_cast<DialogObject*>(objects->objectAtIndex(0))->m_character;
 		title = character.c_str();
-		for (int i = 0; i < objects->count(); i++) {
-			if (text == "")
+		for (size_t i = 0; i < objects->count(); i++) {
+			if (text.length() == 0) {
 				text = static_cast<DialogObject*>(objects->objectAtIndex(i))->m_text;
+			}
 			else
 				text = fmt::format("{}\n\n\n\n{}", text, static_cast<DialogObject*>(objects->objectAtIndex(i))->m_text);
 		}
 	}
+	if (!DialogLayer::init(dialogObject, objects, p2)) return false;
 	auto unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
 	auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
@@ -65,7 +67,6 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 	return true;
 }
 void DeltaruneDialogLayer::displayNextObject() {
-	DialogLayer::displayNextObject();
 	this->setVisible(false);
 }
 void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {

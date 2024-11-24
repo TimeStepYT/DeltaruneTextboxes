@@ -1,3 +1,6 @@
+### v1.2.8
+- Fixed a bug where the first dialog doesn't appear
+
 ### v1.2.7
 - Fixed a crash that sometimes happened when speaking to the shopkeeper (and maybe other characters)
 
