@@ -1,3 +1,6 @@
+### v1.2.9
+- Fixed the crash that was born due to the fix
+
 ### v1.2.8
 - Fixed a bug where the first dialog doesn't appear
 
