@@ -1,7 +1,11 @@
 #include "DialogLayer.h"
 #include "FLAlertLayer.h"
 
-bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, int p2) {
+bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
+	CCArray* objects = CCArray::create();
+	objects->addObjectsFromArray(objectsOriginal);
+	if (!DialogLayer::init(dialogObject, objectsOriginal, p2)) return false;
+
 	m_fields->dialogObject = dialogObject;
 	std::string character;
 	char const* title;
@@ -12,7 +16,6 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 		title = character.c_str();
 	}
 	else {
-		log::info("{}", objects);
 		character = static_cast<DialogObject*>(objects->objectAtIndex(0))->m_character;
 		title = character.c_str();
 		for (size_t i = 0; i < objects->count(); i++) {
@@ -23,7 +26,6 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objects, in
 				text = fmt::format("{}\n\n\n\n{}", text, static_cast<DialogObject*>(objects->objectAtIndex(i))->m_text);
 		}
 	}
-	if (!DialogLayer::init(dialogObject, objects, p2)) return false;
 	auto unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
 	auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
