@@ -1,5 +1,5 @@
 {
-    "geode": "4.0.1",
+    "geode": "4.2.0",
     "gd": {
         "win": "2.2074",
         "android": "2.2074",
@@ -8,26 +8,27 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.2.9",
+    "version": "v1.3.0",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {
         "source": "https://github.com/TimeStepYT/DeltaruneTextboxes"
     },
-    "tags": ["customization"],
-    "dependencies": [
-        {
-            "id": "geode.node-ids",
-            "importance": "required",
-            "version": ">=1.10.0"
-        },
-        {
-            "id": "geode.custom-keybinds",
-            "version": ">=v1.7.1",
-            "platforms": ["win", "android64"],
-            "importance": "required"
-        }
+    "tags": [
+        "customization"
     ],
+    "dependencies": {
+        "geode.node-ids": ">=1.19.0",
+        "geode.custom-keybinds": {
+            "importance": "required",
+            "version": ">=v1.7.1",
+            "platforms": [
+                "win",
+                "macos",
+                "android64"
+            ]
+        }
+    },
     "resources": {
         "sprites": [
             "resources/undertaleSquare.png",
@@ -99,7 +100,10 @@
             "type": "bool",
             "default": false,
             "description": "Disables <cy>clicking</c> to progress textboxes",
-            "platforms": ["win", "mac"]
+            "platforms": [
+                "win",
+                "mac"
+            ]
         },
         "coloredPortraits": {
             "name": "Colored Portraits",

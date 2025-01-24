@@ -1,3 +1,6 @@
+### v1.3.0
+- Added Custom Keybinds support to MacOS!
+
 ### v1.2.9
 - Fixed the crash that was born due to the fix
 

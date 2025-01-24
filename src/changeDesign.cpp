@@ -111,7 +111,7 @@ void DeltaruneAlertLayer::changeButtons() {
 }
 
 void DeltaruneAlertLayer::changeTitle() {
-	CCLabelBMFont*& title = m_fields->title;
+	CCLabelBMFont* &title = m_fields->title;
 	auto& bg = m_fields->bg;
 	title->setAnchorPoint(CCPoint{ 0, 0 });
 	title->setFntFile("Determination.fnt"_spr);

@@ -13,6 +13,6 @@ If you're <c>able</c> to use the <cj>Custom Keybinds</c> mod, then you can <cj>r
 If you want to suggest a feature, create an issue on github or ping me on discord (@timestepyt)
 
 # Special Thanks
-<cr>prevter</c>: Answered my stupid questions, and helped a lot!
+<cr>prevter</c>: Answered my stupid questions and helped alot!
 
 JohnnyEnglish1: Reported a bug where choices don't appear, which never happened to me.
