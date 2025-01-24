@@ -4,7 +4,7 @@ This Geometry Dash mod turns every Popup into a Deltarune styled Textbox!
 You can advance the text by pressing Z, Enter or by clicking/tapping on the screen!
 You can skip the text by pressing X, Space or clicking/tapping on the screen!
 
-Keybinds changeable if you use the Custom Keybinds mod!
+Keybinds changeable with the Custom Keybinds mod!
 
 Apply using the Geode mod loader!
 
