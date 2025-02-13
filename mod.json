@@ -14,21 +14,20 @@
     "links": {
         "source": "https://github.com/TimeStepYT/DeltaruneTextboxes"
     },
-    "tags": [
-        "customization"
-    ],
-    "dependencies": {
-        "geode.node-ids": ">=1.19.0",
-        "geode.custom-keybinds": {
+    "tags": ["customization"],
+    "dependencies": [
+        {
+            "id": "geode.node-ids",
+            "version": ">=1.19.0",
+            "importance": "required"
+        },
+        {
+            "id": "geode.custom-keybinds",
             "importance": "required",
             "version": ">=v1.7.1",
-            "platforms": [
-                "win",
-                "macos",
-                "android64"
-            ]
+            "platforms": ["win", "macos", "android64"]
         }
-    },
+    ],
     "resources": {
         "sprites": [
             "resources/undertaleSquare.png",
@@ -100,10 +99,7 @@
             "type": "bool",
             "default": false,
             "description": "Disables <cy>clicking</c> to progress textboxes",
-            "platforms": [
-                "win",
-                "mac"
-            ]
+            "platforms": ["win", "mac"]
         },
         "coloredPortraits": {
             "name": "Colored Portraits",

@@ -16,7 +16,7 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 		title = character.c_str();
 	}
 	else {
-		character = static_cast<DialogObject*>(objects->objectAtIndex(0))->m_character;
+		character = static_cast<DialogObject*>(objects->firstObject())->m_character;
 		title = character.c_str();
 		for (size_t i = 0; i < objects->count(); i++) {
 			if (text.length() == 0) {
@@ -40,7 +40,7 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 		alert->m_fields->characterSprite = sprite;
 	}
 	else {
-		auto firstObj = static_cast<DialogObject*>(objects->objectAtIndex(0));
+		auto firstObj = static_cast<DialogObject*>(objects->firstObject());
 		std::string textureName = fmt::format("dialogIcon_{:03}.png", firstObj->m_characterFrame);
 
 		if (Mod::get()->getSettingValue<bool>("coloredPortraits"))
