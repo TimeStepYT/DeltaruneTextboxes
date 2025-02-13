@@ -52,12 +52,12 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	NodeIDs::provideFor(this);
 	setID("FLAlertLayer");
 
-	std::string const descString = desc; // stupid android
+	std::string_view descString = desc;
 	bool const isEmpty = std::ranges::all_of(descString, [](unsigned char c) {
 		return std::isspace(c);
 		});
 	bool const prismLoaded = Loader::get()->isModLoaded("firee.prism");
-	std::string prismString = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // probably the easiest way to detect a Prism Menu alert :3
+	std::string_view prismString{ "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }; // probably the easiest way to detect a Prism Menu alert :3
 	if ((prismLoaded && desc == prismString) || isEmpty) {
 		m_fields->incompatible = true;
 		return true;
@@ -192,20 +192,17 @@ void DeltaruneAlertLayer::show() {
 	changeLook();
 }
 void DeltaruneAlertLayer::setHeartPosition(CCMenuItemSpriteExtra* button) {
-	auto& heart = m_fields->heart;
-	CCNode* text = button->getChildByType<ButtonSprite>(0)->getChildByType<CCLabelBMFont>(0);
+	auto& heart{ m_fields->heart };
+	auto text{ button->getChildByType<ButtonSprite>(0)->getChildByType<CCLabelBMFont>(0) };
 
 	if (!text) return;
-	
+
 	heart->setPositionX(m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5);
 }
 
 void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
-	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
-	if (!label) {
-		// log::info("Where the fuck is the label?");
-		return;
-	}
+	auto label{ buttonSprite->getChildByType<CCLabelBMFont>(0) };
+	if (!label) return;
 	if (btn->isSelected()) {
 		label->setColor(ccColor3B{ 255, 255, 0 });
 		m_fields->btnSelected = btnSelected;
@@ -227,20 +224,9 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	auto& btn2 = m_fields->btn2;
 	int& btnSelected = m_fields->btnSelected;
 
-	if (!btn1) {
-		// log::info("No btn1");
-		return ret;
-	}
-	if (!btn2) {
-		// log::info("No btn2");
-		return ret;
-	}
-
-	if (!btn1->isSelected() && !btn2->isSelected()) {
-		// log::info("None of the buttons are clicked");
-		return ret;
-	}
-	// log::info("No problems in ccTouchBegan!");
+	if (!btn1 || !btn2) return ret;
+	if (!btn1->isSelected() && !btn2->isSelected()) return ret;
+	
 	clickedOnButton(btn1, m_button1, 1);
 	clickedOnButton(btn2, m_button2, 2);
 	return ret;
@@ -350,7 +336,7 @@ void DeltaruneAlertLayer::skipText() {
 	if (!clippingNode) return;
 	CCArrayExt<TextArea*> textAreas = clippingNode->getChildren();
 	for (auto textArea : textAreas) {
-		CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
+		CCArrayExt<CCLabelBMFont*> lines = textArea->getChildByType<MultilineBitmapFont>(0)->getChildren();
 
 		for (int i = linesProgressed + m_fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
 			auto line = lines[i];
@@ -374,19 +360,17 @@ void DeltaruneAlertLayer::skipText() {
 }
 
 int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
-	auto& textArea = m_fields->textArea;
-	auto& linesProgressed = m_fields->linesProgressed;
-	auto fontNode = (CCNode*) textArea->getChildren()->objectAtIndex(0);
-	int lines = 0;
+	auto& textArea{ m_fields->textArea };
+	auto& linesProgressed{ m_fields->linesProgressed };
+	auto fontNode{ textArea->getChildByType<MultilineBitmapFont>(0) };
+	int lines{ 0 };
 	while (true) {
 		if (linesProgressed + lines + offset >= fontNode->getChildrenCount()) break;
 
-		auto topLineNode = fontNode->getChildren()->objectAtIndex(linesProgressed + lines + offset);
-		auto topLine = static_cast<CCLabelBMFont*>(topLineNode);
-		if (!topLineNode) break;
+		auto topLine{ fontNode->getChildByType<CCLabelBMFont>(linesProgressed + lines + offset) };
 		if (!topLine) break;
 
-		std::string topLineString = topLine->getString();
+		std::string_view topLineString = topLine->getString();
 		bool empty = std::ranges::all_of(topLineString, [](unsigned char c) {
 			return std::isspace(c);
 			});
@@ -394,8 +378,8 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 
 		lines++;
 
-		auto star = m_mainLayer->getChildByID("star"_spr);
-		auto starShadow = m_mainLayer->getChildByID("starShadow"_spr);
+		auto star{ m_mainLayer->getChildByID("star"_spr) };
+		auto starShadow{ m_mainLayer->getChildByID("starShadow"_spr) };
 
 		if (star) star->setVisible(true);
 		if (starShadow) starShadow->setVisible(true);
@@ -408,21 +392,21 @@ void DeltaruneAlertLayer::progressText() {
 	if (!m_buttonMenu) return;
 	if (!m_fields->textAreaClippingNode) return;
 
-	auto& textArea = m_fields->textArea;
-	auto& btn1 = m_fields->btn1;
-	auto& btn2 = m_fields->btn2;
-	auto& shadow = m_fields->shadow;
-	auto& gradientOverlay = m_fields->gradientOverlay;
-	int& btnSelected = m_fields->btnSelected;
-	int& linesProgressed = m_fields->linesProgressed;
-	bool& done = m_fields->done;
-	bool& noShadow = m_fields->noShadow;
+	auto& textArea{ m_fields->textArea };
+	auto& btn1{ m_fields->btn1 };
+	auto& btn2{ m_fields->btn2 };
+	auto& shadow{ m_fields->shadow };
+	auto& gradientOverlay{ m_fields->gradientOverlay };
+	int& btnSelected{ m_fields->btnSelected };
+	int& linesProgressed{ m_fields->linesProgressed };
+	bool& done{ m_fields->done };
+	bool& noShadow{ m_fields->noShadow };
 
 	if (!textArea) return;
 
 	if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
 		if (!m_button2) {
-			auto dialogLayer = m_fields->dialogLayer;
+			auto dialogLayer{ m_fields->dialogLayer };
 			done = true;
 			if (m_fields->dialog && dialogLayer) {
 				dialogLayer->keyBackClicked();
@@ -485,7 +469,7 @@ void DeltaruneAlertLayer::progressText() {
 		}
 
 
-		auto title = m_fields->titles[dialogCount];
+		auto& title = m_fields->titles[dialogCount];
 		auto& nameToSound = m_fields->nameToSound;
 		m_fields->title->setString(title.c_str());
 		m_mainLayer->removeChildByID("character-sprite"_spr);
@@ -541,12 +525,12 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		else rolledPage = false;
 
 		for (auto textArea : textAreas) {
-			CCArrayExt<CCLabelBMFont*> lines = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0))->getChildren();
+			CCArrayExt<CCLabelBMFont*> lines = textArea->getChildByType<MultilineBitmapFont>(0)->getChildren();
 			int currentLine = linesProgressed + rollingLine;
 			if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
-				auto line = lines[currentLine];
-				CCArrayExt<CCNode*> letters = line->getChildren();
-				auto letter = letters[characterCount];
+				auto line{ lines[currentLine] };
+				CCArrayExt<CCNode*> letters{ line->getChildren() };
+				auto letter{ letters[characterCount] };
 				if (letter->isVisible()) {
 					unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 					doneRolling = true;
