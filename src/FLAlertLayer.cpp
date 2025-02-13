@@ -8,8 +8,8 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 }
 
 void DeltaruneAlertLayer::initMaps() {
-	auto& nameToFile = m_fields->nameToFile;
-	auto& nameToSound = m_fields->nameToSound;
+	auto& nameToFile{ m_fields->nameToFile };
+	auto& nameToSound{ m_fields->nameToSound };
 
 	nameToFile["Default"] = "SND_TXT1";
 	nameToFile["Typewriter"] = "SND_TXT2";
@@ -148,18 +148,18 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 }
 
 int DeltaruneAlertLayer::getLinesLeft() {
-	auto& textArea = m_fields->textArea;
+	auto& textArea{ m_fields->textArea };
 	if (!m_fields->textAreaClippingNode) return 0;
 	if (!textArea) return 0;
 
-	auto bitmapFont = static_cast<CCNode*>(textArea->getChildren()->objectAtIndex(0));
-	CCArrayExt<CCLabelBMFont*> content = bitmapFont->getChildren();
+	auto bitmapFont{ textArea->getChildByType<MultilineBitmapFont>(0) };
+	CCArrayExt<CCLabelBMFont*> content{ bitmapFont->getChildren() };
 	return content.size() - m_fields->linesProgressed;
 }
 void DeltaruneAlertLayer::show() {
-	bool& showing = m_fields->showing;
-	bool& incompatible = m_fields->incompatible;
-	auto& titleNode = m_fields->title;
+	bool& showing{ m_fields->showing };
+	bool& incompatible{ m_fields->incompatible };
+	auto& titleNode{ m_fields->title };
 
 	FLAlertLayer::show();
 
@@ -173,7 +173,7 @@ void DeltaruneAlertLayer::show() {
 	if (!m_mainLayer) return;
 
 
-	auto title = std::string_view(titleNode->getString());
+	auto title{ std::string_view(titleNode->getString()) };
 
 	if (Loader::get()->isModLoaded("user95401.geode-mod-comments") && (title == "Create Comment" || this->getID() == "finish")) {
 		this->setVisible(false);
@@ -191,16 +191,12 @@ void DeltaruneAlertLayer::show() {
 	decideToBlockKeys();
 	changeLook();
 }
-void DeltaruneAlertLayer::setHeartPosition(CCNode* button) {
+void DeltaruneAlertLayer::setHeartPosition(CCMenuItemSpriteExtra* button) {
 	auto& heart = m_fields->heart;
-	CCNode* text = nullptr;
-	for (auto node : (CCArrayExt<CCNode*>) static_cast<CCNode*>(button->getChildren()->objectAtIndex(0))->getChildren()) {
-		if (auto label = typeinfo_cast<CCLabelBMFont*>(node)) {
-			text = label;
-			break;
-		}
-	}
+	CCNode* text = button->getChildByType<ButtonSprite>(0)->getChildByType<CCLabelBMFont>(0);
+
 	if (!text) return;
+	
 	heart->setPositionX(m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5);
 }
 
@@ -510,22 +506,22 @@ void DeltaruneAlertLayer::progressText() {
 }
 
 void DeltaruneAlertLayer::rollText(float dt) {
-	int& waitQueue = m_fields->waitQueue;
-	int& linesProgressed = m_fields->linesProgressed;
-	int& characterCount = m_fields->characterCount;
-	int& rollingLine = m_fields->rollingLine;
-	bool& playedSound = m_fields->playedSound;
-	bool& doneRolling = m_fields->doneRolling;
-	bool& rolledPage = m_fields->rolledPage;
-	float& lostTime = m_fields->lostTime;
-	float const pause = Mod::get()->getSettingValue<double>("textRollingPause") / 30;
+	int& waitQueue{ m_fields->waitQueue };
+	int& linesProgressed{ m_fields->linesProgressed };
+	int& characterCount{ m_fields->characterCount };
+	int& rollingLine{ m_fields->rollingLine };
+	bool& playedSound{ m_fields->playedSound };
+	bool& doneRolling{ m_fields->doneRolling };
+	bool& rolledPage{ m_fields->rolledPage };
+	float& lostTime{ m_fields->lostTime };
+	double const pause{ Mod::get()->getSettingValue<double>("textRollingPause") / 30 };
 
 	if (dt - pause > pause)
 		lostTime += dt - pause;
 
 	bool playSound = true;
 
-	for (bool firstRun = true; lostTime >= pause || firstRun;) {
+	for (bool firstRun{ true }; lostTime >= pause || firstRun;) {
 		bool newLine = false;
 		firstRun = false;
 		if (waitQueue != 0) {
@@ -595,10 +591,10 @@ void DeltaruneAlertLayer::rollText(float dt) {
 			lostTime -= pause;
 		}
 	}
-	auto nameToFile = m_fields->nameToFile;
-	std::string const textSound = m_fields->textSound;
-	std::string const resFolder = Mod::get()->getResourcesDir().string();
-	std::string path = fmt::format("{}/{}.wav", resFolder, nameToFile[textSound]);
+	auto& nameToFile = m_fields->nameToFile;
+	auto const textSound = m_fields->textSound;
+	auto const resFolder = Mod::get()->getResourcesDir().string();
+	auto path = fmt::format("{}/{}.wav", resFolder, nameToFile[textSound]);
 
 	if (nameToFile.find(textSound) == nameToFile.end()) return;
 
@@ -606,12 +602,12 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		playedSound = false;
 		return;
 	}
-	float pitch = 1;
+	float pitch{ 1.f };
 	playedSound = true;
 
-	auto& system = m_fields->system;
-	auto& channel = m_fields->channel;
-	auto& sound = m_fields->sound;
+	auto& system{ m_fields->system };
+	auto& channel{ m_fields->channel };
+	auto& sound{ m_fields->sound };
 
 	if (textSound == "Queen")
 		pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
