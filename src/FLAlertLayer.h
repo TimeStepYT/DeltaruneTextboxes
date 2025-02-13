@@ -42,8 +42,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::vector<std::string> titles;
 		std::string text = "";
 		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
-		std::unordered_map<std::string, std::string> nameToFile;
-		std::unordered_map<std::string, std::string> nameToSound;
+		std::unordered_map<std::string_view, std::string_view> nameToFile;
+		std::unordered_map<std::string_view, std::string_view> nameToSound;
 	};
 	void animateBG(float);
 	void changeBG();
@@ -59,7 +59,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void handleLetters(TextArea*, bool&, bool&);
 	void rollText(float);
 	void showButtons();
-	void setHeartPosition(CCNode*);
+	void setHeartPosition(CCMenuItemSpriteExtra*);
 	int getLinesLeft();
 	void skipText();
 	int emptyLinesAmount(int = 0);

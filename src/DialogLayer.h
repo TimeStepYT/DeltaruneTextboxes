@@ -4,6 +4,7 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 	struct Fields {
 		DialogObject* dialogObject;
 		FLAlertLayer* alert;
+		CCLayer* dialogMainLayer;
 	};
 	bool init(DialogObject*, CCArray*, int);
 	void displayNextObject();
