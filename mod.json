@@ -25,7 +25,12 @@
             "id": "geode.custom-keybinds",
             "importance": "required",
             "version": ">=v1.7.1",
-            "platforms": ["win", "macos", "android64"]
+            "platforms": [
+                "win",
+                "mac-intel",
+                "mac-arm",
+                "android64"
+            ]
         }
     ],
     "resources": {
