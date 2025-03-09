@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} SHARED
     src/DialogLayer.cpp
     src/CCKeyboardDispatcher.cpp
     src/changeDesign.cpp
+    src/PurchaseItemPopup.cpp
     # Add any extra C++ source files here
 )
 

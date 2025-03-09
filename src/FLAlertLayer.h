@@ -42,8 +42,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::vector<std::string> titles;
 		std::string text = "";
 		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
-		std::unordered_map<std::string_view, std::string_view> nameToFile;
-		std::unordered_map<std::string_view, std::string_view> nameToSound;
+		std::unordered_map<std::string, std::string_view> nameToFile;
+		std::unordered_map<std::string, std::string_view> nameToSound;
 	};
 	void animateBG(float);
 	void changeBG();

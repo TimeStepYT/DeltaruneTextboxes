@@ -1,3 +1,6 @@
+### v1.4.0
+- Made purchase popups look Deltarune as well!
+
 ### v1.3.0
 - Added Custom Keybinds support to MacOS!
 

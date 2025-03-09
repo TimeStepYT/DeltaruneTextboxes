@@ -91,14 +91,14 @@ void DeltaruneAlertLayer::changeButtons() {
 	m_buttonMenu->setVisible(false);
 
 	if (!m_button2) return;
-	auto& bg{ m_fields->bg };
-	float const positionStart{ bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2 };
+	auto& bg = m_fields->bg;
+	float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2;
 	m_fields->btn1->setPositionX(positionStart + m_fields->screenSize / 4);
 	m_fields->btn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
 
-	CCArrayExt<CCNode*> buttons{ m_buttonMenu->getChildren() };
+	CCArrayExt<CCNode*> buttons = m_buttonMenu->getChildren();
 
-	auto heart{ CCSprite::create("heart.png"_spr) };
+	auto heart = CCSprite::create("heart.png"_spr);
 	heart->setVisible(false);
 	heart->setPositionY(m_buttonMenu->getPositionY());
 	heart->setPositionX(m_buttonMenu->getPositionX());
@@ -111,33 +111,33 @@ void DeltaruneAlertLayer::changeButtons() {
 }
 
 void DeltaruneAlertLayer::changeTitle() {
-	auto& title{ m_fields->title };
-	auto& bg{ m_fields->bg };
+	auto& title = m_fields->title;
+	auto& bg = m_fields->bg;
 	title->setAnchorPoint(CCPoint{ 0, 0 });
 	title->setFntFile("Determination.fnt"_spr);
 	title->setPosition(CCPoint{ bg->getPositionX() - bg->getContentWidth() / 2 + 24, 138 });
 }
 void DeltaruneAlertLayer::changeText() {
-	auto& textArea{ m_fields->textArea };
+	auto& textArea = m_fields->textArea;
 	if (!textArea) return;
 	textArea->removeFromParent();
 
-	auto& sound{ m_fields->textSound };
-	auto& size{ m_fields->textSize };
-	auto& nameToSound{ m_fields->nameToSound };
-	bool& noShadow{ m_fields->noShadow };
+	auto& sound = m_fields->textSound;
+	auto& size = m_fields->textSize;
+	auto& nameToSound = m_fields->nameToSound;
+	bool& noShadow = m_fields->noShadow;
 
 
 	noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
 
-	CCLabelBMFont* star{ CCLabelBMFont::create("*", "Determination.fnt"_spr) };
-	CCLabelBMFont* starShadow{ nullptr };
+	CCLabelBMFont* star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+	CCLabelBMFont* starShadow = nullptr;
 	if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 
-	auto str{ m_fields->text };
-	auto screenSize{ m_fields->screenSize };
-	auto& bg{ m_fields->bg };
-	std::string_view titleString{ m_fields->title->getString() };
+	auto str = m_fields->text;
+	auto screenSize = m_fields->screenSize;
+	auto& bg = m_fields->bg;
+	auto titleString = m_fields->title->getString();
 
 	int xOffset = star->getContentWidth();
 
@@ -184,8 +184,8 @@ void DeltaruneAlertLayer::changeText() {
 	newDesc->setZOrder(textArea->getZOrder());
 	newDesc->setID("content-text-area");
 
-	TextArea* newDescGrad{ nullptr };
-	TextArea* newDescShad{ nullptr };
+	TextArea* newDescGrad = nullptr;
+	TextArea* newDescShad = nullptr;
 	if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
 		newDescGrad = TextArea::create(
 			str,
@@ -202,7 +202,7 @@ void DeltaruneAlertLayer::changeText() {
 		newDescGrad->setZOrder(textArea->getZOrder() + 1);
 		newDescGrad->setID("gradient-overlay"_spr);
 
-		CCArrayExt<CCLabelBMFont*> linesGrad{ newDescGrad->getChildByType<MultilineBitmapFont>(0)->getChildren() };
+		CCArrayExt<CCLabelBMFont*> linesGrad = newDescGrad->getChildByType<MultilineBitmapFont>(0)->getChildren();
 		for (auto line : linesGrad) {
 			CCArrayExt<CCSprite*> letters = line->getChildren();
 			for (auto letter : letters) {
@@ -234,10 +234,10 @@ void DeltaruneAlertLayer::changeText() {
 			CCArrayExt<CCSprite*> letters = line->getChildren();
 			int j = 0;
 			for (auto letter : letters) {
-				auto origLinesParent{ newDesc->getChildByType<MultilineBitmapFont>(0) };
-				auto origLine{ origLinesParent->getChildByType<CCLabelBMFont>(i) };
-				auto origChar{ origLine->getChildByType<CCSprite>(j) };
-				auto color{ origChar->getColor() };
+				auto origLinesParent = newDesc->getChildByType<MultilineBitmapFont>(0);
+				auto origLine = origLinesParent->getChildByType<CCLabelBMFont>(i);
+				auto origChar = origLine->getChildByType<CCSprite>(j);
+				auto color = origChar->getColor();
 
 				if (color == ccColor3B{ 255,255,255 }) letter->setColor({ 15, 15, 127 });
 				else if (color == ccColor3B{ 255, 0, 255 }) letter->setColor({ 76, 0, 76 });
@@ -259,7 +259,7 @@ void DeltaruneAlertLayer::changeText() {
 			i++;
 		}
 	}
-	CCArrayExt<CCLabelBMFont*> lines{ newDesc->getChildByType<MultilineBitmapFont>(0)->getChildren() };
+	CCArrayExt<CCLabelBMFont*> lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildren();
 
 	for (auto line : lines) {
 		CCArrayExt<CCSprite*> letters = line->getChildren();
@@ -282,7 +282,7 @@ void DeltaruneAlertLayer::changeText() {
 	textArea = newDesc;
 	m_fields->gradientOverlay = newDescGrad;
 	m_fields->shadow = newDescShad;
-	double pause{ Mod::get()->getSettingValue<double>("textRollingPause") };
+	double pause = Mod::get()->getSettingValue<double>("textRollingPause");
 
 	m_fields->linesProgressed += emptyLinesAmount();
 	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * m_fields->linesProgressed);
