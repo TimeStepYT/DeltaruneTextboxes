@@ -7,6 +7,7 @@
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/DialogLayer.hpp>
+#include <Geode/modify/PurchaseItemPopup.hpp>
 #include <vector>
 #include <random>
 
