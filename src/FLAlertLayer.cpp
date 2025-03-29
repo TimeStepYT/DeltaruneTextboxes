@@ -320,7 +320,7 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
 		}
 		return ListenerResult::Propagate;
 		}, "progress"_spr);
-	this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
+	this->template addEventListener<keybinds::InvokeBindFilter>([this](keybinds::InvokeBindEvent* event) {
 		if (event->isDown()) {
 			skipText();
 			return ListenerResult::Stop;
