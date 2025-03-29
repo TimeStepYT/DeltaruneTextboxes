@@ -2,17 +2,17 @@
 #include "FLAlertLayer.h"
 
 template<class T>
-bool vectorContains(std::vector<T> vector, T value) {
+bool vectorContains(std::vector<T>& vector, T value) {
 	return std::find(vector.begin(), vector.end(), value) != vector.end();
 }
 
 void capitalize(std::string& str) {
 	bool disable = false;
 	auto nextFilter = std::vector<char>{ 'c', 'd', '/', 'i', 's' };
-	for (char& c : str) {
-		char next = *(&c + 1);
+	for (auto& c : str) {
+		char* const next = (&c + sizeof(c));
 		if (c == '<') {
-			if (vectorContains(nextFilter, next)) {
+			if (vectorContains(nextFilter, *next)) {
 				disable = true;
 				continue;
 			}
@@ -49,14 +49,17 @@ void DeltaruneAlertLayer::animateBG(float dt) {
 
 void DeltaruneAlertLayer::changeBG() {
 	auto& bg = m_fields->bg;
-	auto const screenSize = m_fields->screenSize;
-	auto& character = m_fields->characterSprite;
+	auto& screenSize = m_fields->screenSize;
+	auto& imageNode = m_fields->imageNode;
 	auto undertaleBG = Mod::get()->getSettingValue<bool>("undertaleBG");
+
 	bg->removeFromParentAndCleanup(true);
+
 	if (undertaleBG)
 		bg = CCScale9Sprite::create("undertaleSquare.png"_spr);
 	else
 		bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
+
 	bg->setContentHeight(140);
 	bg->setContentWidth(screenSize);
 	bg->setPosition(CCPoint{ CCDirector::sharedDirector()->getWinSize().width / 2, 70 });
@@ -67,24 +70,26 @@ void DeltaruneAlertLayer::changeBG() {
 		schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
 
 	if (m_fields->dialog) {
-		character->setZOrder(bg->getZOrder() + 1);
-		character->setPosition({ bg->getPositionX() - screenSize / 2 + 65, bg->getPositionY() });
-
-		character->setID("character-sprite"_spr);
-		m_mainLayer->addChild(character);
+		imageNode->setZOrder(bg->getZOrder() + 1);
+		imageNode->setPosition({ bg->getPositionX() - screenSize / 2 + 68, bg->getPositionY() });
 	}
 	m_mainLayer->addChild(bg);
 }
+
 void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite) {
 	btn->m_animationEnabled = false;
+
 	auto buttonTexture = buttonSprite->getChildByType<CCScale9Sprite>(0);
-	if (buttonTexture) buttonTexture->setVisible(false);
+	if (buttonTexture)
+		buttonTexture->setVisible(false);
+
 	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
 	if (label) {
 		label->setFntFile("Determination.fnt"_spr);
 		label->setScale(1);
 	}
 }
+
 void DeltaruneAlertLayer::changeButtons() {
 	if (!m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
@@ -117,6 +122,7 @@ void DeltaruneAlertLayer::changeTitle() {
 	title->setFntFile("Determination.fnt"_spr);
 	title->setPosition(CCPoint{ bg->getPositionX() - bg->getContentWidth() / 2 + 24, 138 });
 }
+
 void DeltaruneAlertLayer::changeText() {
 	auto& textArea = m_fields->textArea;
 	if (!textArea) return;
@@ -147,7 +153,7 @@ void DeltaruneAlertLayer::changeText() {
 		else
 			sound = "Default";
 
-		xOffset = m_fields->characterSprite->getContentWidth() + 27 + star->getContentWidth();
+		xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
 	}
 	star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
 	star->setPositionY(110);
@@ -158,7 +164,7 @@ void DeltaruneAlertLayer::changeText() {
 		starShadow->setPositionY(109);
 		starShadow->setZOrder(0);
 		starShadow->setID("starShadow"_spr);
-		auto character{ starShadow->getChildByType<CCSprite>(0) };
+		auto character = starShadow->getChildByType<CCSprite>(0);
 		character->setColor({ 15, 15, 127 });
 	}
 	std::string font = "Determination.fnt"_spr;
@@ -167,7 +173,7 @@ void DeltaruneAlertLayer::changeText() {
 		font = "Papyrus.fnt"_spr;
 		capitalize(str);
 	}
-	float creatingWidth = screenSize - 100 - xOffset * 2;
+	float creatingWidth = screenSize - 100 - xOffset;
 	auto newDesc = TextArea::create(
 		str,
 		font.c_str(),
@@ -291,6 +297,7 @@ void DeltaruneAlertLayer::changeText() {
 
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
+
 void DeltaruneAlertLayer::changeLook() {
 	changeBG();
 	changeButtons();

@@ -1,4 +1,5 @@
 #include "include.h"
+#include "ImageNode.h"
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
@@ -33,7 +34,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCNode* bg;
 		CCSprite* heart;
 		CCLabelBMFont* title;
-		CCSprite* characterSprite;
+		ImageNode* imageNode;
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
 		FMOD::Channel* channel;
@@ -56,13 +57,13 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void show() override;
 	void initMaps();
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
-	void handleLetters(TextArea*, bool&, bool&);
 	void rollText(float);
 	void showButtons();
 	void setHeartPosition(CCMenuItemSpriteExtra*);
 	int getLinesLeft();
 	void skipText();
 	int emptyLinesAmount(int = 0);
+	void createImageNode();
 	void progressText();
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);

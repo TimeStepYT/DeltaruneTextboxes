@@ -1,5 +1,6 @@
 #include "FLAlertLayer.h"
 #include "DialogLayer.h"
+#include "ImageNode.h"
 
 bool blockKeys = false;
 
@@ -389,6 +390,15 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 	return lines;
 }
 
+void DeltaruneAlertLayer::createImageNode() {
+	auto& imageNode = m_fields->imageNode;
+
+	imageNode = ImageNode::create();
+	imageNode->setID("image-node"_spr);
+
+	m_mainLayer->addChild(imageNode);
+}
+
 void DeltaruneAlertLayer::progressText() {
 	if (!m_mainLayer) return;
 	if (!m_buttonMenu) return;
@@ -451,30 +461,20 @@ void DeltaruneAlertLayer::progressText() {
 	if (progressDialog) {
 		dialogCount++;
 		auto& spriteName = characters[dialogCount];
-		if (Mod::get()->getSettingValue<bool>("coloredPortraits")) {
-			auto prevChar = (CCSprite*) m_mainLayer->getChildByID("character-sprite"_spr);
-			auto newChar = CCSprite::create(spriteName.c_str());
-			newChar->setPosition(prevChar->getPosition());
-			newChar->setZOrder(prevChar->getZOrder());
-			m_fields->characterSprite = newChar;
-			newChar->setID("character-sprite"_spr);
-			m_mainLayer->addChild(newChar);
-		}
-		else {
-			auto prevChar = (CCSpriteGrayscale*) m_mainLayer->getChildByID("character-sprite"_spr);
-			auto newChar = CCSpriteGrayscale::create(spriteName);
-			newChar->setPosition(prevChar->getPosition());
-			newChar->setZOrder(prevChar->getZOrder());
-			m_fields->characterSprite = newChar;
-			newChar->setID("character-sprite"_spr);
-			m_mainLayer->addChild(newChar);
-		}
+		auto& imageNode = m_fields->imageNode;
 
+		if (!imageNode) // Just in case! I have no idea what other mods will do to my stuff...
+			createImageNode();
 
+		imageNode->removeAllChildrenWithCleanup(true);
+		imageNode->setCharacterImage(spriteName);
+
+		// Setting the title
 		auto& title = m_fields->titles[dialogCount];
-		auto& nameToSound = m_fields->nameToSound;
 		m_fields->title->setString(title.c_str());
-		m_mainLayer->removeChildByID("character-sprite"_spr);
+
+		// Getting the right text sound based on the character name
+		auto& nameToSound = m_fields->nameToSound;
 		if (nameToSound.find(title.c_str()) != nameToSound.end())
 			m_fields->textSound = nameToSound[title.c_str()];
 		else
