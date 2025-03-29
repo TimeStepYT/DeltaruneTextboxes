@@ -1,5 +1,7 @@
 ### v1.4.0
 - Made purchase popups look Deltarune as well!
+- Made the character image spot able to hold multiple nodes inside
+- Update to Geode 4.3.1
 
 ### v1.3.0
 - Added Custom Keybinds support to MacOS!

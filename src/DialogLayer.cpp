@@ -29,23 +29,21 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 	auto unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
 	auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
+	auto& imageNode = alert->m_fields->imageNode;
+
+	alert->createImageNode();
+
 	if (dialogObject) {
 		CCSprite* sprite;
 		auto texture = m_characterSprite->getTexture();
 
-		if (Mod::get()->getSettingValue<bool>("coloredPortraits"))
-			sprite = CCSprite::createWithTexture(texture);
-		else sprite = CCSpriteGrayscale::createWithTexture(texture);
-
-		alert->m_fields->characterSprite = sprite;
+		imageNode->setCharacterImage(texture);
 	}
 	else {
 		auto firstObj = static_cast<DialogObject*>(objects->firstObject());
 		std::string textureName = fmt::format("dialogIcon_{:03}.png", firstObj->m_characterFrame);
 
-		if (Mod::get()->getSettingValue<bool>("coloredPortraits"))
-			alert->m_fields->characterSprite = CCSprite::create(textureName.c_str());
-		else alert->m_fields->characterSprite = CCSpriteGrayscale::create(textureName);
+		imageNode->setCharacterImage(textureName);
 
 		for (int i = 0; i < objects->count(); i++) {
 			auto diaObj = static_cast<DialogObject*>(objects->objectAtIndex(i));

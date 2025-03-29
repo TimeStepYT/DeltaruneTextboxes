@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} SHARED
     src/CCKeyboardDispatcher.cpp
     src/changeDesign.cpp
     src/PurchaseItemPopup.cpp
+    src/ImageNode.cpp
     # Add any extra C++ source files here
 )
 
