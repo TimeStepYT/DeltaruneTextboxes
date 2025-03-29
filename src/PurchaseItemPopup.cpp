@@ -2,8 +2,21 @@
 
 void DeltarunePurchaseItemPopup::handlePurchasePopup() {
     auto& quickPopup = m_fields->quickPopup;
+    auto itemIcon = m_mainLayer->getChildByType<GJItemIcon>(0);
+    auto bg = quickPopup->m_mainLayer->getChildByID("background");
 
+    if (!bg) return;
+    
+    float xPos = bg->getPositionX();
+    float yPos = bg->getContentHeight() + itemIcon->getContentHeight() / 2 - 3;
+    
+    itemIcon->setPositionX(xPos);
+    itemIcon->setPositionY(yPos);
+    
+    quickPopup->m_mainLayer->addChild(itemIcon);
+    
     this->setVisible(false);
+
     quickPopup->setTouchPriority(this->getTouchPriority() + 1);
     quickPopup->setVisible(true);
 }
@@ -54,6 +67,7 @@ bool DeltarunePurchaseItemPopup::init(GJStoreItem* p0) {
         }
     );
 
+    // teehee
     this->setKeyboardEnabled(false);
     this->setKeypadEnabled(false);
     this->setTouchEnabled(false);
