@@ -499,10 +499,7 @@ void DeltaruneAlertLayer::handleAprilFools() {
 	auto& nameToFile = m_fields->nameToFile;
 
 	time_t t = time(nullptr);
-	struct tm now;
-
-	if (localtime_s(&now, &t) != 0) 
-		return;
+	auto now = fmt::localtime(t);
 
 	if (now.tm_mon != 3 || now.tm_mday != 1)
 		return;
