@@ -4,8 +4,12 @@
 
 bool blockKeys = false;
 
+static std::mt19937 mt{ static_cast<std::mt19937::result_type>(
+	std::chrono::steady_clock::now().time_since_epoch().count()
+) };
+
 float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float range) { // thanks cvolton for this amazing name
-	return static_cast<float>(rand() % static_cast<int>(range * 100 + 1)) / 100.f - (range / 2.f);
+	return static_cast<float>(mt() % static_cast<int>(range * 100 + 1)) / 100.f - (range / 2.f);
 }
 
 void DeltaruneAlertLayer::initMaps() {
@@ -491,6 +495,23 @@ void DeltaruneAlertLayer::progressText() {
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
+void DeltaruneAlertLayer::handleAprilFools() {
+	auto& nameToFile = m_fields->nameToFile;
+
+	time_t t = time(nullptr);
+	struct tm now;
+
+	if (localtime_s(&now, &t) != 0) 
+		return;
+
+	if (now.tm_mon != 3 || now.tm_mday != 1)
+		return;
+
+	auto randomSound = nameToFile.begin();
+	std::advance(randomSound, mt() % nameToFile.size());
+	m_fields->textSound = randomSound->first;
+}
+
 void DeltaruneAlertLayer::rollText(float dt) {
 	int& waitQueue = m_fields->waitQueue;
 	int& linesProgressed = m_fields->linesProgressed;
@@ -578,9 +599,8 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		}
 	}
 	auto& nameToFile = m_fields->nameToFile;
-	auto const textSound = m_fields->textSound;
+	auto& textSound = m_fields->textSound;
 	auto const resFolder = Mod::get()->getResourcesDir();
-	auto path = resFolder / fmt::format("{}.wav", nameToFile[textSound]);
 
 	if (nameToFile.find(textSound) == nameToFile.end()) return;
 
@@ -588,12 +608,16 @@ void DeltaruneAlertLayer::rollText(float dt) {
 		playedSound = false;
 		return;
 	}
+
+	handleAprilFools();
+
 	float pitch = 1.f;
 	playedSound = true;
 
 	auto& system = m_fields->system;
 	auto& channel = m_fields->channel;
 	auto& sound = m_fields->sound;
+	auto path = resFolder / fmt::format("{}.wav", nameToFile[textSound]);
 
 	if (textSound == "Queen")
 		pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);

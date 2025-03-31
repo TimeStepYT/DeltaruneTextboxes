@@ -64,6 +64,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void skipText();
 	int emptyLinesAmount(int = 0);
 	void createImageNode();
+	void handleAprilFools();
 	void progressText();
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
