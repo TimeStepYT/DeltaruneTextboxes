@@ -1,3 +1,6 @@
+### v1.4.1
+- Added a really cool guy (He's off-screen you can't see him)
+
 ### v1.4.0
 - Made purchase popups look Deltarune as well!
 - Made the character image spot able to hold multiple nodes inside
