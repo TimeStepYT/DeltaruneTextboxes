@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - '**'
+      - "**"
 
 jobs:
   build:
@@ -14,14 +14,18 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
+
         - name: macOS
           os: macos-latest
+
         - name: iOS
           os: macos-latest
           target: iOS
+
         - name: Android32
           os: ubuntu-latest
           target: Android32
+
         - name: Android64
           os: ubuntu-latest
           target: Android64
@@ -32,30 +36,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
-        with:
-          repository: geode-sdk/textureldr
-          path: textureldr
-
       - name: Build the mod
-        uses: ./
+        uses: geode-sdk/build-geode-mod@main
         with:
-          cli: nightly
-          sdk: nightly
-          build-config: RelWithDebInfo
-          path: textureldr
+          bindings: geode-sdk/bindings
+          bindings-ref: main
           combine: true
           target: ${{ matrix.config.target }}
+          sdk: stable
 
   package:
-    name: Package both builds
+    name: Package builds
     runs-on: ubuntu-latest
     needs: ['build']
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: ./combine
+      - uses: geode-sdk/build-geode-mod/combine@main
         id: build
 
       - uses: actions/upload-artifact@v4
