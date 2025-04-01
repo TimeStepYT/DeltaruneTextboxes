@@ -25,7 +25,8 @@
             "platforms": [
                 "win",
                 "macos",
-                "android64"
+                "android64",
+                "ios"
             ]
         }
     },
