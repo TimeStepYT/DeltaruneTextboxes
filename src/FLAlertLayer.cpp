@@ -82,7 +82,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 	textArea = m_mainLayer->getChildByID("content-text-area");
 	bg = m_mainLayer->getChildByID("background");
 	titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
-#if !(defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
+#if !defined(DISABLE_KEYBOARD)
 	initCustomKeybinds();
 #endif
 	Loader::get()->queueInMainThread([bg, titleNode, textArea, this] {
@@ -238,7 +238,7 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	clickedOnButton(btn2, m_button2, 2);
 	return ret;
 }
-#if (defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
+#if defined(DISABLE_KEYBOARD)
 void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 	if (m_fields->incompatible) {
 		FLAlertLayer::keyDown(key);

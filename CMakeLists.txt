@@ -10,6 +10,10 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(DeltaruneTextboxes VERSION 1.4.1)
 
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS OR (ANDROID AND ANDROID_ABI STREQUAL "armeabi-v7a"))
+    add_compile_definitions(DISABLE_KEYBOARD)
+endif()
+
 add_library(${PROJECT_NAME} SHARED
     src/FLAlertLayer.cpp
     src/DialogLayer.cpp

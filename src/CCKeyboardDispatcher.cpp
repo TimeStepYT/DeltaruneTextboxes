@@ -1,6 +1,6 @@
 #include "include.h"
 
-#if !(defined(DEBUG_MAC_INPUTS) || defined(GEODE_IS_ANDROID32))
+#if !defined(DISABLE_KEYBOARD)
 $execute{
 	keybinds::BindManager::get()->registerBindable(
 		{
