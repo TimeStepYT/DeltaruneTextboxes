@@ -1,3 +1,6 @@
+### v1.4.2
+- iOS support!
+
 ### v1.4.1
 - Added a really cool guy (He's off-screen you can't see him)
 

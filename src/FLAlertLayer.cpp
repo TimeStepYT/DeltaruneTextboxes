@@ -495,11 +495,11 @@ void DeltaruneAlertLayer::progressText() {
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
+time_t t = time(nullptr);
+auto now = fmt::localtime(t);
+
 void DeltaruneAlertLayer::handleAprilFools() {
 	auto& nameToFile = m_fields->nameToFile;
-
-	time_t t = time(nullptr);
-	auto now = fmt::localtime(t);
 
 	if (now.tm_mon != 3 || now.tm_mday != 1)
 		return;
