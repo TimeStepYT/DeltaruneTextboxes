@@ -499,12 +499,12 @@ time_t t = time(nullptr);
 auto now = fmt::localtime(t);
 
 void DeltaruneAlertLayer::handleAprilFools() {
-	auto& nameToFile = m_fields->nameToFile;
-
 	if (now.tm_mon != 3 || now.tm_mday != 1)
 		return;
 
+	auto& nameToFile = m_fields->nameToFile;
 	auto randomSound = nameToFile.begin();
+
 	std::advance(randomSound, mt() % nameToFile.size());
 	m_fields->textSound = randomSound->first;
 }
