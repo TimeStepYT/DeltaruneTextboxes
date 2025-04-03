@@ -24,7 +24,7 @@
             "version": ">=v1.7.1",
             "platforms": [
                 "win",
-                "macos",
+                "mac",
                 "android64"
             ]
         }
