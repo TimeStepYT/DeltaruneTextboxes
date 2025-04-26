@@ -1,3 +1,6 @@
+### v1.4.3
+- Fixed a crash that happened when using the mod comments mod for the first time. (I don't know, maybe this will help other mods as well)
+
 ### v1.4.2
 - iOS support!
 
