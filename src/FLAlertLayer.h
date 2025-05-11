@@ -49,6 +49,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void animateBG(float);
 	void changeBG();
 	void changeSingleButton(CCMenuItemSpriteExtra*, ButtonSprite*);
+	void removeControllerGlyphs();
 	void changeButtons();
 	void changeTitle();
 	void changeText();
