@@ -1,3 +1,7 @@
+### v1.4.4
+- Bumped to Geode 4.4.0
+- Removed controller glyphs
+
 ### v1.4.3
 - Fixed a crash that happened when using the mod comments mod for the first time. (I don't know, maybe this will help other mods as well)
 

@@ -126,32 +126,32 @@ void DeltaruneAlertLayer::changeTitle() {
 void DeltaruneAlertLayer::changeText() {
 	auto& textArea = m_fields->textArea;
 	if (!textArea) return;
-	
+
 	auto& sound = m_fields->textSound;
 	auto& size = m_fields->textSize;
 	auto& nameToSound = m_fields->nameToSound;
 	bool& noShadow = m_fields->noShadow;
-	
-	
+
+
 	noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
-	
+
 	CCLabelBMFont* star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 	CCLabelBMFont* starShadow = nullptr;
 	if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-	
+
 	auto str = m_fields->text;
 	auto screenSize = m_fields->screenSize;
 	auto& bg = m_fields->bg;
 	auto titleString = m_fields->title->getString();
-	
+
 	int xOffset = star->getContentWidth();
-	
+
 	if (m_fields->dialog) {
 		if (nameToSound.find(titleString) != nameToSound.end())
-		sound = nameToSound[titleString];
+			sound = nameToSound[titleString];
 		else
-		sound = "Default";
-		
+			sound = "Default";
+
 		xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
 	}
 	star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
@@ -182,13 +182,13 @@ void DeltaruneAlertLayer::changeText() {
 		size,
 		false
 	);
-	
+
 	newDesc->setContentWidth(creatingWidth);
 	newDesc->setAnchorPoint(CCPoint{ 0, 1 });
 	newDesc->setPositionY(110);
 	newDesc->setZOrder(textArea->getZOrder());
 	newDesc->setID("content-text-area");
-	
+
 	TextArea* newDescGrad = nullptr;
 	TextArea* newDescShad = nullptr;
 	if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
@@ -206,7 +206,7 @@ void DeltaruneAlertLayer::changeText() {
 		newDescGrad->setPositionY(110);
 		newDescGrad->setZOrder(textArea->getZOrder() + 1);
 		newDescGrad->setID("gradient-overlay"_spr);
-		
+
 		CCArrayExt<CCLabelBMFont*> linesGrad = newDescGrad->getChildByType<MultilineBitmapFont>(0)->getChildren();
 		for (auto line : linesGrad) {
 			CCArrayExt<CCSprite*> letters = line->getChildren();
@@ -232,7 +232,7 @@ void DeltaruneAlertLayer::changeText() {
 		newDescShad->setPositionX(newDescShad->getPositionX() + 1);
 		newDescShad->setZOrder(textArea->getZOrder() - 1);
 		newDescShad->setID("shadow"_spr);
-		
+
 		CCArrayExt<CCLabelBMFont*> linesShad = newDescShad->getChildByType<MultilineBitmapFont>(0)->getChildren();
 		int i = 0;
 		for (auto line : linesShad) {
@@ -243,7 +243,7 @@ void DeltaruneAlertLayer::changeText() {
 				auto origLine = origLinesParent->getChildByType<CCLabelBMFont>(i);
 				auto origChar = origLine->getChildByType<CCSprite>(j);
 				auto color = origChar->getColor();
-				
+
 				if (color == ccColor3B{ 255,255,255 }) letter->setColor({ 15, 15, 127 });
 				else if (color == ccColor3B{ 255, 0, 255 }) letter->setColor({ 76, 0, 76 });
 				else if (color == ccColor3B{ 255, 90, 90 }) letter->setColor({ 76, 0, 0 });
@@ -257,7 +257,7 @@ void DeltaruneAlertLayer::changeText() {
 					uint8_t blue = color.b / 2;
 					letter->setColor(ccColor3B{ red, green, blue });
 				}
-				
+
 				letter->setVisible(false);
 				j++;
 			}
@@ -265,7 +265,7 @@ void DeltaruneAlertLayer::changeText() {
 		}
 	}
 	CCArrayExt<CCLabelBMFont*> lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildren();
-	
+
 	for (auto line : lines) {
 		CCArrayExt<CCSprite*> letters = line->getChildren();
 		for (auto letter : letters) {
@@ -289,16 +289,28 @@ void DeltaruneAlertLayer::changeText() {
 	m_fields->gradientOverlay = newDescGrad;
 	m_fields->shadow = newDescShad;
 	double pause = Mod::get()->getSettingValue<double>("textRollingPause");
-	
+
 	m_fields->linesProgressed += emptyLinesAmount();
 	textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * m_fields->linesProgressed);
 	if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
 	if (newDescShad) newDescShad->setPositionY(textArea->getPositionY() - 1);
-	
+
 	schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
+void DeltaruneAlertLayer::removeControllerGlyphs() {
+	auto& mainLayer = this->m_mainLayer;
+	auto backControllerGlyph = mainLayer->getChildByID("controller-back-hint");
+	auto okControllerGlyph = mainLayer->getChildByID("controller-ok-hint");
+
+	if (backControllerGlyph)
+		backControllerGlyph->removeFromParentAndCleanup(true);
+	if (okControllerGlyph)
+		okControllerGlyph->removeFromParentAndCleanup(true);
+}
+
 void DeltaruneAlertLayer::changeLook() {
+	removeControllerGlyphs();
 	changeBG();
 	changeButtons();
 	changeTitle();
