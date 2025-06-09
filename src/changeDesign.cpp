@@ -90,6 +90,7 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 	}
 }
 
+// fix handleTouchPrio breaking the buttons
 void DeltaruneAlertLayer::fixTouchPrio() {
 	auto& buttonMenu = this->m_buttonMenu;
 
@@ -125,10 +126,9 @@ void DeltaruneAlertLayer::changeButtons() {
 	changeSingleButton(m_fields->btn1, m_button1);
 	changeSingleButton(m_fields->btn2, m_button2);
 
-	// fix handleTouchPrio breaking the buttons
-	Loader::get()->queueInMainThread([popup = Ref(this)] {
-		Loader::get()->queueInMainThread([popup] {
-			popup->fixTouchPrio();
+	Loader::get()->queueInMainThread([this] {
+		Loader::get()->queueInMainThread([this] {
+			this->fixTouchPrio();
 			});
 		});
 }
