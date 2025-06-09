@@ -218,8 +218,8 @@ void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSpri
 	else label->setColor(ccColor3B{ 255,255,255 });
 }
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
-	if (m_fields->incompatible) { 
-		return FLAlertLayer::ccTouchBegan(touch, event); }
+	if (m_fields->incompatible)
+		return FLAlertLayer::ccTouchBegan(touch, event);
 
 	if (!m_fields->done && !m_fields->disableClickToProgress) {
 		if (m_fields->rolledPage)
