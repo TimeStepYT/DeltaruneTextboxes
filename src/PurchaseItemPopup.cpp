@@ -58,12 +58,12 @@ bool DeltarunePurchaseItemPopup::init(GJStoreItem* p0) {
         title,
         content,
         button1String, button2String,
-        [self = Ref(this)] (auto, bool btn2) {
+        [popup = Ref(this)] (auto, bool btn2) {
             if (btn2) {
-                self->onBuy();
+                popup->onBuy();
                 return;
             }
-            self->onCancel();
+            popup->onCancel();
         }
     );
 
