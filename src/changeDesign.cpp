@@ -86,7 +86,7 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
 	if (label) {
 		label->setFntFile("Determination.fnt"_spr);
-		label->setScale(1);
+		label->setScale(1.f);
 	}
 }
 
@@ -113,6 +113,19 @@ void DeltaruneAlertLayer::changeButtons() {
 
 	changeSingleButton(m_fields->btn1, m_button1);
 	changeSingleButton(m_fields->btn2, m_button2);
+
+	Loader::get()->queueInMainThread([self = Ref(this)] {
+		Loader::get()->queueInMainThread([self] {
+			auto& buttonMenu = self->m_buttonMenu;
+
+			int parentTouchPrio = self->getTouchPriority();
+			int menuTouchPrio = buttonMenu->getTouchPriority();
+
+			if (parentTouchPrio >= menuTouchPrio) {
+				buttonMenu->setTouchPriority(parentTouchPrio + 1);
+			}
+		});
+	});
 }
 
 void DeltaruneAlertLayer::changeTitle() {
