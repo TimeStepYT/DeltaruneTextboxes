@@ -1,3 +1,6 @@
+### v1.4.5
+- Fixed a bug where buttons can't be pressed after handleTouchPrio
+
 ### v1.4.4
 - Bumped to Geode 4.4.0
 - Removed controller glyphs
