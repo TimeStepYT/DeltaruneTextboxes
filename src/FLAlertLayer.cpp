@@ -177,7 +177,6 @@ void DeltaruneAlertLayer::show() {
 	if (!m_fields->textArea) return;
 	if (!m_mainLayer) return;
 
-
 	auto title = titleNode->getString();
 
 	if (Loader::get()->isModLoaded("user95401.geode-mod-comments") && (strcmp(title, "Create Comment") == 0 || this->getID() == "finish")) {
@@ -210,6 +209,7 @@ void DeltaruneAlertLayer::setHeartPosition(CCMenuItemSpriteExtra* button) {
 void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
 	auto label = buttonSprite->getChildByType<CCLabelBMFont>(0);
 	if (!label) return;
+
 	if (btn->isSelected()) {
 		label->setColor(ccColor3B{ 255, 255, 0 });
 		m_fields->btnSelected = btnSelected;

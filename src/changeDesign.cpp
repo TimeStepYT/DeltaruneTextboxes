@@ -127,9 +127,7 @@ void DeltaruneAlertLayer::changeButtons() {
 	changeSingleButton(m_fields->btn2, m_button2);
 
 	Loader::get()->queueInMainThread([this] {
-		Loader::get()->queueInMainThread([this] {
-			this->fixTouchPrio();
-			});
+		this->fixTouchPrio();
 		});
 }
 
