@@ -1,5 +1,5 @@
-#include "DialogLayer.h"
-#include "FLAlertLayer.h"
+#include "DialogLayer.hpp"
+#include "FLAlertLayer.hpp"
 
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
 	CCArray* objects = CCArray::create();

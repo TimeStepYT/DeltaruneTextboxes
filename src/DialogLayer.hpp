@@ -1,4 +1,4 @@
-#include "include.h"
+#include "include.hpp"
 
 class $modify(DeltaruneDialogLayer, DialogLayer) {
 	struct Fields {

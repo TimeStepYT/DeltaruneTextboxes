@@ -1,4 +1,4 @@
-#include "PurchaseItemPopup.h"
+#include "PurchaseItemPopup.hpp"
 
 void DeltarunePurchaseItemPopup::handlePurchasePopup() {
     auto& quickPopup = m_fields->quickPopup;

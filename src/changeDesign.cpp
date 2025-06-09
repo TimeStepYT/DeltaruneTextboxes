@@ -1,5 +1,5 @@
-#include "include.h"
-#include "FLAlertLayer.h"
+#include "include.hpp"
+#include "FLAlertLayer.hpp"
 
 template<class T>
 bool vectorContains(std::vector<T>& vector, T value) {

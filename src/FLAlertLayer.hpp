@@ -1,5 +1,5 @@
-#include "include.h"
-#include "ImageNode.h"
+#include "include.hpp"
+#include "ImageNode.hpp"
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
