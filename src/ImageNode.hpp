@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include.h"
+#include "include.hpp"
 
 class ImageNode : public cocos2d::CCNode {
 public:

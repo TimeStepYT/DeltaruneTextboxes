@@ -1,4 +1,4 @@
-#include "ImageNode.h"
+#include "ImageNode.hpp"
 
 ImageNode* ImageNode::create() {
     auto ret = new ImageNode();

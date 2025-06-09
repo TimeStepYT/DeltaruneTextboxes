@@ -1,6 +1,6 @@
-#include "FLAlertLayer.h"
-#include "DialogLayer.h"
-#include "ImageNode.h"
+#include "FLAlertLayer.hpp"
+#include "DialogLayer.hpp"
+#include "ImageNode.hpp"
 
 bool blockKeys = false;
 
