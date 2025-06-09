@@ -90,6 +90,17 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 	}
 }
 
+void DeltaruneAlertLayer::fixTouchPrio() {
+	auto& buttonMenu = this->m_buttonMenu;
+
+	int parentTouchPrio = this->getTouchPriority();
+	int menuTouchPrio = buttonMenu->getTouchPriority();
+
+	if (parentTouchPrio >= menuTouchPrio) {
+		buttonMenu->setTouchPriority(parentTouchPrio + 1);
+	}
+}
+
 void DeltaruneAlertLayer::changeButtons() {
 	if (!m_buttonMenu) return;
 	m_buttonMenu->setPositionY(32);
@@ -117,16 +128,9 @@ void DeltaruneAlertLayer::changeButtons() {
 	// fix handleTouchPrio breaking the buttons
 	Loader::get()->queueInMainThread([popup = Ref(this)] {
 		Loader::get()->queueInMainThread([popup] {
-			auto& buttonMenu = popup->m_buttonMenu;
-
-			int parentTouchPrio = popup->getTouchPriority();
-			int menuTouchPrio = buttonMenu->getTouchPriority();
-
-			if (parentTouchPrio >= menuTouchPrio) {
-				buttonMenu->setTouchPriority(parentTouchPrio + 1);
-			}
+			popup->fixTouchPrio();
+			});
 		});
-	});
 }
 
 void DeltaruneAlertLayer::changeTitle() {

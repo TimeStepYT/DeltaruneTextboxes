@@ -72,6 +72,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void onBtn1(CCObject*);
 	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
+	void fixTouchPrio();
 
 #if defined(DISABLE_KEYBOARD)
 	void keyDown(enumKeyCodes) override;
