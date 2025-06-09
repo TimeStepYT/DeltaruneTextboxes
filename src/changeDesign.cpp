@@ -114,11 +114,12 @@ void DeltaruneAlertLayer::changeButtons() {
 	changeSingleButton(m_fields->btn1, m_button1);
 	changeSingleButton(m_fields->btn2, m_button2);
 
-	Loader::get()->queueInMainThread([self = Ref(this)] {
-		Loader::get()->queueInMainThread([self] {
-			auto& buttonMenu = self->m_buttonMenu;
+	// fix handleTouchPrio breaking the buttons
+	Loader::get()->queueInMainThread([popup = Ref(this)] {
+		Loader::get()->queueInMainThread([popup] {
+			auto& buttonMenu = popup->m_buttonMenu;
 
-			int parentTouchPrio = self->getTouchPriority();
+			int parentTouchPrio = popup->getTouchPriority();
 			int menuTouchPrio = buttonMenu->getTouchPriority();
 
 			if (parentTouchPrio >= menuTouchPrio) {
