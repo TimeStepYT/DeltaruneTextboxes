@@ -1,3 +1,7 @@
+### v1.5.0
+- Added the new chapter 3 & 4 voices!
+- Changed the voice of the shopkeeper and the diamond shopkeeper to more fitting ones
+
 ### v1.4.5
 - Fixed a bug where buttons can't be pressed after handleTouchPrio
 

@@ -8,8 +8,6 @@ You can <cj>skip</c> the text by pressing <cy>X</c>, <cy>Space</c> or by <cy>tap
 
 You can <cj>change the keybinds</c> with the <cj>Custom Keybinds</c> mod!
 
-![[This should be a screenshot]](timestepyt.deltarune_textboxes/screenshot.jpg&scale:0.5)
-
 If you want to suggest a feature, create an issue on github or ping me on discord (@timestepyt)
 
 # Special Thanks
