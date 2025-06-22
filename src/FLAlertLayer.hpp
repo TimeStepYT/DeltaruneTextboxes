@@ -25,6 +25,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int textSize = 36;
 		int btnSelected = 0;
 		int dialogCount = 0;
+		int prevSoundNum = 200;
 		CCMenuItemSpriteExtra* btn1;
 		CCMenuItemSpriteExtra* btn2;
 		CCNode* textAreaClippingNode;
@@ -43,7 +44,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::vector<std::string> titles;
 		std::string text = "";
 		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
-		std::unordered_map<std::string, std::string_view> nameToFile;
+		std::unordered_map<std::string, std::string> nameToFile;
 		std::unordered_map<std::string, std::string_view> nameToSound;
 	};
 	void animateBG(float);
@@ -52,6 +53,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void removeControllerGlyphs();
 	void changeButtons();
 	void changeTitle();
+	void handleSound();
 	void changeText();
 	void changeLook();
 	void decideToBlockKeys();
@@ -73,6 +75,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 	void fixTouchPrio();
+	void playSound(char);
 
 #if defined(DISABLE_KEYBOARD)
 	void keyDown(enumKeyCodes) override;
