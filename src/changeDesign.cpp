@@ -143,11 +143,11 @@ void DeltaruneAlertLayer::changeTitle() {
 }
 
 void DeltaruneAlertLayer::handleSound() {
-	auto& nameToSound = m_fields->nameToSound;
+    auto& nameToSound = m_fields->nameToSound;
     auto titleString = m_fields->title->getString();
     auto& sound = m_fields->textSound;
 
-	if (nameToSound.find(titleString) != nameToSound.end())
+    if (nameToSound.find(titleString) != nameToSound.end())
         sound = nameToSound[titleString];
     else if (m_fields->dialog)
         sound = "Default";
@@ -173,7 +173,7 @@ void DeltaruneAlertLayer::changeText() {
 
     int xOffset = star->getContentWidth();
 
-	DeltaruneAlertLayer::handleSound();
+    DeltaruneAlertLayer::handleSound();
 
     if (m_fields->dialog)
         xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
@@ -193,7 +193,7 @@ void DeltaruneAlertLayer::changeText() {
     }
 
     std::string font = "Determination.fnt"_spr;
-	
+
     if (sound == "Sans") font = "ComicSans.fnt"_spr;
     if (sound == "Papyrus") {
         font = "Papyrus.fnt"_spr;

@@ -34,7 +34,12 @@ jobs:
     runs-on: ${{ matrix.config.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Update LLVM Windows
+        run: choco upgrade llvm
+        if: matrix.config.os == 'windows-latest'
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
@@ -45,6 +50,7 @@ jobs:
           target: ${{ matrix.config.target }}
           sdk: nightly
           cli: nightly
+          build-config: ${{ matrix.config.build-type || 'Release' }}
 
   package:
     name: Package builds
