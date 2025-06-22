@@ -1,3 +1,6 @@
+### v1.5.1
+- Updated to newer Geode version so that iOS 26 works that came out right after I submitted v1.5.0, just my luck!
+
 ### v1.5.0
 - Added the new chapter 3 & 4 voices!
 - Changed the voice of the shopkeeper and the diamond shopkeeper to more fitting ones
