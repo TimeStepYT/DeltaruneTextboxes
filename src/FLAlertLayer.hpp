@@ -11,7 +11,6 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool noShadow = false;
 		bool doneRolling = false;
 		bool rolledPage = false;
-		bool playedSound = false;
 		bool done = false;
 		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
@@ -26,6 +25,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int btnSelected = 0;
 		int dialogCount = 0;
 		int prevSoundNum = 200;
+		int soundRate = 2;
+		int soundTimer = 0;
 		CCMenuItemSpriteExtra* btn1;
 		CCMenuItemSpriteExtra* btn2;
 		CCNode* textAreaClippingNode;
@@ -38,14 +39,15 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		ImageNode* imageNode;
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
-		FMOD::Channel* channel;
-		FMOD::Sound* sound;
+		FMOD::Channel* channel = nullptr;
+		FMOD::Sound* sound = nullptr;
 		std::vector<std::string> characterSpriteNames;
 		std::vector<std::string> titles;
 		std::string text = "";
 		std::string textSound = Mod::get()->getSettingValue<std::string>("textSound");
 		std::unordered_map<std::string, std::string> nameToFile;
 		std::unordered_map<std::string, std::string_view> nameToSound;
+		std::unordered_map<std::string, int> nameToSoundRate;
 	};
 	void animateBG(float);
 	void changeBG();
@@ -58,6 +60,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void changeLook();
 	void decideToBlockKeys();
 	void show() override;
+	void initSoundRate();
 	void initMaps();
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);

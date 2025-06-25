@@ -24,6 +24,7 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 void DeltaruneAlertLayer::initMaps() {
     auto& nameToFile = m_fields->nameToFile;
     auto& nameToSound = m_fields->nameToSound;
+    auto& nameToSoundRate = m_fields->nameToSoundRate;
 
     nameToFile["Default"] = "SND_TXT1";
     nameToFile["Typewriter"] = "SND_TXT2";
@@ -57,6 +58,24 @@ void DeltaruneAlertLayer::initMaps() {
     nameToSound["Globed"] = "Tenna";
     nameToSound["Globed Error"] = "Tenna";
     nameToSound["Globed notice"] = "Tenna";  // I thought it was funny
+
+    nameToSoundRate["Tenna"] = 3;
+    nameToSoundRate["Jackenstein"] = 3;
+    nameToSoundRate["Gerson"] = 3;
+    nameToSoundRate["Queen"] = 3;
+}
+
+void DeltaruneAlertLayer::initSoundRate() {
+    auto& soundRate = m_fields->soundRate;
+    auto& soundTimer = m_fields->soundTimer;
+    auto& textSound = m_fields->textSound;
+    auto& nameToSoundRate = m_fields->nameToSoundRate;
+
+    if (nameToSoundRate.find(textSound) == nameToSoundRate.end())
+        return;
+
+    soundRate = nameToSoundRate[textSound];
+    soundTimer = soundRate;
 }
 
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
@@ -88,6 +107,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     auto& titleNode = m_fields->title;
 
     initMaps();  // for sounds
+    initSoundRate();
 
     this->m_noElasticity = true;
 
@@ -520,11 +540,12 @@ void DeltaruneAlertLayer::rollText(float dt) {
     int& linesProgressed = m_fields->linesProgressed;
     int& characterCount = m_fields->characterCount;
     int& rollingLine = m_fields->rollingLine;
-    bool& playedSound = m_fields->playedSound;
     bool& doneRolling = m_fields->doneRolling;
     bool& rolledPage = m_fields->rolledPage;
     float& lostTime = m_fields->lostTime;
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause") / 30;
+    auto& soundTimer = m_fields->soundTimer;
+    auto& soundRate = m_fields->soundRate;
 
     if (dt - pause > pause)
         lostTime += dt - pause;
@@ -532,13 +553,15 @@ void DeltaruneAlertLayer::rollText(float dt) {
     bool playSound = true;
     char character;
 
+    soundTimer++;
+
     for (bool firstRun{true}; lostTime >= pause || firstRun; firstRun = false) {
         bool newLine = false;
 
         if (waitQueue != 0) {
             waitQueue--;
-            playedSound = false;
             playSound = false;
+
             if (lostTime >= pause && !firstRun) {
                 lostTime -= pause;
             }
@@ -570,7 +593,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
                 character = line->getString()[characterCount];
                 switch (character) {
                     case ' ':
-                        waitQueue = 1;
+                        waitQueue = 0;
                         playSound = false;
                         break;
                     case '.':
@@ -611,8 +634,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
     }
 
-    if (!playSound || playedSound) {
-        playedSound = false;
+    if (!playSound || soundTimer < soundRate) {
         return;
     }
 
@@ -622,8 +644,9 @@ void DeltaruneAlertLayer::rollText(float dt) {
 void DeltaruneAlertLayer::playSound(char character) {
     auto& nameToFile = m_fields->nameToFile;
     auto& textSound = m_fields->textSound;
-    auto& playedSound = m_fields->playedSound;
-	auto& prevSoundNum = m_fields->prevSoundNum;
+    auto& soundRate = m_fields->soundRate;
+    auto& soundTimer = m_fields->soundTimer;
+    auto& prevSoundNum = m_fields->prevSoundNum;
     auto const resFolder = Mod::get()->getResourcesDir();
 
     if (nameToFile.find(textSound) == nameToFile.end()) return;
@@ -631,7 +654,8 @@ void DeltaruneAlertLayer::playSound(char character) {
     handleAprilFools();
 
     float pitch = 1.f;
-    playedSound = true;
+
+    soundTimer = 0;
 
     auto& system = m_fields->system;
     auto& channel = m_fields->channel;
@@ -649,12 +673,12 @@ void DeltaruneAlertLayer::playSound(char character) {
             soundNumber = 5;
         else {
             soundNumber = mt() % numSounds + 1;
-			while (prevSoundNum == soundNumber) {
-				soundNumber = mt() % numSounds + 1;
-			}
+            while (prevSoundNum == soundNumber) {
+                soundNumber = mt() % numSounds + 1;
+            }
         }
 
-		prevSoundNum = soundNumber;
+        prevSoundNum = soundNumber;
 
         file = fmt::format("snd_txtten{}", soundNumber);
     }
