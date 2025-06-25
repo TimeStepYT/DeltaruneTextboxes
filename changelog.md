@@ -1,3 +1,6 @@
+### v1.5.2
+- Tweaked the rate of the text sounds for some characters
+
 ### v1.5.1
 - Updated to newer Geode version so that iOS 26 works that came out right after I submitted v1.5.0, just my luck!
 
