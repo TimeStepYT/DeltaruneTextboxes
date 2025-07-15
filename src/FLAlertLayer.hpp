@@ -29,11 +29,11 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int soundTimer = 0;
 		CCMenuItemSpriteExtra* btn1;
 		CCMenuItemSpriteExtra* btn2;
-		CCNode* textAreaClippingNode;
-		CCNode* textArea;
-		CCNode* gradientOverlay;
-		CCNode* shadow;
-		CCNode* bg;
+		CCClippingNode* textAreaClippingNode;
+		TextArea* textArea;
+		TextArea* gradientOverlay;
+		TextArea* shadow;
+		CCScale9Sprite* bg;
 		CCSprite* heart;
 		CCLabelBMFont* title;
 		ImageNode* imageNode;

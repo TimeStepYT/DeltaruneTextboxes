@@ -1,5 +1,7 @@
 ### v1.5.2
 - Tweaked the rate of the text sounds for some characters
+- Changed how the background animation changes frames
+- Fixed Jackenstein's voice having a weird popping sound
 
 ### v1.5.1
 - Updated to newer Geode version so that iOS 26 works that came out right after I submitted v1.5.0, just my luck!
