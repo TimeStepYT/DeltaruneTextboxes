@@ -8,7 +8,7 @@ bool blockKeys = false;
 static std::mt19937 mt{std::random_device{}()};
 
 // thanks cvolton for this amazing name
-float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float const range) {
+float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(const float& range) {
     auto randomNumber = mt();
 
     float const halfRange = range / 2.f;
@@ -25,6 +25,8 @@ void DeltaruneAlertLayer::initMaps() {
     auto& nameToFile = m_fields->nameToFile;
     auto& nameToSound = m_fields->nameToSound;
     auto& nameToSoundRate = m_fields->nameToSoundRate;
+
+    nameToFile.reserve(22);
 
     nameToFile["Default"] = "SND_TXT1";
     nameToFile["Typewriter"] = "SND_TXT2";
@@ -49,6 +51,8 @@ void DeltaruneAlertLayer::initMaps() {
     nameToFile["Gerson"] = "snd_txtger";
     nameToFile["Jackenstein"] = "snd_txtjack";
 
+    nameToSound.reserve(9);
+
     nameToSound["The Mechanic"] = "Alphys";
     nameToSound["The Shopkeeper"] = "Gerson";
     nameToSound["Scratch"] = "Lancer";
@@ -59,8 +63,10 @@ void DeltaruneAlertLayer::initMaps() {
     nameToSound["Globed Error"] = "Tenna";
     nameToSound["Globed notice"] = "Tenna";  // I thought it was funny
 
+    nameToSoundRate.reserve(4);
+
     nameToSoundRate["Tenna"] = 3;
-    nameToSoundRate["Jackenstein"] = 3;
+    nameToSoundRate["Jackenstein"] = 4;
     nameToSoundRate["Gerson"] = 3;
     nameToSoundRate["Queen"] = 3;
 }
@@ -70,6 +76,8 @@ void DeltaruneAlertLayer::initSoundRate() {
     auto& soundTimer = m_fields->soundTimer;
     auto& textSound = m_fields->textSound;
     auto& nameToSoundRate = m_fields->nameToSoundRate;
+    
+    log::info("{}", textSound);
 
     if (nameToSoundRate.find(textSound) == nameToSoundRate.end())
         return;
@@ -107,15 +115,14 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     auto& titleNode = m_fields->title;
 
     initMaps();  // for sounds
-    initSoundRate();
 
     this->m_noElasticity = true;
 
     m_fields->btn1 = m_button1 ? static_cast<CCMenuItemSpriteExtra*>(m_button1->getParent()) : nullptr;
     m_fields->btn2 = m_button2 ? static_cast<CCMenuItemSpriteExtra*>(m_button2->getParent()) : nullptr;
 
-    textArea = m_mainLayer->getChildByID("content-text-area");
-    bg = m_mainLayer->getChildByID("background");
+    textArea = static_cast<TextArea*>(m_mainLayer->getChildByID("content-text-area"));
+    bg = static_cast<CCScale9Sprite*>(m_mainLayer->getChildByID("background"));
     titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
 #if !defined(DISABLE_KEYBOARD)
     initCustomKeybinds();
@@ -303,24 +310,24 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
 void DeltaruneAlertLayer::initCustomKeybinds() {
     if (m_fields->incompatible) return;
 
-    this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-                return ListenerResult::Propagate;
-            }
+    this->template addEventListener<keybinds::InvokeBindFilter>(
+        [=, this](keybinds::InvokeBindEvent* event) {
+            if (event->isDown()) {
+                if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
+                    return ListenerResult::Propagate;
+                }
 
-            int& btnSelected = m_fields->btnSelected;
-            btnSelected = 1;
-            auto label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-            auto label2 = m_button2->getChildByType<CCLabelBMFont>(0);
-            label1->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn1);
-            label2->setColor(ccColor3B{255, 255, 255});
-            return ListenerResult::Stop;
-        }
-        return ListenerResult::Propagate;
-    },
-                                                                "left"_spr);
+                int& btnSelected = m_fields->btnSelected;
+                btnSelected = 1;
+                auto label1 = m_button1->getChildByType<CCLabelBMFont>(0);
+                auto label2 = m_button2->getChildByType<CCLabelBMFont>(0);
+                label1->setColor(ccColor3B{255, 255, 0});
+                setHeartPosition(m_fields->btn1);
+                label2->setColor(ccColor3B{255, 255, 255});
+                return ListenerResult::Stop;
+            }
+            return ListenerResult::Propagate;
+        }, "left"_spr);
     this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
         if (event->isDown()) {
             if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
@@ -661,11 +668,11 @@ void DeltaruneAlertLayer::playSound(char character) {
     auto& channel = m_fields->channel;
     auto& sound = m_fields->sound;
 
-    auto file = nameToFile[textSound];
-
+    std::string file;
     if (textSound == "Queen" || textSound == "Gerson" || textSound == "Jackenstein")
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
-    else if (textSound == "Tenna") {
+
+    if (textSound == "Tenna") {
         int const numSounds = 10;
         int soundNumber;
 
@@ -682,11 +689,13 @@ void DeltaruneAlertLayer::playSound(char character) {
 
         file = fmt::format("snd_txtten{}", soundNumber);
     }
+    else file = nameToFile[textSound];
 
-    auto path = resFolder / fmt::format("{}.wav", file);
+    auto path = resFolder / fmt::format("{}.wav", std::string_view(file));
 
     system->createSound(path.string().c_str(), FMOD_DEFAULT, nullptr, &sound);
     system->playSound(sound, nullptr, false, &channel);
     channel->setPitch(pitch);
+    channel->setVolumeRamp(false);
     channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
 }

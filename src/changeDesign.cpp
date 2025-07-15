@@ -26,26 +26,24 @@ void capitalize(std::string& str) {
 }
 
 void DeltaruneAlertLayer::animateBG(float dt) {
-    auto bg = m_fields->bg;
+    auto& bg = m_fields->bg;
     int& frame = m_fields->frame;
     bool& reverseAnim = m_fields->reverseAnim;
 
-    m_mainLayer->getChildByIDRecursive("background")->removeFromParentAndCleanup(true);
-    bg = CCScale9Sprite::create(fmt::format("deltaruneSquare_{}.png"_spr, frame).c_str());
-    bg->setContentHeight(140);
-    bg->setContentWidth(m_fields->screenSize);
-    bg->setPosition(CCPoint{CCDirector::sharedDirector()->getWinSize().width / 2, 70});
-    bg->setID("background");
-    bg->setZOrder(-1);
-
-    m_mainLayer->addChild(bg);
-
+    auto spriteName = fmt::format("deltaruneSquare_{}.png"_spr, frame);
+    
     if (reverseAnim)
         frame--;
     else
         frame++;
     if (frame == 0 || frame == 4)
         reverseAnim = !reverseAnim;
+
+    auto sprite = CCSprite::create(spriteName.c_str());
+    auto prevContentSize = bg->getContentSize();
+
+    bg->setSpriteFrame(sprite->displayFrame());
+    bg->setContentSize(prevContentSize);
 }
 
 void DeltaruneAlertLayer::changeBG() {
@@ -54,7 +52,7 @@ void DeltaruneAlertLayer::changeBG() {
     auto& imageNode = m_fields->imageNode;
     auto undertaleBG = Mod::get()->getSettingValue<bool>("undertaleBG");
 
-    bg->removeFromParentAndCleanup(true);
+    bg->removeFromParent();
 
     if (undertaleBG)
         bg = CCScale9Sprite::create("undertaleSquare.png"_spr);
@@ -151,6 +149,8 @@ void DeltaruneAlertLayer::handleSound() {
         sound = nameToSound[titleString];
     else if (m_fields->dialog)
         sound = "Default";
+
+    initSoundRate();
 }
 
 void DeltaruneAlertLayer::changeText() {
