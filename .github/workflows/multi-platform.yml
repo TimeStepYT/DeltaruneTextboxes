@@ -48,8 +48,6 @@ jobs:
           bindings-ref: main
           combine: true
           target: ${{ matrix.config.target }}
-          sdk: stable
-          cli: stable
           build-config: ${{ matrix.config.build-type || 'Release' }}
 
   package:
