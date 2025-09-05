@@ -2,7 +2,7 @@
 #include "FLAlertLayer.hpp"
 
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
-	CCArray* objects = CCArray::create();
+	CCArray* const objects = CCArray::create();
 	if (objectsOriginal) objects->addObjectsFromArray(objectsOriginal);
 	if (!DialogLayer::init(dialogObject, objectsOriginal, p2)) return false;
 
@@ -26,27 +26,23 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 				text = fmt::format("{}\n\n\n\n{}", text, static_cast<DialogObject*>(objects->objectAtIndex(i))->m_text);
 		}
 	}
-	auto unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
-	auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
-
-	auto& imageNode = alert->m_fields->imageNode;
-
-	alert->createImageNode();
+	auto const unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
+	auto const alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
+	auto const imageNode = alert->createImageNode();
 
 	if (dialogObject) {
-		CCSprite* sprite;
-		auto texture = m_characterSprite->getTexture();
+		auto const texture = m_characterSprite->getTexture();
 
 		imageNode->setCharacterImage(texture);
 	}
 	else {
-		auto firstObj = static_cast<DialogObject*>(objects->firstObject());
+		auto const firstObj = static_cast<DialogObject*>(objects->firstObject());
 		std::string textureName = fmt::format("dialogIcon_{:03}.png", firstObj->m_characterFrame);
 
 		imageNode->setCharacterImage(textureName);
 
 		for (int i = 0; i < objects->count(); i++) {
-			auto diaObj = static_cast<DialogObject*>(objects->objectAtIndex(i));
+			auto const diaObj = static_cast<DialogObject*>(objects->objectAtIndex(i));
 			textureName = fmt::format("dialogIcon_{:03}.png", diaObj->m_characterFrame);
 			alert->m_fields->characterSpriteNames.push_back(textureName);
 			alert->m_fields->titles.push_back(diaObj->m_character);

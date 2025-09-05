@@ -25,30 +25,37 @@ bool ImageNode::init() {
 }
 
 void ImageNode::handleCharacterImage(CCSprite* newChar) {
-    newChar->setPositionX(this->getContentWidth() * this->getAnchorPoint().x);
-    newChar->setPositionY(this->getContentHeight() * this->getAnchorPoint().y);
+    float const contentWidth = this->getContentWidth();
+    float const contentHeight = this-> getContentHeight();
+    auto const& anchorPoint = this->getAnchorPoint();
+
+    float const newX = contentWidth * anchorPoint.x;
+    float const newY = contentHeight * anchorPoint.y;
+
+    newChar->setPositionX(newX);
+    newChar->setPositionY(newY);
 
     this->addChild(newChar);
 }
 
 void ImageNode::setCharacterImage(std::string_view spriteName) {
-    CCSprite* newChar;
+    CCSprite* newChar = nullptr;
 
     if (Mod::get()->getSettingValue<bool>("coloredPortraits"))
         newChar = CCSprite::create(spriteName.data());
     else
         newChar = CCSpriteGrayscale::create(spriteName.data());
 
-    handleCharacterImage(newChar);
+    this->handleCharacterImage(newChar);
 }
 
 void ImageNode::setCharacterImage(CCTexture2D* spriteTexture) {
-    CCSprite* newChar;
+    CCSprite* newChar = nullptr;
 
     if (Mod::get()->getSettingValue<bool>("coloredPortraits"))
         newChar = CCSprite::createWithTexture(spriteTexture);
     else
         newChar = CCSpriteGrayscale::createWithTexture(spriteTexture);
 
-    handleCharacterImage(newChar);
+    this->handleCharacterImage(newChar);
 }
