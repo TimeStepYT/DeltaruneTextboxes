@@ -30,29 +30,32 @@ void DeltarunePurchaseItemPopup::onCancel() {
 }
 
 bool DeltarunePurchaseItemPopup::init(GJStoreItem* p0) {
-    if (!PurchaseItemPopup::init(p0)) return false;
+    if (!PurchaseItemPopup::init(p0))
+        return false;
 
-    auto title = this->m_mainLayer->getChildByType<CCLabelBMFont>(0)->getString();
+    auto const title = this->m_mainLayer->getChildByType<CCLabelBMFont>(0)->getString();
     std::string content = "";
 
-    auto textArea = this->m_mainLayer->getChildByType<TextArea>(0);
+    auto const textArea = this->m_mainLayer->getChildByType<TextArea>(0);
 
-    CCArrayExt<CCLabelBMFont*> contentParent = textArea->getChildByType<MultilineBitmapFont>(0)->getChildren();
-    for (auto label : contentParent) {
+    auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
+    auto const& contentParent = mlbmf->getChildrenExt<CCLabelBMFont>();
+
+    for (auto const label : contentParent) {
         content.append(label->getString());
     }
 
-    auto menu = this->m_mainLayer->getChildByType<CCMenu>(0);
+    auto const menu = this->m_mainLayer->getChildByType<CCMenu>(0);
 
     if (!menu) return true;
 
-    auto button1 = menu->getChildByType<CCMenuItemSpriteExtra>(0)->getChildByType<ButtonSprite>(0);
-    auto button2 = menu->getChildByType<CCMenuItemSpriteExtra>(1)->getChildByType<ButtonSprite>(0);
+    auto const button1 = menu->getChildByType<CCMenuItemSpriteExtra>(0)->getChildByType<ButtonSprite>(0);
+    auto const button2 = menu->getChildByType<CCMenuItemSpriteExtra>(1)->getChildByType<ButtonSprite>(0);
 
     if (!button1 || !button2) return true;
 
-    auto button1String = button1->getChildByType<CCLabelBMFont>(0)->getString();
-    auto button2String = button2->getChildByType<CCLabelBMFont>(0)->getString();
+    auto const button1String = button1->getChildByType<CCLabelBMFont>(0)->getString();
+    auto const button2String = button2->getChildByType<CCLabelBMFont>(0)->getString();
 
     auto quickPopup = geode::createQuickPopup(
         title,

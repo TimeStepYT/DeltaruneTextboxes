@@ -69,7 +69,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	int getLinesLeft();
 	void skipText();
 	int emptyLinesAmount(int = 0);
-	void createImageNode();
+	ImageNode* createImageNode();
 	void handleAprilFools();
 	void progressText();
 	// I can't check for enter key so I guess I have to hook the buttons
