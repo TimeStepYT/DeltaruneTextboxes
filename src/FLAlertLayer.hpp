@@ -16,6 +16,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
 		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
 		float lostTime = 0;
+		float contentXOffset = 0.f;
 		int waitQueue = 0;
 		int frame = 0;
 		int rollingLine = 0;
@@ -56,6 +57,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void changeButtons();
 	void changeTitle();
 	void handleSound();
+	CCLabelBMFont* createStar();
 	void changeText();
 	void changeLook();
 	void decideToBlockKeys();
