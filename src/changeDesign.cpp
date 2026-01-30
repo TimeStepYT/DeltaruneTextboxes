@@ -153,27 +153,17 @@ void DeltaruneAlertLayer::handleSound() {
     initSoundRate();
 }
 
-void DeltaruneAlertLayer::changeText() {
-    auto& textArea = m_fields->textArea;
-    if (!textArea) return;
-
-    auto const& sound = m_fields->textSound;
-    auto const size = m_fields->textSize;
-    bool& noShadow = m_fields->noShadow;
-
-    noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
-
-    CCLabelBMFont* const star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-    CCLabelBMFont* starShadow = nullptr;
-    if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-
-    auto& str = m_fields->text;
+CCLabelBMFont* DeltaruneAlertLayer::createStar() {
+    auto const noShadow = m_fields->noShadow;
     auto const screenSize = m_fields->screenSize;
     auto const bg = m_fields->bg;
 
-    int xOffset = star->getContentWidth();
-
-    DeltaruneAlertLayer::handleSound();
+    CCLabelBMFont* const star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+    /*
+    CCLabelBMFont* starShadow = nullptr;
+    if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+    */
+    float xOffset = star->getContentWidth();
 
     if (m_fields->dialog)
         xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
@@ -182,7 +172,7 @@ void DeltaruneAlertLayer::changeText() {
     star->setPositionY(110);
     star->setZOrder(1);
     star->setID("star"_spr);
-
+    /*
     if (!noShadow) {
         starShadow->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
         starShadow->setPositionY(109);
@@ -190,7 +180,33 @@ void DeltaruneAlertLayer::changeText() {
         starShadow->setID("starShadow"_spr);
         auto const character = starShadow->getChildByType<CCSprite>(0);
         character->setColor({15, 15, 127});
+        
+        m_mainLayer->addChild(starShadow);
     }
+    */
+    this->m_fields->contentXOffset = xOffset;
+    
+    return star;
+}
+
+void DeltaruneAlertLayer::changeText() {
+    auto fields = m_fields.self();
+    auto& textArea = fields->textArea;
+    if (!textArea) return;
+
+    auto const& sound = fields->textSound;
+    auto const size = fields->textSize;
+    bool& noShadow = fields->noShadow;
+
+    noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
+
+    auto const star = this->createStar();
+
+    auto& str = fields->text;
+    auto const screenSize = fields->screenSize;
+    auto const bg = fields->bg;
+
+    DeltaruneAlertLayer::handleSound();
 
     std::string font = "Determination.fnt"_spr;
 
@@ -200,6 +216,7 @@ void DeltaruneAlertLayer::changeText() {
         capitalize(str);
     }
 
+    float xOffset = fields->contentXOffset;
     float creatingWidth = screenSize - 100 - xOffset;
     auto const newDesc = TextArea::create(
         str,
@@ -216,6 +233,7 @@ void DeltaruneAlertLayer::changeText() {
     newDesc->setZOrder(textArea->getZOrder());
     newDesc->setID("content-text-area");
 
+    /*
     TextArea* newDescGrad = nullptr;
     TextArea* newDescShad = nullptr;
     if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
@@ -298,6 +316,7 @@ void DeltaruneAlertLayer::changeText() {
             i++;
         }
     }
+    */
     auto const& lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
 
     for (auto const line : lines) {
@@ -309,30 +328,37 @@ void DeltaruneAlertLayer::changeText() {
     textArea->removeFromParent();
     m_mainLayer->addChild(star);
 
-    if (!noShadow) m_mainLayer->addChild(starShadow);
+    auto const rect = CCLayerColor::create(
+        {0, 0, 0, 0},
+        bg->getContentWidth(), 
+        bg->getContentHeight() - 20
+    );
 
-    auto const rect = CCLayerColor::create({0, 0, 0, 0}, bg->getContentWidth(), bg->getContentHeight() - 20);
     auto const clippingNode = CCClippingNode::create(rect);
     clippingNode->setID("content-text-area"_spr);
     clippingNode->setPositionY(10);
     clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
     clippingNode->addChild(newDesc);
-    if (newDescGrad) clippingNode->addChild(newDescGrad);
-    if (!noShadow) clippingNode->addChild(newDescShad);
 
     m_mainLayer->addChild(clippingNode);
 
-    m_fields->textAreaClippingNode = clippingNode;
+    fields->textAreaClippingNode = clippingNode;
     textArea = newDesc;
-    m_fields->gradientOverlay = newDescGrad;
-    m_fields->shadow = newDescShad;
+    /*
+    if (newDescGrad) clippingNode->addChild(newDescGrad);
+    if (!noShadow) clippingNode->addChild(newDescShad);
+    fields->gradientOverlay = newDescGrad;
+    fields->shadow = newDescShad;
+    */
 
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
 
-    m_fields->linesProgressed += emptyLinesAmount();
-    textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * m_fields->linesProgressed);
+    fields->linesProgressed += emptyLinesAmount();
+    textArea->setPositionY(textArea->getPositionY() + fields->textSize * fields->linesProgressed);
+    /*
     if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
     if (newDescShad) newDescShad->setPositionY(textArea->getPositionY() - 1);
+    */
 
     schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
