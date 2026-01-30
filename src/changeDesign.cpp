@@ -1,5 +1,6 @@
 #include <Geode/utils/cocos.hpp>
 #include "FLAlertLayer.hpp"
+#include "TextShaders.hpp"
 #include "include.hpp"
 
 template <class I, class T>
@@ -88,6 +89,10 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
     if (label) {
         label->setFntFile("Determination.fnt"_spr);
         label->setScale(1.f);
+
+        auto const program = DeltaruneTextShaders::getShader(m_fields->noShadow, m_fields->noGradient);
+        if (program)
+            label->setShaderProgram(program);
     }
 }
 
@@ -154,24 +159,28 @@ void DeltaruneAlertLayer::handleSound() {
 }
 
 CCLabelBMFont* DeltaruneAlertLayer::createStar() {
-    auto const noShadow = m_fields->noShadow;
-    auto const screenSize = m_fields->screenSize;
-    auto const bg = m_fields->bg;
+    auto const fields = m_fields.self();
+    bool const noShadow = fields->noShadow;
+    bool const noGradient = fields->noGradient;
+    float const screenSize = fields->screenSize;
+    auto const bg = fields->bg;
 
     CCLabelBMFont* const star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-    /*
-    CCLabelBMFont* starShadow = nullptr;
-    if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-    */
+
     float xOffset = star->getContentWidth();
 
-    if (m_fields->dialog)
-        xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
+    if (fields->dialog)
+        xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
     star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
     star->setPositionY(110);
     star->setZOrder(1);
     star->setID("star"_spr);
+
+    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
+    if (program)
+        star->setShaderProgram(program);
+
     /*
     if (!noShadow) {
         starShadow->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
@@ -184,21 +193,23 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
         m_mainLayer->addChild(starShadow);
     }
     */
-    this->m_fields->contentXOffset = xOffset;
+    fields->contentXOffset = xOffset;
     
     return star;
 }
 
 void DeltaruneAlertLayer::changeText() {
-    auto fields = m_fields.self();
+    auto const fields = m_fields.self();
     auto& textArea = fields->textArea;
     if (!textArea) return;
 
     auto const& sound = fields->textSound;
     auto const size = fields->textSize;
     bool& noShadow = fields->noShadow;
+    bool& noGradient = fields->noGradient;
 
-    noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
+    noShadow = Mod::get()->getSettingValue<bool>("noShadow");
+    noGradient = Mod::get()->getSettingValue<bool>("noGradientOverlay");
 
     auto const star = this->createStar();
 
@@ -206,12 +217,15 @@ void DeltaruneAlertLayer::changeText() {
     auto const screenSize = fields->screenSize;
     auto const bg = fields->bg;
 
+
     DeltaruneAlertLayer::handleSound();
 
     std::string font = "Determination.fnt"_spr;
 
-    if (sound == "Sans") font = "ComicSans.fnt"_spr;
-    if (sound == "Papyrus") {
+    if (sound == "Sans") {
+        font = "ComicSans.fnt"_spr;
+    }
+    else if (sound == "Papyrus") {
         font = "Papyrus.fnt"_spr;
         capitalize(str);
     }
@@ -233,10 +247,15 @@ void DeltaruneAlertLayer::changeText() {
     newDesc->setZOrder(textArea->getZOrder());
     newDesc->setID("content-text-area");
 
+    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
+    if (program) {
+        newDesc->setShaderProgram(program);
+    }
+
     /*
     TextArea* newDescGrad = nullptr;
     TextArea* newDescShad = nullptr;
-    if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
+    if (!noGradient) {
         newDescGrad = TextArea::create(
             str,
             "DeterminationGradient.fnt"_spr,

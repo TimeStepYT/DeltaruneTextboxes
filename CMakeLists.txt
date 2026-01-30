@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
     src/changeDesign.cpp
     src/PurchaseItemPopup.cpp
     src/ImageNode.cpp
+    src/TextShaders.cpp
     # Add any extra C++ source files here
 )
 

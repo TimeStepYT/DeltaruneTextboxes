@@ -1,6 +1,6 @@
 #include <Geode/utils/cocos.hpp>
 #include "FLAlertLayer.hpp"
-
+#include "TextShaders.hpp"
 #include "DialogLayer.hpp"
 #include "ImageNode.hpp"
 
@@ -449,25 +449,28 @@ ImageNode* DeltaruneAlertLayer::createImageNode() {
 void DeltaruneAlertLayer::progressText() {
     if (!m_mainLayer) return;
     if (!m_buttonMenu) return;
-    if (!m_fields->textAreaClippingNode) return;
 
-    auto const textArea = m_fields->textArea;
-    auto const btn1 = m_fields->btn1;
-    auto const btn2 = m_fields->btn2;
-    auto const shadow = m_fields->shadow;
-    auto const gradientOverlay = m_fields->gradientOverlay;
-    int const btnSelected = m_fields->btnSelected;
-    int& linesProgressed = m_fields->linesProgressed;
-    bool& done = m_fields->done;
-    bool const noShadow = m_fields->noShadow;
+    auto const fields = m_fields.self();
+
+    if (!fields->textAreaClippingNode) return;
+
+    auto const textArea = fields->textArea;
+    auto const btn1 = fields->btn1;
+    auto const btn2 = fields->btn2;
+    auto const shadow = fields->shadow;
+    auto const gradientOverlay = fields->gradientOverlay;
+    int const btnSelected = fields->btnSelected;
+    int& linesProgressed = fields->linesProgressed;
+    bool& done = fields->done;
+    bool const noShadow = fields->noShadow;
 
     if (!textArea) return;
 
     if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
         if (!m_button2) {
-            auto const dialogLayer = m_fields->dialogLayer;
+            auto const dialogLayer = fields->dialogLayer;
             done = true;
-            if (m_fields->dialog && dialogLayer) {
+            if (fields->dialog && dialogLayer) {
                 dialogLayer->keyBackClicked();
             }
             FLAlertLayer::onBtn1(btn1);
@@ -489,11 +492,10 @@ void DeltaruneAlertLayer::progressText() {
 
     int offset;
     m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-    if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
 
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-    m_fields->characterCount = 0;
-    m_fields->rollingLine = 0;
+    fields->characterCount = 0;
+    fields->rollingLine = 0;
 
     if (getLinesLeft() > 3)
         offset = 3;
@@ -503,14 +505,14 @@ void DeltaruneAlertLayer::progressText() {
     int const emptyLines = emptyLinesAmount(offset);
     offset += emptyLines;
 
-    auto const& characters = m_fields->characterSpriteNames;
-    int& dialogCount = m_fields->dialogCount;
+    auto const& characters = fields->characterSpriteNames;
+    int& dialogCount = fields->dialogCount;
     bool const progressDialog = emptyLines > 0 && characters.size() > 1;
     
     if (progressDialog) {
         dialogCount++;
         auto const& spriteName = characters[dialogCount];
-        auto const imageNode = m_fields->imageNode;
+        auto const imageNode = fields->imageNode;
 
         if (!imageNode)  // Just in case! I have no idea what other mods will do to my stuff...
             createImageNode();
@@ -519,19 +521,19 @@ void DeltaruneAlertLayer::progressText() {
         imageNode->setCharacterImage(spriteName);
 
         // Setting the title
-        auto const& title = m_fields->titles[dialogCount];
-        m_fields->title->setString(title.c_str());
+        auto const& title = fields->titles[dialogCount];
+        fields->title->setString(title.c_str());
 
         // Getting the right text sound based on the character name
-        auto&& nameToSound = m_fields->nameToSound;
+        auto&& nameToSound = fields->nameToSound;
         if (nameToSound.find(title.c_str()) != nameToSound.end())
-            m_fields->textSound = nameToSound[title.c_str()];
+            fields->textSound = nameToSound[title.c_str()];
         else
-            m_fields->textSound = "Default";
+            fields->textSound = "Default";
     }
 
     linesProgressed += offset;
-    textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * offset);
+    textArea->setPositionY(textArea->getPositionY() + fields->textSize * offset);
     if (gradientOverlay) gradientOverlay->setPositionY(textArea->getPositionY());
     if (shadow) shadow->setPositionY(textArea->getPositionY() - 1);
 
@@ -555,16 +557,18 @@ void DeltaruneAlertLayer::handleAprilFools() {
 }
 
 void DeltaruneAlertLayer::rollText(float dt) {
-    int& waitQueue = m_fields->waitQueue;
-    int const linesProgressed = m_fields->linesProgressed;
-    int& characterCount = m_fields->characterCount;
-    int& rollingLine = m_fields->rollingLine;
-    bool& doneRolling = m_fields->doneRolling;
-    bool& rolledPage = m_fields->rolledPage;
-    float& lostTime = m_fields->lostTime;
+    auto const fields = m_fields.self();
+
+    int& waitQueue = fields->waitQueue;
+    int const linesProgressed = fields->linesProgressed;
+    int& characterCount = fields->characterCount;
+    int& rollingLine = fields->rollingLine;
+    bool& doneRolling = fields->doneRolling;
+    bool& rolledPage = fields->rolledPage;
+    float& lostTime = fields->lostTime;
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause") / 30;
-    auto& soundTimer = m_fields->soundTimer;
-    auto const soundRate = m_fields->soundRate;
+    auto& soundTimer = fields->soundTimer;
+    auto const soundRate = fields->soundRate;
 
     if (dt - pause > pause)
         lostTime += dt - pause;
@@ -594,7 +598,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
         else rolledPage = false;
 
-        auto const& textAreas = m_fields->textAreaClippingNode->getChildrenExt();
+        auto const& textAreas = fields->textAreaClippingNode->getChildrenExt();
         
         for (auto const textArea : textAreas) {
             auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
@@ -613,6 +617,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
                     return;
                 }
                 letter->setVisible(true);
+
                 character = line->getString()[characterCount];
                 switch (character) {
                     case ' ':
