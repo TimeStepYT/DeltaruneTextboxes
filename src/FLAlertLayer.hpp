@@ -81,7 +81,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void playSound(char);
 
 #if defined(DISABLE_KEYBOARD)
-	void keyDown(enumKeyCodes) override;
+	void keyDown(enumKeyCodes, double) override;
 #else 
 	void initCustomKeybinds();
 #endif

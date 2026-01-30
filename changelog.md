@@ -1,3 +1,7 @@
+### v1.6.0
+- Updated to GD 2.2081 and Geode v5.0.0
+- Disabled Custom Keybinds temporarily (remove once reenabled)
+
 ### v1.5.2
 - Tweaked the rate of the text sounds for some characters
 - Changed how the background animation changes frames

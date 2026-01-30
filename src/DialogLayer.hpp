@@ -10,5 +10,5 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 	void displayNextObject();
 	void displayDialogObject(DialogObject*);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
-	void keyDown(enumKeyCodes) override;
+	void keyDown(enumKeyCodes, double) override;
 };

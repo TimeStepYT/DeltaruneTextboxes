@@ -1,7 +1,7 @@
 #include "include.hpp"
 
 #if !defined(DISABLE_KEYBOARD)
-$execute{
+$execute {
 	keybinds::BindManager::get()->registerBindable(
 		{
 			"left"_spr,
