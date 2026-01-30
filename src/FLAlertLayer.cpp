@@ -274,9 +274,9 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
     return ret;
 }
 #if defined(DISABLE_KEYBOARD)
-void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
+void DeltaruneAlertLayer::keyDown(enumKeyCodes key, double timestamp) {
     if (m_fields->incompatible) {
-        FLAlertLayer::keyDown(key);
+        FLAlertLayer::keyDown(key, timestamp);
         return;
     }
     if (key == KEY_Z || key == KEY_Y /*screw QWERTZ*/) {
@@ -288,7 +288,7 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
         return;
     } else if (key == KEY_ArrowLeft || key == KEY_ArrowRight || key == KEY_Left || key == KEY_Right) {
         if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-            FLAlertLayer::keyDown(key);
+            FLAlertLayer::keyDown(key, timestamp);
             return;
         }
 
@@ -308,7 +308,7 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key) {
             label1->setColor(ccColor3B{255, 255, 255});
         }
     } else
-        FLAlertLayer::keyDown(key);
+        FLAlertLayer::keyDown(key, timestamp);
 }
 #else
 void DeltaruneAlertLayer::initCustomKeybinds() {

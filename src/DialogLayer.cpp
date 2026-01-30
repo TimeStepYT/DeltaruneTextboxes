@@ -72,4 +72,4 @@ void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
 bool DeltaruneDialogLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	return false;
 }
-void DeltaruneDialogLayer::keyDown(enumKeyCodes key) {}
+void DeltaruneDialogLayer::keyDown(enumKeyCodes key, double timestamp) {}
