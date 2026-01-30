@@ -9,6 +9,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool incompatible = false;
 		bool dialog = false;
 		bool noShadow = false;
+		bool noGradient = false;
 		bool doneRolling = false;
 		bool rolledPage = false;
 		bool done = false;
