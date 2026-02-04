@@ -1,6 +1,6 @@
 #include "include.hpp"
 #include "ImageNode.hpp"
-
+#include <alphalaneous.alphas-ui-pack/include/API.hpp>
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
 		bool clickedChoice = false;
@@ -29,15 +29,14 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int prevSoundNum = 200;
 		int soundRate = 2;
 		int soundTimer = 0;
-		CCMenuItemSpriteExtra* btn1;
-		CCMenuItemSpriteExtra* btn2;
-		CCClippingNode* textAreaClippingNode;
-		TextArea* textArea;
-		TextArea* gradientOverlay;
-		TextArea* shadow;
-		CCScale9Sprite* bg;
-		CCSprite* heart;
-		CCLabelBMFont* title;
+		CCMenuItemSpriteExtra* btn1 = nullptr;
+		CCMenuItemSpriteExtra* btn2 = nullptr;
+		CCClippingNode* textAreaClippingNode = nullptr;
+		TextArea* textArea = nullptr;
+		CCScale9Sprite* bg = nullptr;
+		CCLabelBMFont* title = nullptr;
+		CCSprite* heart = nullptr;
+		alpha::ui::RenderNode* renderedSprite = nullptr;
 		ImageNode* imageNode;
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
@@ -82,6 +81,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 	void fixTouchPrio();
 	void playSound(char);
+	void updateRenderTexture();
 
 #if defined(DISABLE_KEYBOARD)
 	void keyDown(enumKeyCodes, double) override;

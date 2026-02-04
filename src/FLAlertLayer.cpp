@@ -373,25 +373,25 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
 void DeltaruneAlertLayer::skipText() {
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 
-    auto const& clippingNode = m_fields->textAreaClippingNode;
-    int const linesProgressed = m_fields->linesProgressed;
-    bool& doneRolling = m_fields->doneRolling;
+    auto const fields = this->m_fields.self();
+
+    auto const& clippingNode = fields->textAreaClippingNode;
+    int const linesProgressed = fields->linesProgressed;
+    bool& doneRolling = fields->doneRolling;
 
     if (!clippingNode) return;
 
-    auto const& textAreas = clippingNode->getChildrenExt();
+    auto const textArea = fields->textArea;
     
-    for (auto textArea : textAreas) {
-        auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-        auto lines = std::move(mlbmf->getChildrenExt());
+    auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
+    auto lines = std::move(mlbmf->getChildrenExt());
 
-        for (int i = linesProgressed + m_fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
-            auto const line = lines[i];
-            auto const& letters = line->getChildrenExt();
+    for (int i = linesProgressed + fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
+        auto const line = lines[i];
+        auto const& letters = line->getChildrenExt();
 
-            for (auto const& letter : letters) {
-                letter->setVisible(true);
-            }
+        for (auto const& letter : letters) {
+            letter->setVisible(true);
         }
     }
 
@@ -457,8 +457,6 @@ void DeltaruneAlertLayer::progressText() {
     auto const textArea = fields->textArea;
     auto const btn1 = fields->btn1;
     auto const btn2 = fields->btn2;
-    auto const shadow = fields->shadow;
-    auto const gradientOverlay = fields->gradientOverlay;
     int const btnSelected = fields->btnSelected;
     int& linesProgressed = fields->linesProgressed;
     bool& done = fields->done;
@@ -534,8 +532,6 @@ void DeltaruneAlertLayer::progressText() {
 
     linesProgressed += offset;
     textArea->setPositionY(textArea->getPositionY() + fields->textSize * offset);
-    if (gradientOverlay) gradientOverlay->setPositionY(textArea->getPositionY());
-    if (shadow) shadow->setPositionY(textArea->getPositionY() - 1);
 
     showButtons();
     float const pause = Mod::get()->getSettingValue<double>("textRollingPause");
@@ -543,7 +539,7 @@ void DeltaruneAlertLayer::progressText() {
 }
 
 time_t const& t = time(nullptr);
-auto const& now = fmt::localtime(t);
+auto const& now = geode::localtime(t);
 
 void DeltaruneAlertLayer::handleAprilFools() {
     if (now.tm_mon != 3 || now.tm_mday != 1)
@@ -598,60 +594,61 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
         else rolledPage = false;
 
-        auto const& textAreas = fields->textAreaClippingNode->getChildrenExt();
+        auto const textArea = fields->textArea;
         
-        for (auto const textArea : textAreas) {
-            auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-            auto lines = std::move(mlbmf->getChildrenExt<CCLabelBMFont>());
-            int currentLine = linesProgressed + rollingLine;
+        auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
+        auto lines = mlbmf->getChildrenExt<CCLabelBMFont>();
+        int currentLine = linesProgressed + rollingLine;
 
-            if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
-                auto const line = lines[currentLine];
-                auto letters = std::move(line->getChildrenExt<CCSprite>());
-                auto const letter = letters[characterCount];
-                if (letter->isVisible()) {
-                    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-                    doneRolling = true;
-                    rolledPage = true;
-                    showButtons();
-                    return;
-                }
-                letter->setVisible(true);
-
-                character = line->getString()[characterCount];
-                switch (character) {
-                    case ' ':
-                        waitQueue = 0;
-                        playSound = false;
-                        break;
-                    case '.':
-                        [[fallthrough]];
-                    case ',':
-                        [[fallthrough]];
-                    case ':':
-                        [[fallthrough]];
-                    case ';':
-                        [[fallthrough]];
-                    case '?':
-                        [[fallthrough]];
-                    case '!':
-                        waitQueue = 2;
-                        break;
-                    default:
-                        waitQueue = 0;
-                        break;
-                }
-                if (characterCount == line->getChildrenCount() - 1) {
-                    newLine = true;
-                }
-            } else {
+        if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
+            auto const line = lines[currentLine];
+            auto letters = std::move(line->getChildrenExt<CCSprite>());
+            auto const letter = letters[characterCount];
+            if (letter->isVisible()) {
                 unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
                 doneRolling = true;
                 rolledPage = true;
                 showButtons();
                 return;
             }
+            letter->setVisible(true);
+
+            character = line->getString()[characterCount];
+            switch (character) {
+                case ' ':
+                    waitQueue = 0;
+                    playSound = false;
+                    break;
+                case '.':
+                    [[fallthrough]];
+                case ',':
+                    [[fallthrough]];
+                case ':':
+                    [[fallthrough]];
+                case ';':
+                    [[fallthrough]];
+                    case '?':
+                    [[fallthrough]];
+                    case '!':
+                    waitQueue = 2;
+                    break;
+                    default:
+                    waitQueue = 0;
+                    break;
+            }
+            if (characterCount == line->getChildrenCount() - 1) {
+                newLine = true;
+            }
+        } else {
+            unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+            doneRolling = true;
+            rolledPage = true;
+            showButtons();
+            this->updateRenderTexture();
+            return;
         }
+
+        
         characterCount++;
         if (newLine) {
             characterCount = 0;
@@ -661,12 +658,19 @@ void DeltaruneAlertLayer::rollText(float dt) {
             lostTime -= pause;
         }
     }
+    this->updateRenderTexture();
 
     if (!playSound || soundTimer < soundRate) {
         return;
     }
 
     DeltaruneAlertLayer::playSound(character);
+}
+
+void DeltaruneAlertLayer::updateRenderTexture() {
+    auto fields = this->m_fields.self();
+
+    // fields->renderedSprite->render();
 }
 
 void DeltaruneAlertLayer::playSound(char character) {
