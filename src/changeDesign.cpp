@@ -1,7 +1,10 @@
 #include <Geode/utils/cocos.hpp>
+#include <alphalaneous.alphas-ui-pack/include/API.hpp>
 #include "FLAlertLayer.hpp"
 #include "TextShaders.hpp"
 #include "include.hpp"
+
+using namespace alpha::prelude;
 
 template <class I, class T>
 bool iteratorContains(I const& iterator, T const& value) {
@@ -181,18 +184,6 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
     if (program)
         star->setShaderProgram(program);
 
-    /*
-    if (!noShadow) {
-        starShadow->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
-        starShadow->setPositionY(109);
-        starShadow->setZOrder(0);
-        starShadow->setID("starShadow"_spr);
-        auto const character = starShadow->getChildByType<CCSprite>(0);
-        character->setColor({15, 15, 127});
-        
-        m_mainLayer->addChild(starShadow);
-    }
-    */
     fields->contentXOffset = xOffset;
     
     return star;
@@ -247,14 +238,8 @@ void DeltaruneAlertLayer::changeText() {
     newDesc->setZOrder(textArea->getZOrder());
     newDesc->setID("content-text-area");
 
-    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
-    if (program) {
-        newDesc->setShaderProgram(program);
-    }
-
     /*
     TextArea* newDescGrad = nullptr;
-    TextArea* newDescShad = nullptr;
     if (!noGradient) {
         newDescGrad = TextArea::create(
             str,
@@ -279,62 +264,6 @@ void DeltaruneAlertLayer::changeText() {
             }
         }
     }
-    if (!noShadow) {
-        newDescShad = TextArea::create(
-            str,
-            font.c_str(),
-            1.f,
-            creatingWidth,
-            CCPoint{0, 1},
-            size,
-            false);
-        newDescShad->setContentWidth(creatingWidth);
-        newDescShad->setAnchorPoint(CCPoint{0, 1});
-        newDescShad->setPositionY(109);
-        newDescShad->setPositionX(newDescShad->getPositionX() + 1);
-        newDescShad->setZOrder(textArea->getZOrder() - 1);
-        newDescShad->setID("shadow"_spr);
-
-        auto const& linesShad = newDescShad->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
-        int i = 0;
-
-        for (auto const line : linesShad) {
-            auto const& letters = line->getChildrenExt<CCSprite>();
-            int j = 0;
-
-            for (auto const letter : letters) {
-                auto const origLinesParent = newDesc->getChildByType<MultilineBitmapFont>(0);
-                auto const origLine = origLinesParent->getChildByType<CCLabelBMFont>(i);
-                auto const origChar = origLine->getChildByType<CCSprite>(j);
-                auto const& color = origChar->getColor();
-
-                if (color == ccColor3B{255, 255, 255})
-                    letter->setColor({15, 15, 127});
-                else if (color == ccColor3B{255, 0, 255})
-                    letter->setColor({76, 0, 76});
-                else if (color == ccColor3B{255, 90, 90})
-                    letter->setColor({76, 0, 0});
-                else if (color == ccColor3B{255, 165, 75})
-                    letter->setColor({76, 38, 18});
-                else if (color == ccColor3B{255, 255, 0})
-                    letter->setColor({76, 76, 0});
-                else if (color == ccColor3B{64, 227, 72})
-                    letter->setColor({0, 76, 0});
-                else if (color == ccColor3B{74, 82, 255})
-                    letter->setColor({0, 0, 76});
-                else {
-                    uint8_t const red = color.r / 2;
-                    uint8_t const green = color.g / 2;
-                    uint8_t const blue = color.b / 2;
-                    letter->setColor(ccColor3B{red, green, blue});
-                }
-
-                letter->setVisible(false);
-                j++;
-            }
-            i++;
-        }
-    }
     */
     auto const& lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
 
@@ -357,7 +286,19 @@ void DeltaruneAlertLayer::changeText() {
     clippingNode->setID("content-text-area"_spr);
     clippingNode->setPositionY(10);
     clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
+    clippingNode->setContentSize(rect->getContentSize());
     clippingNode->addChild(newDesc);
+
+    auto renderNode = RenderNode::create(newDesc);
+    fields->renderedSprite = renderNode;
+    renderNode->render();
+    
+    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
+
+    if (program)
+        renderNode->setShaderProgram(program);
+
+    clippingNode->addChild(renderNode);
 
     m_mainLayer->addChild(clippingNode);
 
@@ -365,9 +306,7 @@ void DeltaruneAlertLayer::changeText() {
     textArea = newDesc;
     /*
     if (newDescGrad) clippingNode->addChild(newDescGrad);
-    if (!noShadow) clippingNode->addChild(newDescShad);
     fields->gradientOverlay = newDescGrad;
-    fields->shadow = newDescShad;
     */
 
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
@@ -376,7 +315,6 @@ void DeltaruneAlertLayer::changeText() {
     textArea->setPositionY(textArea->getPositionY() + fields->textSize * fields->linesProgressed);
     /*
     if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
-    if (newDescShad) newDescShad->setPositionY(textArea->getPositionY() - 1);
     */
 
     schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);

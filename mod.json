@@ -26,7 +26,8 @@
                 "mac",
                 "android64"
             ]
-        }
+        },
+        "alphalaneous.alphas-ui-pack": ">=v1.0.1-beta.1"
     },
     "resources": {
         "sprites": [
@@ -53,12 +54,6 @@
             }
         },
         "files": [
-            "resources/fonts/DeterminationGradient-uhd.fnt",
-            "resources/fonts/DeterminationGradient-hd.fnt",
-            "resources/fonts/DeterminationGradient.fnt",
-            "resources/fonts/DeterminationGradient-uhd.png",
-            "resources/fonts/DeterminationGradient-hd.png",
-            "resources/fonts/DeterminationGradient.png",
             "resources/sounds/SND_TXT1.wav",
             "resources/sounds/SND_TXT2.wav",
             "resources/sounds/snd_txtal.wav",
@@ -90,6 +85,7 @@
             "resources/sounds/snd_txtten8.wav",
             "resources/sounds/snd_txtten9.wav",
             "resources/sounds/snd_txtten10.wav",
+            "resources/shaders/*",
             "resources/g.jpg"
         ]
     },
