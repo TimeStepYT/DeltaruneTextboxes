@@ -1,6 +1,6 @@
-### v1.6.0
+### v1.5.3
 - Updated to GD 2.2081 and Geode v5.0.0
-- Disabled Custom Keybinds temporarily (remove once reenabled)
+- Disabled Custom Keybinds (dw, it will come back)
 
 ### v1.5.2
 - Tweaked the rate of the text sounds for some characters
