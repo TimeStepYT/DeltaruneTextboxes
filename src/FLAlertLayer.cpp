@@ -541,7 +541,7 @@ void DeltaruneAlertLayer::progressText() {
 }
 
 time_t const& t = time(nullptr);
-auto const& now = fmt::localtime(t);
+auto const& now = geode::localtime(t);
 
 void DeltaruneAlertLayer::handleAprilFools() {
     if (now.tm_mon != 3 || now.tm_mday != 1)
