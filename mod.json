@@ -1,5 +1,5 @@
 {
-    "geode": "5.0.0-alpha.1",
+    "geode": "5.0.0-beta.2",
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
@@ -20,7 +20,6 @@
     "dependencies": {
         "geode.node-ids": ">=1.19.0",
         "geode.custom-keybinds": {
-            "importance": "required",
             "version": ">=v1.7.1",
             "platforms": [
                 "mac",
