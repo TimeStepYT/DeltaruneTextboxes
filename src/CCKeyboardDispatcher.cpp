@@ -44,9 +44,9 @@ $execute {
 class $modify(MyHookLol, CCKeyboardDispatcher) {
 	// Needed because BetterInfo has special FLAlertLayers that duplicate for some reason
 	bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool idk, double time) {
-		if (down && key == KEY_G) {
-			PurchaseItemPopup::create(GJStoreItem::create(1, 1, 1, 1, ShopType::Normal))->show();
-		}
+		// if (down && key == KEY_G) {
+		// 	PurchaseItemPopup::create(GJStoreItem::create(1, 1, 1, 1, ShopType::Normal))->show();
+		// }
 		if (blockKeys && down && Loader::get()->isModLoaded("cvolton.betterinfo")) {
 			if (key == KEY_Left || key == KEY_Right)
 				return true;
