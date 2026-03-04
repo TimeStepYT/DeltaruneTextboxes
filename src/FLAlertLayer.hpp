@@ -1,3 +1,4 @@
+#include <Geode/ui/Button.hpp>
 #include "include.hpp"
 #include "ImageNode.hpp"
 
@@ -27,8 +28,10 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int prevSoundNum = 200;
 		int soundRate = 2;
 		int soundTimer = 0;
-		CCMenuItemSpriteExtra* btn1;
-		CCMenuItemSpriteExtra* btn2;
+		CCMenuItemSpriteExtra* old_btn1;
+		CCMenuItemSpriteExtra* old_btn2;
+		Button* btn1;
+		Button* btn2;
 		CCClippingNode* textAreaClippingNode;
 		TextArea* textArea;
 		TextArea* gradientOverlay;
@@ -65,7 +68,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();
-	void setHeartPosition(CCMenuItemSpriteExtra*);
+	void setHeartPosition(Button*);
 	int getLinesLeft();
 	void skipText();
 	int emptyLinesAmount(int = 0);
@@ -75,9 +78,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
-	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
+	void clickedOnButton(Button*, Button*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
-	void fixTouchPrio();
 	void playSound(char);
 
 #if defined(DISABLE_KEYBOARD)
