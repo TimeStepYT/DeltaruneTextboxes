@@ -1,3 +1,6 @@
+### v1.5.4
+- Fixed a touch prio bug
+
 ### v1.5.3
 - Updated to GD 2.2081 and Geode v5.0.0
 - Disabled Custom Keybinds (dw, it will come back)

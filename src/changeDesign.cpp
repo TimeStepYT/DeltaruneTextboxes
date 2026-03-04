@@ -1,4 +1,5 @@
 #include <Geode/utils/cocos.hpp>
+#include <Geode/ui/Button.hpp>
 #include "FLAlertLayer.hpp"
 #include "include.hpp"
 
@@ -91,18 +92,6 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
     }
 }
 
-// fix handleTouchPrio breaking the buttons
-void DeltaruneAlertLayer::fixTouchPrio() {
-    auto const buttonMenu = this->m_buttonMenu;
-
-    int const parentTouchPrio = this->getTouchPriority();
-    int const menuTouchPrio = buttonMenu->getTouchPriority();
-
-    if (parentTouchPrio >= menuTouchPrio) {
-        buttonMenu->setTouchPriority(parentTouchPrio + 1);
-    }
-}
-
 void DeltaruneAlertLayer::changeButtons() {
     if (!m_buttonMenu) return;
     m_buttonMenu->setPositionY(32);
@@ -111,8 +100,38 @@ void DeltaruneAlertLayer::changeButtons() {
     if (!m_button2) return;
     auto const bg = m_fields->bg;
     float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2;
-    m_fields->btn1->setPositionX(positionStart + m_fields->screenSize / 4);
-    m_fields->btn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
+
+    Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, "Determination.fnt"_spr);
+    newBtn1->setPositionX(positionStart + m_fields->screenSize / 4);
+    newBtn1->setPositionY(m_fields->old_btn1->getPositionY() + 2);
+    newBtn1->setAnimationType(Button::AnimationType::None);
+    newBtn1->setActivateCallback([this](Button* button) {
+        this->onBtn1(button);
+    });
+    
+    Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
+    newBtn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
+    newBtn2->setPositionY(m_fields->old_btn2->getPositionY() + 2);
+    newBtn2->setAnimationType(Button::AnimationType::None);
+    newBtn2->setActivateCallback([this](Button* button) {
+        this->onBtn2(button);
+    });
+    
+    newBtn1->setSelectCallback([this, newBtn2](Button* button){
+        this->clickedOnButton(button, newBtn2, 1);
+    });
+    newBtn2->setSelectCallback([this, newBtn1](Button* button){
+        this->clickedOnButton(button, newBtn1, 2);
+    });
+
+    this->m_buttonMenu->addChild(newBtn1);
+    this->m_buttonMenu->addChild(newBtn2);
+
+    m_fields->btn1 = newBtn1;
+    m_fields->btn2 = newBtn2;
+
+    m_fields->old_btn1->removeFromParent();
+    m_fields->old_btn2->removeFromParent();
 
     auto const heart = CCSprite::create("heart.png"_spr);
     heart->setVisible(false);
@@ -122,14 +141,8 @@ void DeltaruneAlertLayer::changeButtons() {
     m_mainLayer->addChild(heart);
     m_fields->heart = heart;
 
-    changeSingleButton(m_fields->btn1, m_button1);
-    changeSingleButton(m_fields->btn2, m_button2);
-
-    Loader::get()->queueInMainThread([popup = Ref(this)] {
-        Loader::get()->queueInMainThread([popup] {
-            popup->fixTouchPrio();
-        });
-    });
+    changeSingleButton(m_fields->old_btn1, m_button1);
+    changeSingleButton(m_fields->old_btn2, m_button2);
 }
 
 void DeltaruneAlertLayer::changeTitle() {

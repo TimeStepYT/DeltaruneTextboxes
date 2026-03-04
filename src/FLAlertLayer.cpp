@@ -117,8 +117,8 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
 
     this->m_noElasticity = true;
 
-    m_fields->btn1 = m_button1 ? static_cast<CCMenuItemSpriteExtra*>(m_button1->getParent()) : nullptr;
-    m_fields->btn2 = m_button2 ? static_cast<CCMenuItemSpriteExtra*>(m_button2->getParent()) : nullptr;
+    m_fields->old_btn1 = m_button1 ? static_cast<CCMenuItemSpriteExtra*>(m_button1->getParent()) : nullptr;
+    m_fields->old_btn2 = m_button2 ? static_cast<CCMenuItemSpriteExtra*>(m_button2->getParent()) : nullptr;
 
     textArea = static_cast<TextArea*>(m_mainLayer->getChildByID("content-text-area"));
     bg = static_cast<CCScale9Sprite*>(m_mainLayer->getChildByID("background"));
@@ -193,6 +193,7 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
         progressText();
         return;
     }
+
     blockKeys = false;
     FLAlertLayer::onBtn1(sender);
 }
@@ -229,9 +230,9 @@ void DeltaruneAlertLayer::show() {
     changeLook();
 }
 
-void DeltaruneAlertLayer::setHeartPosition(CCMenuItemSpriteExtra* button) {
+void DeltaruneAlertLayer::setHeartPosition(Button* button) {
     auto const heart = m_fields->heart;
-    auto const text = button->getChildByType<ButtonSprite>(0)->getChildByType<CCLabelBMFont>(0);
+    auto const text = button->getChildByType<CCLabelBMFont>(0);
 
     if (!text) return;
 
@@ -240,16 +241,15 @@ void DeltaruneAlertLayer::setHeartPosition(CCMenuItemSpriteExtra* button) {
     heart->setPositionX(xPos);
 }
 
-void DeltaruneAlertLayer::clickedOnButton(CCMenuItemSpriteExtra* btn, ButtonSprite* buttonSprite, int btnSelected) {
-    auto const label = buttonSprite->getChildByType<CCLabelBMFont>(0);
-    if (!label) return;
+void DeltaruneAlertLayer::clickedOnButton(Button* activatedButton, Button* otherButton, int btnSelected) {
+    auto const label = activatedButton->getChildByType<CCLabelBMFont*>(0);
+    auto const otherLabel = otherButton->getChildByType<CCLabelBMFont*>(0);
+    if (!label || !otherLabel) return;
 
-    if (btn->isSelected()) {
-        label->setColor(ccColor3B{255, 255, 0});
-        m_fields->btnSelected = btnSelected;
-        setHeartPosition(btn);
-    }
-    else label->setColor(ccColor3B{255, 255, 255});
+    label->setColor(ccColor3B{255, 255, 0});
+    m_fields->btnSelected = btnSelected;
+    setHeartPosition(activatedButton);
+    otherLabel->setColor(ccColor3B{255, 255, 255});
 }
 
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
@@ -258,20 +258,12 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 
     if (!m_fields->done && !m_fields->disableClickToProgress) {
         if (m_fields->rolledPage)
-            progressText();
+            this->progressText();
         else
-            skipText();
+            this->skipText();
     }
-    bool const ret = FLAlertLayer::ccTouchBegan(touch, event);
-    auto const btn1 = m_fields->btn1;
-    auto const btn2 = m_fields->btn2;
 
-    if (!btn1 || !btn2) return ret;
-    if (!btn1->isSelected() && !btn2->isSelected()) return ret;
-
-    clickedOnButton(btn1, m_button1, 1);
-    clickedOnButton(btn2, m_button2, 2);
-    return ret;
+    return FLAlertLayer::ccTouchBegan(touch, event);
 }
 #if defined(DISABLE_KEYBOARD)
 void DeltaruneAlertLayer::keyDown(enumKeyCodes key, double timestamp) {
@@ -293,8 +285,8 @@ void DeltaruneAlertLayer::keyDown(enumKeyCodes key, double timestamp) {
         }
 
         int& btnSelected = m_fields->btnSelected;
-        auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-        auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
+        auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
+        auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
 
         if (key == KEY_ArrowLeft || key == KEY_Left) {
             btnSelected = 1;
@@ -326,7 +318,7 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
                 auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
                 auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
                 label1->setColor(ccColor3B{255, 255, 0});
-                setHeartPosition(m_fields->btn1);
+                setHeartPosition(m_fields->old_btn1);
                 label2->setColor(ccColor3B{255, 255, 255});
                 return ListenerResult::Stop;
             }
@@ -343,7 +335,7 @@ void DeltaruneAlertLayer::initCustomKeybinds() {
             auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
             auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
             label2->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn2);
+            setHeartPosition(m_fields->old_btn2);
             label1->setColor(ccColor3B{255, 255, 255});
             return ListenerResult::Stop;
         }
@@ -452,8 +444,8 @@ void DeltaruneAlertLayer::progressText() {
     if (!m_fields->textAreaClippingNode) return;
 
     auto const textArea = m_fields->textArea;
-    auto const btn1 = m_fields->btn1;
-    auto const btn2 = m_fields->btn2;
+    auto const btn1 = m_fields->old_btn1;
+    auto const btn2 = m_fields->old_btn2;
     auto const shadow = m_fields->shadow;
     auto const gradientOverlay = m_fields->gradientOverlay;
     int const btnSelected = m_fields->btnSelected;
