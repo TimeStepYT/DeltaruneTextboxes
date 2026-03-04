@@ -105,6 +105,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn1->setPositionX(positionStart + m_fields->screenSize / 4);
     newBtn1->setPositionY(m_fields->old_btn1->getPositionY() + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
+    newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
         this->onBtn1(button);
     });
@@ -113,6 +114,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
     newBtn2->setPositionY(m_fields->old_btn2->getPositionY() + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
+    newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
         this->onBtn2(button);
     });
