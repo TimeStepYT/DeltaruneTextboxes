@@ -58,6 +58,7 @@ void DeltaruneAlertLayer::changeBG() {
     auto const screenSize = m_fields->screenSize;
     auto const imageNode = m_fields->imageNode;
     auto const undertaleBG = Mod::get()->getSettingValue<bool>("undertaleBG");
+    auto* const director = CCDirector::sharedDirector();
 
     bg->removeFromParent();
 
@@ -66,9 +67,9 @@ void DeltaruneAlertLayer::changeBG() {
     else
         bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
 
-    bg->setContentHeight(140);
-    bg->setContentWidth(screenSize);
-    bg->setPosition(CCPoint{CCDirector::sharedDirector()->getWinSize().width / 2, 70});
+
+    bg->setContentSize({1334.f / 3, 376.f / 3}); // Measured from the game
+    bg->setPosition(CCPoint{screenSize / 2, bg->getContentHeight() / 2});
     bg->setID("background");
     bg->setZOrder(-1);
 
@@ -77,7 +78,7 @@ void DeltaruneAlertLayer::changeBG() {
 
     if (m_fields->dialog) {
         imageNode->setZOrder(bg->getZOrder() + 1);
-        imageNode->setPosition({bg->getPositionX() - screenSize / 2 + 68, bg->getPositionY()});
+        imageNode->setPosition({bg->getPositionX() - bg->getContentWidth() / 2 + 68, bg->getPositionY()});
     }
     m_mainLayer->addChild(bg);
 }
@@ -159,7 +160,7 @@ void DeltaruneAlertLayer::changeTitle() {
     auto const bg = m_fields->bg;
     title->setAnchorPoint(CCPoint{0, 0});
     title->setFntFile("Determination.fnt"_spr);
-    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, 138});
+    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, bg->getContentHeight() - 2.f});
 }
 
 void DeltaruneAlertLayer::handleSound() {
@@ -189,8 +190,8 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
     if (fields->dialog)
         xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
-    star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
-    star->setPositionY(110);
+    star->setPositionX(bg->getPositionX() - bg->getContentWidth() / 2 + xOffset - star->getContentWidth() + 27);
+    star->setPositionY(bg->getContentHeight() - 30.f);
     star->setZOrder(1);
     star->setID("star"_spr);
 
@@ -236,7 +237,7 @@ void DeltaruneAlertLayer::changeText() {
     }
 
     float xOffset = fields->contentXOffset;
-    float creatingWidth = screenSize - 100 - xOffset;
+    float creatingWidth = bg->getContentWidth() - 120 - xOffset;
     auto const newDesc = TextArea::create(
         str,
         font.c_str(),
@@ -248,7 +249,7 @@ void DeltaruneAlertLayer::changeText() {
 
     newDesc->setContentWidth(creatingWidth);
     newDesc->setAnchorPoint(CCPoint{0, 1});
-    newDesc->setPositionY(110);
+    newDesc->setPositionY(bg->getContentHeight() - 30.f);
     newDesc->setZOrder(textArea->getZOrder());
     newDesc->setID("content-text-area");
 
@@ -299,7 +300,7 @@ void DeltaruneAlertLayer::changeText() {
     auto const clippingNode = CCClippingNode::create(rect);
     clippingNode->setID("content-text-area"_spr);
     clippingNode->setPositionY(10);
-    clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
+    clippingNode->setPositionX(bg->getPositionX() - bg->getContentWidth() / 2 + 24 + xOffset + star->getContentWidth());
     clippingNode->setContentSize(rect->getContentSize());
     clippingNode->addChild(newDesc);
 
@@ -340,9 +341,9 @@ void DeltaruneAlertLayer::removeControllerGlyphs() {
     auto const okControllerGlyph = mainLayer->getChildByID("controller-ok-hint");
 
     if (backControllerGlyph)
-        backControllerGlyph->removeFromParentAndCleanup(true);
+        backControllerGlyph->removeFromParent();
     if (okControllerGlyph)
-        okControllerGlyph->removeFromParentAndCleanup(true);
+        okControllerGlyph->removeFromParent();
 }
 
 void DeltaruneAlertLayer::changeLook() {

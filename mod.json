@@ -27,7 +27,7 @@
         ],
         "fonts": {
             "Determination": {
-                "size": 78,
+                "size": 70,
                 "path": "resources/fonts/DeterminationMono.ttf",
                 "charset": "32-126,8226",
                 "outline": 0
