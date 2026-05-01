@@ -17,7 +17,7 @@ void DeltarunePurchaseItemPopup::handlePurchasePopup() {
     
     this->setVisible(false);
 
-    quickPopup->setTouchPriority(this->getTouchPriority() + 1);
+    this->removeFromParent();
     quickPopup->setVisible(true);
 }
 

@@ -1,3 +1,4 @@
+#include <Geode/ui/Button.hpp>
 #include "include.hpp"
 #include "ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
@@ -29,8 +30,10 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int prevSoundNum = 200;
 		int soundRate = 2;
 		int soundTimer = 0;
-		CCMenuItemSpriteExtra* btn1 = nullptr;
-		CCMenuItemSpriteExtra* btn2 = nullptr;
+		CCMenuItemSpriteExtra* old_btn1 = nullptr;
+		CCMenuItemSpriteExtra* old_btn2 = nullptr;
+		Button* btn1 = nullptr;
+		Button* btn2 = nullptr;
 		CCClippingNode* textAreaClippingNode = nullptr;
 		TextArea* textArea = nullptr;
 		CCScale9Sprite* bg = nullptr;
@@ -67,7 +70,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();
-	void setHeartPosition(CCMenuItemSpriteExtra*);
+	void setHeartPosition(Button*);
 	int getLinesLeft();
 	void skipText();
 	int emptyLinesAmount(int = 0);
@@ -77,9 +80,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	// I can't check for enter key so I guess I have to hook the buttons
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
-	void clickedOnButton(CCMenuItemSpriteExtra*, ButtonSprite*, int);
+	void clickedOnButton(Button*, Button*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
-	void fixTouchPrio();
 	void playSound(char);
 	void updateRenderTexture();
 
