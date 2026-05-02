@@ -310,7 +310,7 @@ void DeltaruneAlertLayer::changeText() {
     clippingNode->addChild(newDesc);
     fields->textAreaClippingNode = clippingNode;
     
-    auto const textContentNode = CCMenu::create();
+    auto const textContentNode = CCNode::create();
     textContentNode->setID("text-content"_spr);
     textContentNode->setContentSize(bg->getContentSize());
     textContentNode->setPosition(bg->getPosition());
