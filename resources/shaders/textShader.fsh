@@ -8,7 +8,7 @@ uniform sampler2D u_texture;
 
 uniform bool u_noGradient;
 uniform int u_noShadow;
-uniform vec2 u_texelSize;
+uniform vec2 u_shadowDistance;
 uniform float u_yTop;
 
 vec3 rgbToDec(float r, float g, float b) {
@@ -39,8 +39,10 @@ vec3 getShadowColor(vec4 shadowSourceColor) {
 }
 
 void main(void) {
-    vec2 shadowDistance = vec2(3.0 * u_texelSize.x, 3.0 * u_texelSize.y);
-    vec2 shadowSourceCoord = vec2(v_texCoord.x - shadowDistance.x, v_texCoord.y - shadowDistance.y);
+    if (v_texCoord.y < u_yTop) {
+        gl_FragColor = vec4(0, 0, 0, 0);
+        return;
+    }
 
     vec4 color = texture2D(u_texture, v_texCoord);
     vec3 tintedColor = v_fragmentColor.rgb * color.rgb;
@@ -50,6 +52,7 @@ void main(void) {
     resColor = vec4(tintedColor.rgb, color.a);
     
     if (u_noShadow == 0) {
+        vec2 shadowSourceCoord = vec2(v_texCoord.x - u_shadowDistance.x, v_texCoord.y - u_shadowDistance.y);
         vec4 shadowSourceColor = texture2D(u_texture, shadowSourceCoord);
         
         if (shadowSourceCoord.x < 0 || shadowSourceCoord.y < 0) {
