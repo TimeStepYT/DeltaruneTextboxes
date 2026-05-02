@@ -42,10 +42,9 @@ void main(void) {
     vec2 shadowDistance = vec2(3.0 * u_texelSize.x, 3.0 * u_texelSize.y);
     vec2 shadowSourceCoord = vec2(v_texCoord.x - shadowDistance.x, v_texCoord.y - shadowDistance.y);
 
-    
     vec4 color = texture2D(u_texture, v_texCoord);
     vec3 tintedColor = v_fragmentColor.rgb * color.rgb;
-    
+
     vec4 resColor = vec4(0, 0, 0, 0);
     
     resColor = vec4(tintedColor.rgb, color.a);

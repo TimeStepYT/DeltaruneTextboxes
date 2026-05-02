@@ -210,8 +210,8 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
 
 void DeltaruneAlertLayer::changeText() {
     auto const fields = m_fields.self();
-    auto& textArea = fields->old_textArea;
-    if (!textArea) return;
+    auto& oldTextArea = fields->old_textArea;
+    if (!oldTextArea) return;
 
     auto const& sound = fields->textSound;
     auto const size = fields->textSize;
@@ -256,7 +256,7 @@ void DeltaruneAlertLayer::changeText() {
     newDesc->setContentWidth(creatingWidth);
     newDesc->setAnchorPoint(CCPoint{0, 1});
     newDesc->setPositionY(bg->getContentHeight() - 30.f);
-    newDesc->setZOrder(textArea->getZOrder());
+    newDesc->setZOrder(oldTextArea->getZOrder());
     newDesc->setID("content-text-area");
 
     /*
@@ -294,36 +294,42 @@ void DeltaruneAlertLayer::changeText() {
             letter->setVisible(false);
         }
     }
-    textArea->removeFromParent();
-    m_mainLayer->addChild(star);
-
+    oldTextArea->removeFromParent();
+    
     auto const rect = CCLayerColor::create(
         {0, 0, 0, 0},
         bg->getContentWidth(), 
         bg->getContentHeight() - 30.f
     );
-
+    
     auto const clippingNode = CCClippingNode::create(rect);
     clippingNode->setID("content-text-area"_spr);
     clippingNode->setPositionY(10);
     clippingNode->setPositionX(bg->getPositionX() - bg->getContentWidth() / 2 + 24 + xOffset + star->getContentWidth());
     clippingNode->setContentSize(rect->getContentSize());
     clippingNode->addChild(newDesc);
-
-    auto renderNode = RenderNode::create(newDesc);
+    fields->textAreaClippingNode = clippingNode;
+    
+    auto const textContentNode = CCMenu::create();
+    textContentNode->setID("text-content"_spr);
+    textContentNode->setContentSize(bg->getContentSize());
+    textContentNode->setPosition(bg->getPosition());
+    textContentNode->setAnchorPoint({0.5f, 0.5f});
+    this->m_mainLayer->addChild(textContentNode);
+    
+    textContentNode->addChild(star);
+    textContentNode->addChild(clippingNode);
+    
+    auto renderNode = RenderNode::create(textContentNode, true);
     fields->renderedSprite = renderNode;
-    renderNode->render();
     
     auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
 
     if (program)
         renderNode->setShaderProgram(program);
 
-    clippingNode->addChild(renderNode);
+    m_mainLayer->addChild(renderNode);
 
-    m_mainLayer->addChild(clippingNode);
-
-    fields->textAreaClippingNode = clippingNode;
     m_fields->m_textArea = newDesc;
     /*
     if (newDescGrad) clippingNode->addChild(newDescGrad);
