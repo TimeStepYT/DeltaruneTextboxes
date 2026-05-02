@@ -93,7 +93,18 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     m_fields->text = desc;
     scroll = false;
 
-    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
+    // Removing controller glyphs like this seems better than removing the sprites afterwards
+    const auto app = CCApplication::get();
+    const bool controllerConnected = app->m_bControllerConnected;
+
+    app->m_bControllerConnected = false;
+
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
+        app->m_bControllerConnected = controllerConnected;
+        return false;
+    }
+    app->m_bControllerConnected = controllerConnected;
+
 
     NodeIDs::provideFor(this);
     this->setID("FLAlertLayer");
@@ -109,7 +120,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
         return true;
     }
 
-    auto& textArea = m_fields->textArea;
+    auto& textArea = m_fields->old_textArea;
     auto& bg = m_fields->bg;
     auto& titleNode = m_fields->title;
 
@@ -198,7 +209,7 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 }
 
 int DeltaruneAlertLayer::getLinesLeft() {
-    auto const textArea = m_fields->textArea;
+    auto const textArea = m_fields->m_textArea;
 
     if (!m_fields->textAreaClippingNode) return 0;
     if (!textArea) return 0;
@@ -222,7 +233,7 @@ void DeltaruneAlertLayer::show() {
 
     if (!m_fields->bg) return;
     if (!titleNode) return;
-    if (!m_fields->textArea) return;
+    if (!m_fields->old_textArea) return;
     if (!m_mainLayer) return;
 
     decideToBlockKeys();
@@ -371,7 +382,7 @@ void DeltaruneAlertLayer::skipText() {
 
     if (!clippingNode) return;
 
-    auto const textArea = fields->textArea;
+    auto const textArea = fields->m_textArea;
     
     auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
     auto lines = std::move(mlbmf->getChildrenExt());
@@ -397,7 +408,7 @@ void DeltaruneAlertLayer::skipText() {
 }
 
 int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
-    auto const textArea = m_fields->textArea;
+    auto const textArea = m_fields->m_textArea;
     auto const linesProgressed = m_fields->linesProgressed;
     auto const fontNode = textArea->getChildByType<MultilineBitmapFont>(0);
     int lines = 0;
@@ -444,7 +455,7 @@ void DeltaruneAlertLayer::progressText() {
 
     if (!fields->textAreaClippingNode) return;
 
-    auto const textArea = fields->textArea;
+    auto const textArea = fields->m_textArea;
     auto const btn1 = fields->old_btn1;
     auto const btn2 = fields->old_btn2;
     int const btnSelected = fields->btnSelected;
@@ -584,7 +595,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
         else rolledPage = false;
 
-        auto const textArea = fields->textArea;
+        auto const textArea = fields->m_textArea;
         
         auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
         auto lines = mlbmf->getChildrenExt<CCLabelBMFont>();

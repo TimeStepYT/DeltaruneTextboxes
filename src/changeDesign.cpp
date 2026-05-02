@@ -12,7 +12,7 @@ bool iteratorContains(I const& iterator, T const& value) {
     return std::find(iterator.begin(), iterator.end(), value) != iterator.end();
 }
 
-void capitalize(std::string& str) {
+void capitalize(std::string& str, bool toUpper = true) {
     bool disable = false;
     std::array<char, 5> constexpr nextFilter = {'c', 'd', '/', 'i', 's'};
 
@@ -28,7 +28,11 @@ void capitalize(std::string& str) {
             continue;
         }
         if (disable) continue;
-        c = toupper(c);
+        
+        if (toUpper)
+            c = toupper(c);
+        else
+            c = tolower(c);
     }
 }
 
@@ -206,7 +210,7 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
 
 void DeltaruneAlertLayer::changeText() {
     auto const fields = m_fields.self();
-    auto& textArea = fields->textArea;
+    auto& textArea = fields->old_textArea;
     if (!textArea) return;
 
     auto const& sound = fields->textSound;
@@ -230,6 +234,7 @@ void DeltaruneAlertLayer::changeText() {
 
     if (sound == "Sans") {
         font = "ComicSans.fnt"_spr;
+        capitalize(str, false);
     }
     else if (sound == "Papyrus") {
         font = "Papyrus.fnt"_spr;
@@ -243,9 +248,10 @@ void DeltaruneAlertLayer::changeText() {
         font.c_str(),
         1,
         creatingWidth,
-        CCPoint{0, 1},
+        {0, 1},
         size,
-        false);
+        false
+    );
 
     newDesc->setContentWidth(creatingWidth);
     newDesc->setAnchorPoint(CCPoint{0, 1});
@@ -294,7 +300,7 @@ void DeltaruneAlertLayer::changeText() {
     auto const rect = CCLayerColor::create(
         {0, 0, 0, 0},
         bg->getContentWidth(), 
-        bg->getContentHeight() - 20
+        bg->getContentHeight() - 30.f
     );
 
     auto const clippingNode = CCClippingNode::create(rect);
@@ -318,7 +324,7 @@ void DeltaruneAlertLayer::changeText() {
     m_mainLayer->addChild(clippingNode);
 
     fields->textAreaClippingNode = clippingNode;
-    textArea = newDesc;
+    m_fields->m_textArea = newDesc;
     /*
     if (newDescGrad) clippingNode->addChild(newDescGrad);
     fields->gradientOverlay = newDescGrad;
@@ -327,27 +333,15 @@ void DeltaruneAlertLayer::changeText() {
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
 
     fields->linesProgressed += emptyLinesAmount();
-    textArea->setPositionY(textArea->getPositionY() + fields->textSize * fields->linesProgressed);
+    newDesc->setPositionY(newDesc->getPositionY() + fields->textSize * fields->linesProgressed);
     /*
-    if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
+    if (newDescGrad) newDescGrad->setPositionY(newDesc->getPositionY());
     */
 
     schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
-void DeltaruneAlertLayer::removeControllerGlyphs() {
-    auto const mainLayer = this->m_mainLayer;
-    auto const backControllerGlyph = mainLayer->getChildByID("controller-back-hint");
-    auto const okControllerGlyph = mainLayer->getChildByID("controller-ok-hint");
-
-    if (backControllerGlyph)
-        backControllerGlyph->removeFromParent();
-    if (okControllerGlyph)
-        okControllerGlyph->removeFromParent();
-}
-
 void DeltaruneAlertLayer::changeLook() {
-    removeControllerGlyphs();
     changeBG();
     changeButtons();
     changeTitle();
