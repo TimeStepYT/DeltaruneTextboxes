@@ -98,24 +98,24 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
     if (label) {
         label->setFntFile("Determination.fnt"_spr);
         label->setScale(1.f);
-
-        auto const program = DeltaruneTextShaders::getShader(m_fields->noShadow, m_fields->noGradient);
-        if (program)
-            label->setShaderProgram(program);
     }
 }
 
 void DeltaruneAlertLayer::changeButtons() {
     if (!m_buttonMenu) return;
+
+    auto* const fields = this->m_fields.self();
+    auto* const bg = fields->bg;
+    
+    m_buttonMenu->setPositionX(bg->getContentWidth() / 2);
     m_buttonMenu->setPositionY(32);
     m_buttonMenu->setVisible(false);
 
     if (!m_button2) return;
-    auto const bg = m_fields->bg;
-    float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2;
+    float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - fields->screenSize / 2;
     Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, "Determination.fnt"_spr);
-    newBtn1->setPositionX(positionStart + m_fields->screenSize / 4);
-    newBtn1->setPositionY(m_fields->old_btn1->getPositionY() + 2);
+    newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
+    newBtn1->setPositionY(fields->old_btn1->getPositionY() + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
@@ -123,8 +123,8 @@ void DeltaruneAlertLayer::changeButtons() {
     });
 
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
-    newBtn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
-    newBtn2->setPositionY(m_fields->old_btn2->getPositionY() + 2);
+    newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
+    newBtn2->setPositionY(fields->old_btn2->getPositionY() + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
@@ -141,11 +141,11 @@ void DeltaruneAlertLayer::changeButtons() {
     this->m_buttonMenu->addChild(newBtn1);
     this->m_buttonMenu->addChild(newBtn2);
 
-    m_fields->btn1 = newBtn1;
-    m_fields->btn2 = newBtn2;
+    fields->btn1 = newBtn1;
+    fields->btn2 = newBtn2;
 
-    m_fields->old_btn1->removeFromParent();
-    m_fields->old_btn2->removeFromParent();
+    fields->old_btn1->removeFromParent();
+    fields->old_btn2->removeFromParent();
 
     auto const heart = CCSprite::create("heart.png"_spr);
     heart->setVisible(false);
@@ -153,10 +153,10 @@ void DeltaruneAlertLayer::changeButtons() {
     heart->setPositionX(m_buttonMenu->getPositionX());
     heart->setID("heart"_spr);
     m_mainLayer->addChild(heart);
-    m_fields->heart = heart;
+    fields->heart = heart;
 
-    changeSingleButton(m_fields->old_btn1, m_button1);
-    changeSingleButton(m_fields->old_btn2, m_button2);
+    changeSingleButton(fields->old_btn1, m_button1);
+    changeSingleButton(fields->old_btn2, m_button2);
 }
 
 void DeltaruneAlertLayer::changeTitle() {
@@ -194,14 +194,10 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
     if (fields->dialog)
         xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
-    star->setPositionX(bg->getPositionX() - bg->getContentWidth() / 2 + xOffset - star->getContentWidth() + 27);
+    star->setPositionX(xOffset - star->getContentWidth() + 27);
     star->setPositionY(bg->getContentHeight() - 30.f);
     star->setZOrder(1);
     star->setID("star"_spr);
-
-    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
-    if (program)
-        star->setShaderProgram(program);
 
     fields->contentXOffset = xOffset;
     
@@ -255,7 +251,8 @@ void DeltaruneAlertLayer::changeText() {
 
     newDesc->setContentWidth(creatingWidth);
     newDesc->setAnchorPoint(CCPoint{0, 1});
-    newDesc->setPositionY(bg->getContentHeight() - 30.f);
+    newDesc->setPositionX(24 + xOffset + star->getContentWidth());
+    newDesc->setPositionY(bg->getContentHeight() - 20.f);
     newDesc->setZOrder(oldTextArea->getZOrder());
     newDesc->setID("content-text-area");
 
@@ -298,32 +295,38 @@ void DeltaruneAlertLayer::changeText() {
     
     auto const rect = CCLayerColor::create(
         {0, 0, 0, 0},
-        bg->getContentWidth(), 
-        bg->getContentHeight() - 30.f
+        0, 0
     );
     
     auto const clippingNode = CCClippingNode::create(rect);
-    clippingNode->setID("content-text-area"_spr);
-    clippingNode->setPositionY(10);
-    clippingNode->setPositionX(bg->getPositionX() - bg->getContentWidth() / 2 + 24 + xOffset + star->getContentWidth());
+    clippingNode->setID("getoutijustneedyouforrendernodeandthebuttons"_spr);
+    clippingNode->setZOrder(bg->getZOrder() - 1);
     clippingNode->setContentSize(rect->getContentSize());
-    clippingNode->addChild(newDesc);
-    fields->textAreaClippingNode = clippingNode;
     
     auto const textContentNode = CCNode::create();
     textContentNode->setID("text-content"_spr);
     textContentNode->setContentSize(bg->getContentSize());
     textContentNode->setPosition(bg->getPosition());
     textContentNode->setAnchorPoint({0.5f, 0.5f});
-    this->m_mainLayer->addChild(textContentNode);
+    fields->textContentNode = textContentNode;
     
     textContentNode->addChild(star);
-    textContentNode->addChild(clippingNode);
+    textContentNode->addChild(newDesc);
     
+    this->m_buttonMenu->removeFromParentAndCleanup(false);
+    
+    textContentNode->addChild(this->m_buttonMenu);
+    
+    clippingNode->addChild(textContentNode);
+    this->m_mainLayer->addChild(clippingNode);
+
     auto renderNode = RenderNode::create(textContentNode, true);
+    renderNode->setPosition(bg->getPosition());
+    renderNode->setZOrder(bg->getZOrder() + 1);
     fields->renderedSprite = renderNode;
-    
-    auto program = DeltaruneTextShaders::getShader(noShadow, noGradient);
+
+    auto shaderInstance = DeltaruneTextShaders::create(bg);
+    auto program = shaderInstance.getShader(noShadow, noGradient);
 
     if (program)
         renderNode->setShaderProgram(program);

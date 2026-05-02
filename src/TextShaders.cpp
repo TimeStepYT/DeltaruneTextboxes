@@ -16,6 +16,12 @@ std::string DeltaruneTextShaders::getFragmentShaderLog(CCGLProgram* program) {
 	return result;
 }
 
+DeltaruneTextShaders DeltaruneTextShaders::create(cocos2d::CCNode* border) {
+	DeltaruneTextShaders instance;
+	instance.m_borderNode = border;
+	return instance;
+}
+
 CCGLProgram* DeltaruneTextShaders::getShader(bool const noShadow, bool const noGradient) {
     auto ccsc = CCShaderCache::sharedShaderCache();
     auto program = ccsc->programForKey("text-shader"_spr);
@@ -46,18 +52,16 @@ CCGLProgram* DeltaruneTextShaders::getShader(bool const noShadow, bool const noG
 	
     program->updateUniforms();
 	
-	auto const director = CCDirector::get();
-	auto const pixelSize = director->getWinSizeInPixels();
-	float const pixelWidth = pixelSize.width;
-	float const pixelHeight = pixelSize.height;
+	auto const pixelSize = this->m_borderNode->getContentSize();
+	float const texelWidth = 1.f / (pixelSize.width * 3);
+	float const texelHeight = 1.f / (pixelSize.height * 3);
 	
-	auto const winSize = director->getWinSize();
-	float constexpr clippingNodeHeight = 120;
+	float const shadowDistance = 3.f;
 	
     program->setUniformLocationWith1i(program->getUniformLocationForName("u_noShadow"), static_cast<int>(noShadow));
     program->setUniformLocationWith1i(program->getUniformLocationForName("u_noGradient"), static_cast<int>(noGradient));
-	program->setUniformLocationWith2f(program->getUniformLocationForName("u_texelSize"), 1.f / pixelWidth, 1.f / pixelHeight);
-	program->setUniformLocationWith1f(program->getUniformLocationForName("u_yTop"), 1.f - clippingNodeHeight / winSize.height);
+	program->setUniformLocationWith2f(program->getUniformLocationForName("u_shadowDistance"), shadowDistance * texelWidth, shadowDistance * texelHeight);
+    program->setUniformLocationWith1f(program->getUniformLocationForName("u_yTop"), 40.f * texelHeight);
     ccsc->addProgram(program, "text-shader"_spr);
     
 	program->release();

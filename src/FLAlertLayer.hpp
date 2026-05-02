@@ -35,7 +35,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		CCMenuItemSpriteExtra* old_btn2 = nullptr;
 		Button* btn1 = nullptr;
 		Button* btn2 = nullptr;
-		CCClippingNode* textAreaClippingNode = nullptr;
+		CCNode* textContentNode = nullptr;
 		TextArea* old_textArea = nullptr;
 		TextArea* m_textArea = nullptr;
 		CCScale9Sprite* bg = nullptr;

@@ -211,7 +211,6 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 int DeltaruneAlertLayer::getLinesLeft() {
     auto const textArea = m_fields->m_textArea;
 
-    if (!m_fields->textAreaClippingNode) return 0;
     if (!textArea) return 0;
 
     auto bitmapFont = textArea->getChildByType<MultilineBitmapFont>(0);
@@ -246,7 +245,11 @@ void DeltaruneAlertLayer::setHeartPosition(Button* button) {
 
     if (!text) return;
 
-    auto const xPos = m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5;
+    float const distanceFromText = 5.f;
+
+    float const buttonLeftSide = button->getPositionX() - text->getContentWidth() / 2;
+
+    float const xPos = m_fields->screenSize / 2 + buttonLeftSide - heart->getContentWidth() / 2 - distanceFromText;
 
     heart->setPositionX(xPos);
 }
@@ -376,14 +379,14 @@ void DeltaruneAlertLayer::skipText() {
 
     auto const fields = this->m_fields.self();
 
-    auto const& clippingNode = fields->textAreaClippingNode;
     int const linesProgressed = fields->linesProgressed;
     bool& doneRolling = fields->doneRolling;
 
-    if (!clippingNode) return;
-
     auto const textArea = fields->m_textArea;
     
+    if (!textArea)
+        return;
+
     auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
     auto lines = std::move(mlbmf->getChildrenExt());
 
@@ -427,11 +430,9 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 
         lines++;
 
-        auto const star = m_mainLayer->getChildByID("star"_spr);
-        auto const starShadow = m_mainLayer->getChildByID("starShadow"_spr);
+        auto const star = m_fields->textContentNode->getChildByID("star"_spr);
 
         if (star) star->setVisible(true);
-        if (starShadow) starShadow->setVisible(true);
     }
     return lines;
 }
@@ -452,8 +453,6 @@ void DeltaruneAlertLayer::progressText() {
     if (!m_buttonMenu) return;
 
     auto const fields = m_fields.self();
-
-    if (!fields->textAreaClippingNode) return;
 
     auto const textArea = fields->m_textArea;
     auto const btn1 = fields->old_btn1;
@@ -490,7 +489,7 @@ void DeltaruneAlertLayer::progressText() {
     // Move EVERYTHING up
 
     int offset;
-    m_mainLayer->getChildByID("star"_spr)->setVisible(false);
+    fields->textContentNode->getChildByID("star"_spr)->setVisible(false);
 
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
     fields->characterCount = 0;
