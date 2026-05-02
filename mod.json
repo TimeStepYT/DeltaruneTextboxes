@@ -33,13 +33,13 @@
                 "outline": 0
             },
             "ComicSans": {
-                "size": 78,
-                "path": "resources/fonts/comic-sans-pixel.ttf",
+                "size": 70,
+                "path": "resources/fonts/ComicSansPixelAdjusted.ttf",
                 "charset": "32-126,8226",
                 "outline": 0
             },
             "Papyrus": {
-                "size": 78,
+                "size": 70,
                 "path": "resources/fonts/papyrus-pixel.ttf",
                 "charset": "32-126,8226",
                 "outline": 0

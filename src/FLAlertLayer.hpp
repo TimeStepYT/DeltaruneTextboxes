@@ -1,4 +1,5 @@
 #include <Geode/ui/Button.hpp>
+#include <Geode/ui/TextArea.hpp>
 #include "include.hpp"
 #include "ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
@@ -24,7 +25,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int rollingLine = 0;
 		int linesProgressed = 0;
 		int characterCount = 0;
-		int textSize = 36;
+		int textSize = 31;
 		int btnSelected = 0;
 		int dialogCount = 0;
 		int prevSoundNum = 200;
@@ -35,7 +36,8 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		Button* btn1 = nullptr;
 		Button* btn2 = nullptr;
 		CCClippingNode* textAreaClippingNode = nullptr;
-		TextArea* textArea = nullptr;
+		TextArea* old_textArea = nullptr;
+		TextArea* m_textArea = nullptr;
 		CCScale9Sprite* bg = nullptr;
 		CCLabelBMFont* title = nullptr;
 		CCSprite* heart = nullptr;
@@ -56,7 +58,6 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void animateBG(float);
 	void changeBG();
 	void changeSingleButton(CCMenuItemSpriteExtra*, ButtonSprite*);
-	void removeControllerGlyphs();
 	void changeButtons();
 	void changeTitle();
 	void handleSound();
