@@ -16,7 +16,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool rolledPage = false;
 		bool done = false;
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
-		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
+		float screenSize = 0.f;
 		float lostTime = 0;
 		float contentXOffset = 0.f;
 		int waitQueue = 0;
