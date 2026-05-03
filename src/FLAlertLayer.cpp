@@ -4,8 +4,6 @@
 #include "DialogLayer.hpp"
 #include "ImageNode.hpp"
 
-bool blockKeys = false;
-
 static std::mt19937 mt{std::random_device{}()};
 
 // thanks cvolton for this amazing name
@@ -171,9 +169,9 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
         }
     }
     if (numOfSiblings >= 1 && !m_button2)
-        blockKeys = true;
+        global::blockKeys = true;
     else
-        blockKeys = false;
+        global::blockKeys = false;
 }
 
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
@@ -204,7 +202,7 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
         progressText();
         return;
     }
-    blockKeys = false;
+    global::blockKeys = false;
     FLAlertLayer::onBtn1(sender);
 }
 

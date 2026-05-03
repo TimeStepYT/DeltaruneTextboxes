@@ -1,6 +1,6 @@
 #include <Geode/ui/Button.hpp>
 #include <Geode/ui/TextArea.hpp>
-#include "include.hpp"
+#include "Global.hpp"
 #include "ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
