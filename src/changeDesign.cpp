@@ -3,7 +3,7 @@
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
 #include "FLAlertLayer.hpp"
 #include "TextShaders.hpp"
-#include "include.hpp"
+#include "Global.hpp"
 
 using namespace alpha::prelude;
 
@@ -150,7 +150,7 @@ void DeltaruneAlertLayer::changeButtons() {
     auto const heart = CCSprite::create("heart.png"_spr);
     heart->setVisible(false);
     heart->setPositionY(m_buttonMenu->getPositionY());
-    heart->setPositionX(m_buttonMenu->getPositionX());
+    heart->setPositionX(fields->screenSize / 2);
     heart->setID("heart"_spr);
     m_mainLayer->addChild(heart);
     fields->heart = heart;

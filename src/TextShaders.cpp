@@ -1,4 +1,5 @@
 #include "TextShaders.hpp"
+#include "Global.hpp"
 
 using namespace geode::prelude;
 
@@ -19,8 +20,22 @@ std::string DeltaruneTextShaders::getFragmentShaderLog(CCGLProgram* program) {
 DeltaruneTextShaders DeltaruneTextShaders::create(cocos2d::CCNode* border) {
 	DeltaruneTextShaders instance;
 	instance.m_borderNode = border;
+
 	return instance;
 }
+
+// void DeltaruneTextShaders::updateLastShader() {
+//     auto ccsc = CCShaderCache::sharedShaderCache();
+// 	auto program = ccsc->programForKey("text-shader"_spr);
+
+// 	log::debug("Debug value: {}", global::debugVal);
+
+//     if (!program)
+// 		return;
+	
+// 	program->updateUniforms();
+// 	program->setUniformLocationWith1i(program->getUniformLocationForName("u_debugVal"), global::debugVal);
+// }
 
 CCGLProgram* DeltaruneTextShaders::getShader(bool const noShadow, bool const noGradient) {
     auto ccsc = CCShaderCache::sharedShaderCache();
@@ -62,6 +77,7 @@ CCGLProgram* DeltaruneTextShaders::getShader(bool const noShadow, bool const noG
     program->setUniformLocationWith1i(program->getUniformLocationForName("u_noGradient"), static_cast<int>(noGradient));
 	program->setUniformLocationWith2f(program->getUniformLocationForName("u_shadowDistance"), shadowDistance * texelWidth, shadowDistance * texelHeight);
     program->setUniformLocationWith1f(program->getUniformLocationForName("u_yTop"), 40.f * texelHeight);
+    // program->setUniformLocationWith1i(program->getUniformLocationForName("u_debugVal"), global::debugVal);
     ccsc->addProgram(program, "text-shader"_spr);
     
 	program->release();
