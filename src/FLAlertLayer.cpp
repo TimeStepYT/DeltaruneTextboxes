@@ -86,6 +86,8 @@ void DeltaruneAlertLayer::initSoundRate() {
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
     float& screenSize = m_fields->screenSize;
 
+    screenSize = CCDirector::sharedDirector()->getWinSize().width;
+
     m_fields->text = desc;
     scroll = false;
 
