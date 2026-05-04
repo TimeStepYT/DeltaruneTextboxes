@@ -1,6 +1,7 @@
 #include <Geode/ui/Button.hpp>
 #include <Geode/ui/TextArea.hpp>
 #include "Global.hpp"
+#include "DeltaruneTextArea.hpp"
 #include "ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
@@ -36,7 +37,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		Button* btn2 = nullptr;
 		CCNode* textContentNode = nullptr;
 		TextArea* old_textArea = nullptr;
-		TextArea* m_textArea = nullptr;
+		std::shared_ptr<DeltaruneTextArea> m_textArea = nullptr;
 		CCScale9Sprite* bg = nullptr;
 		CCLabelBMFont* title = nullptr;
 		CCSprite* heart = nullptr;
