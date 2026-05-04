@@ -22,6 +22,7 @@ add_library(${PROJECT_NAME} SHARED
     src/PurchaseItemPopup.cpp
     src/ImageNode.cpp
     src/TextShaders.cpp
+    src/DeltaruneTextArea.cpp
     # Add any extra C++ source files here
 )
 

@@ -240,51 +240,20 @@ void DeltaruneAlertLayer::changeText() {
 
     float xOffset = fields->contentXOffset;
     float creatingWidth = bg->getContentWidth() - 120 - xOffset;
-    auto const newDesc = TextArea::create(
+    auto const deltaruneTextArea = DeltaruneTextArea::create(
         str,
-        font.c_str(),
-        1,
+        font,
         creatingWidth,
-        {0, 1},
-        size,
-        false
+        size
     );
-
-    newDesc->setContentWidth(creatingWidth);
-    newDesc->setAnchorPoint(CCPoint{0, 1});
+    auto const newDesc = deltaruneTextArea->getTextArea();
+    
     newDesc->setPositionX(24 + xOffset + star->getContentWidth());
     newDesc->setPositionY(bg->getContentHeight() - 20.f);
     newDesc->setZOrder(oldTextArea->getZOrder());
     newDesc->setID("content-text-area");
 
-    /*
-    TextArea* newDescGrad = nullptr;
-    if (!noGradient) {
-        newDescGrad = TextArea::create(
-            str,
-            "DeterminationGradient.fnt"_spr,
-            1,
-            creatingWidth,
-            CCPoint{0, 1},
-            size,
-            false);
-        newDescGrad->setContentWidth(creatingWidth);
-        newDescGrad->setAnchorPoint(CCPoint{0, 1});
-        newDescGrad->setPositionY(110);
-        newDescGrad->setZOrder(textArea->getZOrder() + 1);
-        newDescGrad->setID("gradient-overlay"_spr);
-
-        auto const& linesGrad = newDescGrad->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
-        for (auto const line : linesGrad) {
-            auto const& letters = line->getChildrenExt<CCSprite>();
-            for (auto const& letter : letters) {
-                letter->setColor(ccColor3B{255, 255, 255});
-                letter->setVisible(false);
-            }
-        }
-    }
-    */
-    auto const& lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
+    auto const& lines = deltaruneTextArea->getLines();
 
     for (auto const line : lines) {
         auto const& letters = line->getChildrenExt();
@@ -334,7 +303,7 @@ void DeltaruneAlertLayer::changeText() {
 
     m_mainLayer->addChild(renderNode);
 
-    m_fields->m_textArea = newDesc;
+    m_fields->m_textArea = std::move(deltaruneTextArea);
     /*
     if (newDescGrad) clippingNode->addChild(newDescGrad);
     fields->gradientOverlay = newDescGrad;

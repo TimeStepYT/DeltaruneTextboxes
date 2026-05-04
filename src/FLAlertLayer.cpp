@@ -211,8 +211,7 @@ int DeltaruneAlertLayer::getLinesLeft() {
 
     if (!textArea) return 0;
 
-    auto bitmapFont = textArea->getChildByType<MultilineBitmapFont>(0);
-    int totalLines = bitmapFont->getChildrenCount();
+    int totalLines = textArea->getLines().size();
 
     return totalLines - m_fields->linesProgressed;
 }
@@ -385,8 +384,7 @@ void DeltaruneAlertLayer::skipText() {
     if (!textArea)
         return;
 
-    auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-    auto lines = std::move(mlbmf->getChildrenExt());
+    auto lines = std::move(textArea->getLines());
 
     for (int i = linesProgressed + fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
         auto const line = lines[i];
@@ -411,13 +409,13 @@ void DeltaruneAlertLayer::skipText() {
 int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
     auto const textArea = m_fields->m_textArea;
     auto const linesProgressed = m_fields->linesProgressed;
-    auto const fontNode = textArea->getChildByType<MultilineBitmapFont>(0);
-    int lines = 0;
+    int lineCount = 0;
 
     while (true) {
-        if (linesProgressed + lines + offset >= fontNode->getChildrenCount()) break;
+        auto lines = std::move(textArea->getLines());
+        if (linesProgressed + lineCount + offset >= lines.size()) break;
 
-        auto const topLine = fontNode->getChildByType<CCLabelBMFont>(linesProgressed + lines + offset);
+        auto const topLine = lines.at(linesProgressed + lineCount + offset);
         if (!topLine) break;
 
         std::string_view topLineString = topLine->getString();
@@ -426,13 +424,13 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
         });
         if (!empty) break;
 
-        lines++;
+        lineCount++;
 
         auto const star = m_fields->textContentNode->getChildByID("star"_spr);
 
         if (star) star->setVisible(true);
     }
-    return lines;
+    return lineCount;
 }
 
 // Adds the ImageNode to the dialog and returns it as well!
@@ -452,7 +450,7 @@ void DeltaruneAlertLayer::progressText() {
 
     auto const fields = m_fields.self();
 
-    auto const textArea = fields->m_textArea;
+    auto const deltaruneTextArea = fields->m_textArea;
     auto const btn1 = fields->old_btn1;
     auto const btn2 = fields->old_btn2;
     int const btnSelected = fields->btnSelected;
@@ -460,8 +458,11 @@ void DeltaruneAlertLayer::progressText() {
     bool& done = fields->done;
     bool const noShadow = fields->noShadow;
 
+    if (!deltaruneTextArea) return;
+    
+    auto const textArea = deltaruneTextArea->getTextArea();
     if (!textArea) return;
-
+    
     if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
         if (!m_button2) {
             auto const dialogLayer = fields->dialogLayer;
@@ -594,12 +595,11 @@ void DeltaruneAlertLayer::rollText(float dt) {
 
         auto const textArea = fields->m_textArea;
         
-        auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-        auto lines = mlbmf->getChildrenExt<CCLabelBMFont>();
+        auto lines = std::move(textArea->getLines());
         int currentLine = linesProgressed + rollingLine;
 
         if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
-            auto const line = lines[currentLine];
+            auto const line = lines.at(currentLine);
             auto letters = std::move(line->getChildrenExt<CCSprite>());
             auto const letter = letters[characterCount];
             if (letter->isVisible()) {
