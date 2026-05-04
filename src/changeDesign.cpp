@@ -217,17 +217,16 @@ void DeltaruneAlertLayer::changeText() {
     noShadow = Mod::get()->getSettingValue<bool>("noShadow");
     noGradient = Mod::get()->getSettingValue<bool>("noGradientOverlay");
 
-    auto const star = this->createStar();
-
+    
     auto& str = fields->text;
     auto const screenSize = fields->screenSize;
     auto const bg = fields->bg;
-
-
+    
+    
     DeltaruneAlertLayer::handleSound();
-
+    
     std::string font = "Determination.fnt"_spr;
-
+    
     if (sound == "Sans") {
         font = "ComicSans.fnt"_spr;
         capitalize(str, false);
@@ -236,6 +235,8 @@ void DeltaruneAlertLayer::changeText() {
         font = "Papyrus.fnt"_spr;
         capitalize(str);
     }
+    
+    auto const star = this->createStar();
 
     float xOffset = fields->contentXOffset;
     float creatingWidth = bg->getContentWidth() - 120 - xOffset;

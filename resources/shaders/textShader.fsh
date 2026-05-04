@@ -45,11 +45,10 @@ vec3 getShadowColor(vec4 shadowSourceColor) {
 }
 
 
-float getGradientBrightness(float y) {
+float getGradientBrightness(float y, float brightness) {
     const float margin = 0.12;
     const float padding = 0.2;
     const int segments = 3;
-    float brightness = 0.49;
 
     const float gradientEffectHeight = 1.0 - (margin * 2.0);
     const float segmentHeight = gradientEffectHeight / segments;
@@ -90,6 +89,13 @@ void main(void) {
             shadowSourceColor = vec4(0, 0, 0, 0);
         }
         vec3 shadowColor = getShadowColor(shadowSourceColor);
+
+        if (u_noGradient == 0) {
+            float gradientBrightness = getGradientBrightness(shadowSourceCoord.y, 0.4);
+            shadowColor.r += gradientBrightness;
+            shadowColor.g += gradientBrightness;
+            shadowColor.b += gradientBrightness;
+        }
         
         resColor.r = resColor.r + shadowColor.r * shadowSourceColor.a * invert(color.a);
         resColor.g = resColor.g + shadowColor.g * shadowSourceColor.a * invert(color.a);
@@ -101,14 +107,13 @@ void main(void) {
     }
 
     if (u_noGradient == 0) {
-        vec2 gradientBrightness = getGradientBrightness(v_texCoord.y);
-        float gradientFactor = gradientBrightness;
+        float gradientBrightness = getGradientBrightness(v_texCoord.y, 0.49);
 
         vec3 gradientColor = vec3(0, 0, 0);
 
-        gradientColor.r = tintedColor.r + gradientFactor;
-        gradientColor.g = tintedColor.g + gradientFactor;
-        gradientColor.b = tintedColor.b + gradientFactor;
+        gradientColor.r = tintedColor.r + gradientBrightness;
+        gradientColor.g = tintedColor.g + gradientBrightness;
+        gradientColor.b = tintedColor.b + gradientBrightness;
 
         resColor.r = resColor.r * invert(color.a) + gradientColor.r * color.a;
         resColor.g = resColor.g * invert(color.a) + gradientColor.g * color.a;

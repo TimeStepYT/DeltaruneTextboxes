@@ -71,7 +71,7 @@ CCGLProgram* DeltaruneTextShaders::getShader(bool const noShadow, bool const noG
 	float const texelWidth = 1.f / (pixelSize.width * 3);
 	float const texelHeight = 1.f / (pixelSize.height * 3);
 	
-	float const shadowDistance = 3.f;
+	float const shadowDistance = 2.f;
 	
     program->setUniformLocationWith1i(program->getUniformLocationForName("u_noShadow"), static_cast<int>(noShadow));
     program->setUniformLocationWith1i(program->getUniformLocationForName("u_noGradient"), static_cast<int>(noGradient));
