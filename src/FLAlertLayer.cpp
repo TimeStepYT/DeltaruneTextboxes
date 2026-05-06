@@ -3,6 +3,7 @@
 #include "TextShaders.hpp"
 #include "DialogLayer.hpp"
 #include "ImageNode.hpp"
+#include "PlatformToolbox.hpp"
 
 static std::mt19937 mt{std::random_device{}()};
 
@@ -91,18 +92,32 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     m_fields->text = desc;
     scroll = false;
 
+#if GEODE_WINDOWS
     // Removing controller glyphs like this seems better than removing the sprites afterwards
     const auto app = CCApplication::get();
     const bool controllerConnected = app->m_bControllerConnected;
 
     app->m_bControllerConnected = false;
-
+    
     if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
         app->m_bControllerConnected = controllerConnected;
         return false;
     }
     app->m_bControllerConnected = controllerConnected;
+#elif GEODE_MACOS
+    PlatToolbox::disable = true;
+    
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
+        PlatToolbox::disable = false;
+        return false;
+    }
 
+    PlatToolbox::disable = false;
+#else
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale))
+        return false;
+#endif
+    
 
     NodeIDs::provideFor(this);
     this->setID("FLAlertLayer");

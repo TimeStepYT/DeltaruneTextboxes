@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} SHARED
     src/ImageNode.cpp
     src/TextShaders.cpp
     src/DeltaruneTextArea.cpp
+    src/PlatformToolbox.cpp
     # Add any extra C++ source files here
 )
 
