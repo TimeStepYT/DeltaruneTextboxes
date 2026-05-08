@@ -4,6 +4,7 @@
 class DeltaruneTextShaders {
 private:
 	cocos2d::CCNode* m_borderNode = nullptr;	
+	void setShadowDistance(cocos2d::CCGLProgram* program);
 
 public:
 	// static void updateLastShader();
