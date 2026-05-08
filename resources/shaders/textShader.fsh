@@ -20,23 +20,23 @@ vec3 rgbToDec(float r, float g, float b) {
 }
 
 vec3 getShadowColor(vec4 shadowSourceColor) {
-    vec3 shadowColor = vec3(0, 0, 0);
+    vec3 shadowColor = vec3(0.0, 0.0, 0.0);
 
     // I am so sorry for what you're about to see
 
-    if (shadowSourceColor.r == shadowSourceColor.g && shadowSourceColor.g == shadowSourceColor.b && shadowSourceColor.r != 0)
+    if (shadowSourceColor.r == shadowSourceColor.g && shadowSourceColor.g == shadowSourceColor.b && shadowSourceColor.r != 0.0)
         shadowColor = rgbToDec(15.0, 15.0, 127.0);
     else if (shadowSourceColor.rgb == vec3(1.0, 0.0, 1.0))
         shadowColor = rgbToDec(76.0, 0.0, 76.0);
-    else if (shadowSourceColor.rgb == rgbToDec(255, 90, 90))
+    else if (shadowSourceColor.rgb == rgbToDec(255.0, 90.0, 90.0))
         shadowColor = rgbToDec(76.0, 0.0, 0.0);
-    else if (shadowSourceColor.rgb == rgbToDec(255, 165, 75))
+    else if (shadowSourceColor.rgb == rgbToDec(255.0, 165.0, 75.0))
         shadowColor = rgbToDec(76.0, 38.0, 18.0);
     else if (shadowSourceColor.rgb == vec3(1.0, 1.0, 0.0))
         shadowColor = rgbToDec(76.0, 76.0, 0.0);
-    else if (shadowSourceColor.rgb == rgbToDec(64, 227, 72))
+    else if (shadowSourceColor.rgb == rgbToDec(64.0, 227.0, 72.0))
         shadowColor = rgbToDec(0.0, 76.0, 0.0);
-    else if (shadowSourceColor.rgb == rgbToDec(74, 82, 255))
+    else if (shadowSourceColor.rgb == rgbToDec(74.0, 82.0, 255.0))
         shadowColor = rgbToDec(0.0, 0.0, 76.0);
     else
         shadowColor = vec3(shadowSourceColor.r / 5.0, shadowSourceColor.g / 5.0, shadowSourceColor.b / 5.0);
@@ -51,7 +51,7 @@ float getGradientBrightness(float y, float brightness) {
     const int segments = 3;
 
     const float gradientEffectHeight = 1.0 - (margin * 2.0);
-    const float segmentHeight = gradientEffectHeight / segments;
+    const float segmentHeight = gradientEffectHeight / float(segments);
 
     float ySegment = y - margin;
 
@@ -62,7 +62,7 @@ float getGradientBrightness(float y, float brightness) {
     ySegment /= segmentHeight;
 
     
-    float ySegmentScaled = ySegment * (1.0 + padding) - padding / 2;
+    float ySegmentScaled = ySegment * (1.0 + padding) - padding / 2.0;
     
     float invertedGradientBrightness = ySegmentScaled;
     float gradientBrightness = invert(invertedGradientBrightness) * brightness;
@@ -81,16 +81,16 @@ void main(void) {
 
     vec4 resColor = vec4(tintedColor.rgb, color.a);
 
-    if (u_noShadow == 0) {
+    if (u_noShadow == false) {
         vec2 shadowSourceCoord = vec2(v_texCoord.x - u_shadowDistance.x, v_texCoord.y - u_shadowDistance.y);
         vec4 shadowSourceColor = texture2D(u_texture, shadowSourceCoord);
         
-        if (shadowSourceCoord.x < 0 || shadowSourceCoord.y < 0) {
-            shadowSourceColor = vec4(0, 0, 0, 0);
+        if (shadowSourceCoord.x < 0.0 || shadowSourceCoord.y < 0.0) {
+            shadowSourceColor = vec4(0.0, 0.0, 0.0, 0.0);
         }
         vec3 shadowColor = getShadowColor(shadowSourceColor);
 
-        if (u_noGradient == 0) {
+        if (u_noGradient == false) {
             float gradientBrightness = getGradientBrightness(shadowSourceCoord.y, 0.4);
             shadowColor.r += gradientBrightness;
             shadowColor.g += gradientBrightness;
@@ -106,10 +106,10 @@ void main(void) {
         resColor.a = color.a;
     }
 
-    if (u_noGradient == 0) {
+    if (u_noGradient == false) {
         float gradientBrightness = getGradientBrightness(v_texCoord.y, 0.49);
 
-        vec3 gradientColor = vec3(0, 0, 0);
+        vec3 gradientColor = vec3(0.0, 0.0, 0.0);
 
         gradientColor.r = tintedColor.r + gradientBrightness;
         gradientColor.g = tintedColor.g + gradientBrightness;
