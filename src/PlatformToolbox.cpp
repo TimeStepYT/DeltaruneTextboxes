@@ -1,4 +1,4 @@
-#if GEODE_MACOS
+#ifdef GEODE_IS_MACOS
 
 #include "PlatformToolbox.hpp"
 
