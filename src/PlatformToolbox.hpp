@@ -1,6 +1,6 @@
 #pragma once
 
-#if GEODE_MACOS
+#ifdef GEODE_IS_MACOS
 
 #include <Geode/Geode.hpp>
 

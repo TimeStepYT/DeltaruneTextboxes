@@ -92,7 +92,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     m_fields->text = desc;
     scroll = false;
 
-#if GEODE_WINDOWS
+#ifdef GEODE_IS_WINDOWS
     // Removing controller glyphs like this seems better than removing the sprites afterwards
     const auto app = CCApplication::get();
     const bool controllerConnected = app->m_bControllerConnected;
@@ -104,7 +104,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
         return false;
     }
     app->m_bControllerConnected = controllerConnected;
-#elif GEODE_MACOS
+#elifdef GEODE_IS_MACOS
     PlatToolbox::disable = true;
     
     if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
