@@ -13,7 +13,7 @@ Keybinds changeable with the Custom Keybinds mod!
 
 Apply using the Geode mod loader!
 
-![[This should show a screenshot]]("resources/screenshot.jpg")
+![[This should show a screenshot]](resources/screenshot.jpg)
 
 ## Sources:
 - Fonts:
