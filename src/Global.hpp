@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Geode/Geode.hpp>
 
 #include <Geode/fmod/fmod.hpp>
@@ -15,4 +17,8 @@
 
 using namespace geode::prelude;
 
-extern bool blockKeys;
+
+namespace global {
+    inline bool blockKeys = false;
+    // inline int debugVal = 0;
+}

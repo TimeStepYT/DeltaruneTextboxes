@@ -1,4 +1,9 @@
 # Deltarune Textboxes
+![Mod Version](https://api.geode-sdk.org/v1/mods/timestepyt.deltarune_textboxes/status_badge?stat=version)
+![Downloads](https://api.geode-sdk.org/v1/mods/timestepyt.deltarune_textboxes/status_badge?stat=downloads)
+![GD Version](https://api.geode-sdk.org/v1/mods/timestepyt.deltarune_textboxes/status_badge?stat=gd_version)
+![Geode Version](https://api.geode-sdk.org/v1/mods/timestepyt.deltarune_textboxes/status_badge?stat=geode_version)
+
 This Geometry Dash mod turns every Popup into a Deltarune styled Textbox!
 
 You can advance the text by pressing Z, Enter or by clicking/tapping on the screen!
@@ -8,7 +13,7 @@ Keybinds changeable with the Custom Keybinds mod!
 
 Apply using the Geode mod loader!
 
-<img src="resources/screenshot.jpg" alt="[This should show a screenshot]">
+![[This should show a screenshot]](previews/preview-1.png)
 
 ## Sources:
 - Fonts:

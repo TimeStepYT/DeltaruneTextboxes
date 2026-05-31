@@ -1,10 +1,9 @@
 #include <Geode/utils/cocos.hpp>
 #include "FLAlertLayer.hpp"
-
+#include "TextShaders.hpp"
 #include "DialogLayer.hpp"
 #include "ImageNode.hpp"
-
-bool blockKeys = false;
+#include "PlatformToolbox.hpp"
 
 static std::mt19937 mt{std::random_device{}()};
 
@@ -87,13 +86,38 @@ void DeltaruneAlertLayer::initSoundRate() {
 
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
     float& screenSize = m_fields->screenSize;
-    if (screenSize >= 569 && !m_fields->dontRestrictWidth)
-        screenSize = 569;
+
+    screenSize = CCDirector::sharedDirector()->getWinSize().width;
 
     m_fields->text = desc;
     scroll = false;
 
-    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) return false;
+#ifdef GEODE_IS_WINDOWS
+    // Removing controller glyphs like this seems better than removing the sprites afterwards
+    const auto app = CCApplication::get();
+    const bool controllerConnected = app->m_bControllerConnected;
+
+    app->m_bControllerConnected = false;
+    
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
+        app->m_bControllerConnected = controllerConnected;
+        return false;
+    }
+    app->m_bControllerConnected = controllerConnected;
+#elifdef GEODE_IS_MACOS
+    PlatToolbox::disable = true;
+    
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
+        PlatToolbox::disable = false;
+        return false;
+    }
+
+    PlatToolbox::disable = false;
+#else
+    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale))
+        return false;
+#endif
+    
 
     NodeIDs::provideFor(this);
     this->setID("FLAlertLayer");
@@ -109,11 +133,12 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
         return true;
     }
 
-    auto& textArea = m_fields->textArea;
+    auto& textArea = m_fields->old_textArea;
     auto& bg = m_fields->bg;
     auto& titleNode = m_fields->title;
 
-    initMaps();  // for sounds
+    this->initMaps();  // for sounds
+    this->registerKeybinds();
 
     this->m_noElasticity = true;
 
@@ -141,6 +166,72 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     });
     return true;
 }
+
+void DeltaruneAlertLayer::registerKeybinds() {
+    if (m_fields->incompatible)
+        return;
+
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-left"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_mainLayer || !m_button2 || !m_fields->doneRolling) 
+                return;
+
+            int& btnSelected = m_fields->btnSelected;
+            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
+            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+
+            btnSelected = 1;
+            label1->setColor(ccColor3B{255, 255, 0});
+            this->setHeartPosition(m_fields->btn1);
+            label2->setColor(ccColor3B{255, 255, 255});
+        }
+    );
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-right"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_mainLayer || !m_button2 || !m_fields->doneRolling) 
+                return;
+
+            int& btnSelected = m_fields->btnSelected;
+            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
+            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+
+            btnSelected = 2;
+            label2->setColor(ccColor3B{255, 255, 0});
+            this->setHeartPosition(m_fields->btn2);
+            label1->setColor(ccColor3B{255, 255, 255});
+        }
+    );
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-confirm"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_fields->rolledPage) 
+                return;
+
+            auto gm = GameManager::get();
+
+            // Special case with the A button on the controller:
+            // Without it, it would skip every other group of three lines of text because
+            // no matter what, the A button clicks at the same time as well
+            if (keybind.key == cocos2d::CONTROLLER_A) {
+                if (getLinesLeft() - emptyLinesAmount(3) <= 3)
+                    this->pickChoice();
+                return;
+            }
+
+            this->progressText();
+        }
+    );
+
+    // I wanted to add Controller_B as a default to this but that closes the entire popup.
+    // I can't be bothered to disable that right now
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-skip"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat) return;
+
+            this->skipText();
+        }
+    );
+}
+
 void DeltaruneAlertLayer::showButtons() {
     if (m_button2 && getLinesLeft() < 3 && m_fields->doneRolling) {
         m_fields->done = true;
@@ -160,9 +251,9 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
         }
     }
     if (numOfSiblings >= 1 && !m_button2)
-        blockKeys = true;
+        global::blockKeys = true;
     else
-        blockKeys = false;
+        global::blockKeys = false;
 }
 
 void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
@@ -171,7 +262,6 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
         return;
     }
     if (!m_fields->done) {
-        progressText();
         return;
     }
 
@@ -189,23 +279,17 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
         FLAlertLayer::onBtn1(sender);
         return;
     }
-    if (!m_fields->done) {
-        progressText();
-        return;
-    }
 
-    blockKeys = false;
+    global::blockKeys = false;
     FLAlertLayer::onBtn1(sender);
 }
 
 int DeltaruneAlertLayer::getLinesLeft() {
-    auto const textArea = m_fields->textArea;
+    auto const textArea = m_fields->m_textArea;
 
-    if (!m_fields->textAreaClippingNode) return 0;
     if (!textArea) return 0;
 
-    auto bitmapFont = textArea->getChildByType<MultilineBitmapFont>(0);
-    int totalLines = bitmapFont->getChildrenCount();
+    int totalLines = textArea->getLines().size();
 
     return totalLines - m_fields->linesProgressed;
 }
@@ -223,7 +307,7 @@ void DeltaruneAlertLayer::show() {
 
     if (!m_fields->bg) return;
     if (!titleNode) return;
-    if (!m_fields->textArea) return;
+    if (!m_fields->old_textArea) return;
     if (!m_mainLayer) return;
 
     decideToBlockKeys();
@@ -236,7 +320,11 @@ void DeltaruneAlertLayer::setHeartPosition(Button* button) {
 
     if (!text) return;
 
-    auto const xPos = m_buttonMenu->getPositionX() + button->getPositionX() - text->getContentWidth() / 2 - heart->getContentWidth() / 2 - 5;
+    float const distanceFromText = 5.f;
+
+    float const buttonLeftSide = button->getPositionX() - text->getContentWidth() / 2;
+
+    float const xPos = m_fields->screenSize / 2 + buttonLeftSide - heart->getContentWidth() / 2 - distanceFromText;
 
     heart->setPositionX(xPos);
 }
@@ -262,128 +350,30 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
         else
             this->skipText();
     }
-
     return FLAlertLayer::ccTouchBegan(touch, event);
 }
-#if defined(DISABLE_KEYBOARD)
-void DeltaruneAlertLayer::keyDown(enumKeyCodes key, double timestamp) {
-    if (m_fields->incompatible) {
-        FLAlertLayer::keyDown(key, timestamp);
-        return;
-    }
-    if (key == KEY_Z || key == KEY_Y /*screw QWERTZ*/) {
-        if (m_fields->rolledPage)
-            progressText();
-        return;
-    } else if (key == KEY_X || key == KEY_Space) {
-        skipText();
-        return;
-    } else if (key == KEY_ArrowLeft || key == KEY_ArrowRight || key == KEY_Left || key == KEY_Right) {
-        if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-            FLAlertLayer::keyDown(key, timestamp);
-            return;
-        }
-
-        int& btnSelected = m_fields->btnSelected;
-        auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
-        auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
-
-        if (key == KEY_ArrowLeft || key == KEY_Left) {
-            btnSelected = 1;
-            label1->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn1);
-            label2->setColor(ccColor3B{255, 255, 255});
-        } else if (key == KEY_ArrowRight || key == KEY_Right) {
-            btnSelected = 2;
-            label2->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn2);
-            label1->setColor(ccColor3B{255, 255, 255});
-        }
-    } else
-        FLAlertLayer::keyDown(key, timestamp);
-}
-#else
-void DeltaruneAlertLayer::initCustomKeybinds() {
-    if (m_fields->incompatible)
-        return;
-
-    this->template addEventListener<keybinds::InvokeBindFilter>(
-        [=, this](keybinds::InvokeBindEvent* event) {
-            if (event->isDown()) {
-                if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-                    return ListenerResult::Propagate;
-                }
-
-                m_fields->btnSelected = 1;
-                auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-                auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
-                label1->setColor(ccColor3B{255, 255, 0});
-                setHeartPosition(m_fields->old_btn1);
-                label2->setColor(ccColor3B{255, 255, 255});
-                return ListenerResult::Stop;
-            }
-            return ListenerResult::Propagate;
-        }, "left"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-                return ListenerResult::Propagate;
-            }
-
-            m_fields->btnSelected = 2;
-            auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-            auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
-            label2->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->old_btn2);
-            label1->setColor(ccColor3B{255, 255, 255});
-            return ListenerResult::Stop;
-        }
-        return ListenerResult::Propagate;
-    }, "right"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            if (m_fields->rolledPage) {
-                progressText();
-                return ListenerResult::Stop;
-            }
-        }
-        return ListenerResult::Propagate;
-    }, "progress"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            skipText();
-            return ListenerResult::Stop;
-        }
-        return ListenerResult::Propagate;
-    }, "skip"_spr);
-}
-#endif
 
 void DeltaruneAlertLayer::skipText() {
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 
-    auto const& clippingNode = m_fields->textAreaClippingNode;
-    int const linesProgressed = m_fields->linesProgressed;
-    bool& doneRolling = m_fields->doneRolling;
+    auto const fields = this->m_fields.self();
 
-    if (!clippingNode) return;
+    int const linesProgressed = fields->linesProgressed;
+    bool& doneRolling = fields->doneRolling;
 
-    auto const& textAreas = clippingNode->getChildrenExt();
+    auto const textArea = fields->m_textArea;
     
-    for (auto textArea : textAreas) {
-        auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-        auto lines = std::move(mlbmf->getChildrenExt());
+    if (!textArea)
+        return;
 
-        for (int i = linesProgressed + m_fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
-            auto const line = lines[i];
-            auto const& letters = line->getChildrenExt();
+    auto lines = std::move(textArea->getLines());
 
-            for (auto const& letter : letters) {
-                letter->setVisible(true);
-            }
+    for (int i = linesProgressed + fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
+        auto const line = lines[i];
+        auto const& letters = line->getChildrenExt();
+
+        for (auto const& letter : letters) {
+            letter->setVisible(true);
         }
     }
 
@@ -399,15 +389,15 @@ void DeltaruneAlertLayer::skipText() {
 }
 
 int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
-    auto const textArea = m_fields->textArea;
+    auto const textArea = m_fields->m_textArea;
     auto const linesProgressed = m_fields->linesProgressed;
-    auto const fontNode = textArea->getChildByType<MultilineBitmapFont>(0);
-    int lines = 0;
+    int lineCount = 0;
 
     while (true) {
-        if (linesProgressed + lines + offset >= fontNode->getChildrenCount()) break;
+        auto lines = std::move(textArea->getLines());
+        if (linesProgressed + lineCount + offset >= lines.size()) break;
 
-        auto const topLine = fontNode->getChildByType<CCLabelBMFont>(linesProgressed + lines + offset);
+        auto const topLine = lines.at(linesProgressed + lineCount + offset);
         if (!topLine) break;
 
         std::string_view topLineString = topLine->getString();
@@ -416,15 +406,13 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
         });
         if (!empty) break;
 
-        lines++;
+        lineCount++;
 
-        auto const star = m_mainLayer->getChildByID("star"_spr);
-        auto const starShadow = m_mainLayer->getChildByID("starShadow"_spr);
+        auto const star = m_fields->textContentNode->getChildByID("star"_spr);
 
         if (star) star->setVisible(true);
-        if (starShadow) starShadow->setVisible(true);
     }
-    return lines;
+    return lineCount;
 }
 
 // Adds the ImageNode to the dialog and returns it as well!
@@ -438,40 +426,51 @@ ImageNode* DeltaruneAlertLayer::createImageNode() {
     return newImageNode;
 }
 
+void DeltaruneAlertLayer::pickChoice() {
+    auto fields = m_fields.self();
+    bool& done = fields->done;
+    auto const btn1 = fields->old_btn1;
+    auto const btn2 = fields->old_btn2;
+    int const btnSelected = fields->btnSelected;
+
+    if (!m_button2) {
+        auto const dialogLayer = fields->dialogLayer;
+
+        done = true;
+        
+        if (fields->dialog && dialogLayer)
+            dialogLayer->keyBackClicked();
+        
+        FLAlertLayer::onBtn1(btn1);
+    } else if (btnSelected != 0) {
+        done = true;
+        
+        if (btnSelected == 1)
+            FLAlertLayer::onBtn1(btn1);
+        else if (btnSelected == 2)
+            FLAlertLayer::onBtn2(btn2);
+    }
+}
+
 void DeltaruneAlertLayer::progressText() {
     if (!m_mainLayer) return;
     if (!m_buttonMenu) return;
-    if (!m_fields->textAreaClippingNode) return;
 
-    auto const textArea = m_fields->textArea;
-    auto const btn1 = m_fields->old_btn1;
-    auto const btn2 = m_fields->old_btn2;
-    auto const shadow = m_fields->shadow;
-    auto const gradientOverlay = m_fields->gradientOverlay;
-    int const btnSelected = m_fields->btnSelected;
-    int& linesProgressed = m_fields->linesProgressed;
-    bool& done = m_fields->done;
-    bool const noShadow = m_fields->noShadow;
+    auto const fields = m_fields.self();
 
+    auto const deltaruneTextArea = fields->m_textArea;
+    int& linesProgressed = fields->linesProgressed;
+    bool const noShadow = fields->noShadow;
+
+    if (!deltaruneTextArea) return;
+    
+    auto const textArea = deltaruneTextArea->getTextArea();
     if (!textArea) return;
-
+    
     if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
-        if (!m_button2) {
-            auto const dialogLayer = m_fields->dialogLayer;
-            done = true;
-            if (m_fields->dialog && dialogLayer) {
-                dialogLayer->keyBackClicked();
-            }
-            FLAlertLayer::onBtn1(btn1);
+        this->pickChoice();
+        if (fields->done)
             return;
-        } else if (btnSelected != 0) {
-            done = true;
-            if (btnSelected == 1)
-                FLAlertLayer::onBtn1(btn1);
-            else if (btnSelected == 2)
-                FLAlertLayer::onBtn2(btn2);
-            return;
-        }
     }
     // Don't progress if there's only a choice left!
     if (getLinesLeft() - emptyLinesAmount(3) < 3 && m_button2)
@@ -480,12 +479,11 @@ void DeltaruneAlertLayer::progressText() {
     // Move EVERYTHING up
 
     int offset;
-    m_mainLayer->getChildByID("star"_spr)->setVisible(false);
-    if (!noShadow) m_mainLayer->getChildByID("starShadow"_spr)->setVisible(false);
+    fields->textContentNode->getChildByID("star"_spr)->setVisible(false);
 
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-    m_fields->characterCount = 0;
-    m_fields->rollingLine = 0;
+    fields->characterCount = 0;
+    fields->rollingLine = 0;
 
     if (getLinesLeft() > 3)
         offset = 3;
@@ -495,14 +493,14 @@ void DeltaruneAlertLayer::progressText() {
     int const emptyLines = emptyLinesAmount(offset);
     offset += emptyLines;
 
-    auto const& characters = m_fields->characterSpriteNames;
-    int& dialogCount = m_fields->dialogCount;
+    auto const& characters = fields->characterSpriteNames;
+    int& dialogCount = fields->dialogCount;
     bool const progressDialog = emptyLines > 0 && characters.size() > 1;
     
     if (progressDialog) {
         dialogCount++;
         auto const& spriteName = characters[dialogCount];
-        auto const imageNode = m_fields->imageNode;
+        auto const imageNode = fields->imageNode;
 
         if (!imageNode)  // Just in case! I have no idea what other mods will do to my stuff...
             createImageNode();
@@ -511,21 +509,19 @@ void DeltaruneAlertLayer::progressText() {
         imageNode->setCharacterImage(spriteName);
 
         // Setting the title
-        auto const& title = m_fields->titles[dialogCount];
-        m_fields->title->setString(title.c_str());
+        auto const& title = fields->titles[dialogCount];
+        fields->title->setString(title.c_str());
 
         // Getting the right text sound based on the character name
-        auto&& nameToSound = m_fields->nameToSound;
+        auto&& nameToSound = fields->nameToSound;
         if (nameToSound.find(title.c_str()) != nameToSound.end())
-            m_fields->textSound = nameToSound[title.c_str()];
+            fields->textSound = nameToSound[title.c_str()];
         else
-            m_fields->textSound = "Default";
+            fields->textSound = "Default";
     }
 
     linesProgressed += offset;
-    textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * offset);
-    if (gradientOverlay) gradientOverlay->setPositionY(textArea->getPositionY());
-    if (shadow) shadow->setPositionY(textArea->getPositionY() - 1);
+    textArea->setPositionY(textArea->getPositionY() + fields->textSize * offset);
 
     showButtons();
     float const pause = Mod::get()->getSettingValue<double>("textRollingPause");
@@ -547,16 +543,18 @@ void DeltaruneAlertLayer::handleAprilFools() {
 }
 
 void DeltaruneAlertLayer::rollText(float dt) {
-    int& waitQueue = m_fields->waitQueue;
-    int const linesProgressed = m_fields->linesProgressed;
-    int& characterCount = m_fields->characterCount;
-    int& rollingLine = m_fields->rollingLine;
-    bool& doneRolling = m_fields->doneRolling;
-    bool& rolledPage = m_fields->rolledPage;
-    float& lostTime = m_fields->lostTime;
+    auto const fields = m_fields.self();
+
+    int& waitQueue = fields->waitQueue;
+    int const linesProgressed = fields->linesProgressed;
+    int& characterCount = fields->characterCount;
+    int& rollingLine = fields->rollingLine;
+    bool& doneRolling = fields->doneRolling;
+    bool& rolledPage = fields->rolledPage;
+    float& lostTime = fields->lostTime;
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause") / 30;
-    auto& soundTimer = m_fields->soundTimer;
-    auto const soundRate = m_fields->soundRate;
+    auto& soundTimer = fields->soundTimer;
+    auto const soundRate = fields->soundRate;
 
     if (dt - pause > pause)
         lostTime += dt - pause;
@@ -586,59 +584,60 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
         else rolledPage = false;
 
-        auto const& textAreas = m_fields->textAreaClippingNode->getChildrenExt();
+        auto const textArea = fields->m_textArea;
         
-        for (auto const textArea : textAreas) {
-            auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-            auto lines = std::move(mlbmf->getChildrenExt<CCLabelBMFont>());
-            int currentLine = linesProgressed + rollingLine;
+        auto lines = std::move(textArea->getLines());
+        int currentLine = linesProgressed + rollingLine;
 
-            if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
-                auto const line = lines[currentLine];
-                auto letters = std::move(line->getChildrenExt<CCSprite>());
-                auto const letter = letters[characterCount];
-                if (letter->isVisible()) {
-                    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-                    doneRolling = true;
-                    rolledPage = true;
-                    showButtons();
-                    return;
-                }
-                letter->setVisible(true);
-                character = line->getString()[characterCount];
-                switch (character) {
-                    case ' ':
-                        waitQueue = 0;
-                        playSound = false;
-                        break;
-                    case '.':
-                        [[fallthrough]];
-                    case ',':
-                        [[fallthrough]];
-                    case ':':
-                        [[fallthrough]];
-                    case ';':
-                        [[fallthrough]];
-                    case '?':
-                        [[fallthrough]];
-                    case '!':
-                        waitQueue = 2;
-                        break;
-                    default:
-                        waitQueue = 0;
-                        break;
-                }
-                if (characterCount == line->getChildrenCount() - 1) {
-                    newLine = true;
-                }
-            } else {
+        if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
+            auto const line = lines.at(currentLine);
+            auto letters = std::move(line->getChildrenExt<CCSprite>());
+            auto const letter = letters[characterCount];
+            if (letter->isVisible()) {
                 unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
                 doneRolling = true;
                 rolledPage = true;
                 showButtons();
                 return;
             }
+            letter->setVisible(true);
+
+            character = line->getString()[characterCount];
+            switch (character) {
+                case ' ':
+                    waitQueue = 0;
+                    playSound = false;
+                    break;
+                case '.':
+                    [[fallthrough]];
+                case ',':
+                    [[fallthrough]];
+                case ':':
+                    [[fallthrough]];
+                case ';':
+                    [[fallthrough]];
+                    case '?':
+                    [[fallthrough]];
+                    case '!':
+                    waitQueue = 2;
+                    break;
+                    default:
+                    waitQueue = 0;
+                    break;
+            }
+            if (characterCount == line->getChildrenCount() - 1) {
+                newLine = true;
+            }
+        } else {
+            unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+            doneRolling = true;
+            rolledPage = true;
+            showButtons();
+            this->updateRenderTexture();
+            return;
         }
+
+        
         characterCount++;
         if (newLine) {
             characterCount = 0;
@@ -648,12 +647,19 @@ void DeltaruneAlertLayer::rollText(float dt) {
             lostTime -= pause;
         }
     }
+    this->updateRenderTexture();
 
     if (!playSound || soundTimer < soundRate) {
         return;
     }
 
     DeltaruneAlertLayer::playSound(character);
+}
+
+void DeltaruneAlertLayer::updateRenderTexture() {
+    auto fields = this->m_fields.self();
+
+    // fields->renderedSprite->render();
 }
 
 void DeltaruneAlertLayer::playSound(char character) {
