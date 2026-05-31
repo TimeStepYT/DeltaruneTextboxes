@@ -137,7 +137,8 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     auto& bg = m_fields->bg;
     auto& titleNode = m_fields->title;
 
-    initMaps();  // for sounds
+    this->initMaps();  // for sounds
+    this->registerKeybinds();
 
     this->m_noElasticity = true;
 
@@ -165,6 +166,72 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     });
     return true;
 }
+
+void DeltaruneAlertLayer::registerKeybinds() {
+    if (m_fields->incompatible)
+        return;
+
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-left"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_mainLayer || !m_button2 || !m_fields->doneRolling) 
+                return;
+
+            int& btnSelected = m_fields->btnSelected;
+            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
+            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+
+            btnSelected = 1;
+            label1->setColor(ccColor3B{255, 255, 0});
+            this->setHeartPosition(m_fields->btn1);
+            label2->setColor(ccColor3B{255, 255, 255});
+        }
+    );
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-right"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_mainLayer || !m_button2 || !m_fields->doneRolling) 
+                return;
+
+            int& btnSelected = m_fields->btnSelected;
+            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
+            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+
+            btnSelected = 2;
+            label2->setColor(ccColor3B{255, 255, 0});
+            this->setHeartPosition(m_fields->btn2);
+            label1->setColor(ccColor3B{255, 255, 255});
+        }
+    );
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-confirm"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat || !m_fields->rolledPage) 
+                return;
+
+            auto gm = GameManager::get();
+
+            // Special case with the A button on the controller:
+            // Without it, it would skip every other group of three lines of text because
+            // no matter what, the A button clicks at the same time as well
+            if (keybind.key == cocos2d::CONTROLLER_A) {
+                if (getLinesLeft() - emptyLinesAmount(3) <= 3)
+                    this->pickChoice();
+                return;
+            }
+
+            this->progressText();
+        }
+    );
+
+    // I wanted to add Controller_B as a default to this but that closes the entire popup.
+    // I can't be bothered to disable that right now
+    this->addEventListener(KeybindSettingPressedEventV3(Mod::get(), "keybind-skip"),
+        [this](Keybind const& keybind, bool down, bool repeat, double time){
+            if (!down || repeat) return;
+
+            this->skipText();
+        }
+    );
+}
+
 void DeltaruneAlertLayer::showButtons() {
     if (m_button2 && getLinesLeft() < 3 && m_fields->doneRolling) {
         m_fields->done = true;
@@ -195,7 +262,6 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
         return;
     }
     if (!m_fields->done) {
-        progressText();
         return;
     }
 
@@ -213,10 +279,7 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
         FLAlertLayer::onBtn1(sender);
         return;
     }
-    if (!m_fields->done) {
-        progressText();
-        return;
-    }
+
     global::blockKeys = false;
     FLAlertLayer::onBtn1(sender);
 }
@@ -289,102 +352,6 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
     }
     return FLAlertLayer::ccTouchBegan(touch, event);
 }
-#if defined(DISABLE_KEYBOARD)
-void DeltaruneAlertLayer::keyDown(enumKeyCodes key, double timestamp) {
-    if (m_fields->incompatible) {
-        FLAlertLayer::keyDown(key, timestamp);
-        return;
-    }
-    if (key == KEY_Z || key == KEY_Y /*screw QWERTZ*/) {
-        if (m_fields->rolledPage)
-            progressText();
-        return;
-    } else if (key == KEY_X || key == KEY_Space) {
-        skipText();
-        return;
-    } else if (key == KEY_ArrowLeft || key == KEY_ArrowRight || key == KEY_Left || key == KEY_Right) {
-        if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-            FLAlertLayer::keyDown(key, timestamp);
-            return;
-        }
-
-        int& btnSelected = m_fields->btnSelected;
-        auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
-        auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
-
-        if (key == KEY_ArrowLeft || key == KEY_Left) {
-            btnSelected = 1;
-            label1->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn1);
-            label2->setColor(ccColor3B{255, 255, 255});
-        } else if (key == KEY_ArrowRight || key == KEY_Right) {
-            btnSelected = 2;
-            label2->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn2);
-            label1->setColor(ccColor3B{255, 255, 255});
-        }
-    } else
-        FLAlertLayer::keyDown(key, timestamp);
-}
-#else
-void DeltaruneAlertLayer::initCustomKeybinds() {
-    if (m_fields->incompatible)
-        return;
-
-    this->template addEventListener<keybinds::InvokeBindFilter>(
-        [=, this](keybinds::InvokeBindEvent* event) {
-            if (event->isDown()) {
-                if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-                    return ListenerResult::Propagate;
-                }
-
-                m_fields->btnSelected = 1;
-                auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-                auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
-                label1->setColor(ccColor3B{255, 255, 0});
-                setHeartPosition(m_fields->btn1);
-                label2->setColor(ccColor3B{255, 255, 255});
-                return ListenerResult::Stop;
-            }
-            return ListenerResult::Propagate;
-        }, "left"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            if (!m_mainLayer || !m_button2 || !m_fields->doneRolling) {
-                return ListenerResult::Propagate;
-            }
-
-            m_fields->btnSelected = 2;
-            auto const label1 = m_button1->getChildByType<CCLabelBMFont>(0);
-            auto const label2 = m_button2->getChildByType<CCLabelBMFont>(0);
-            label2->setColor(ccColor3B{255, 255, 0});
-            setHeartPosition(m_fields->btn2);
-            label1->setColor(ccColor3B{255, 255, 255});
-            return ListenerResult::Stop;
-        }
-        return ListenerResult::Propagate;
-    }, "right"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([=, this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            if (m_fields->rolledPage) {
-                progressText();
-                return ListenerResult::Stop;
-            }
-        }
-        return ListenerResult::Propagate;
-    }, "progress"_spr);
-
-    this->template addEventListener<keybinds::InvokeBindFilter>([this](keybinds::InvokeBindEvent* event) {
-        if (event->isDown()) {
-            skipText();
-            return ListenerResult::Stop;
-        }
-        return ListenerResult::Propagate;
-    }, "skip"_spr);
-}
-#endif
 
 void DeltaruneAlertLayer::skipText() {
     unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
@@ -459,6 +426,32 @@ ImageNode* DeltaruneAlertLayer::createImageNode() {
     return newImageNode;
 }
 
+void DeltaruneAlertLayer::pickChoice() {
+    auto fields = m_fields.self();
+    bool& done = fields->done;
+    auto const btn1 = fields->old_btn1;
+    auto const btn2 = fields->old_btn2;
+    int const btnSelected = fields->btnSelected;
+
+    if (!m_button2) {
+        auto const dialogLayer = fields->dialogLayer;
+
+        done = true;
+        
+        if (fields->dialog && dialogLayer)
+            dialogLayer->keyBackClicked();
+        
+        FLAlertLayer::onBtn1(btn1);
+    } else if (btnSelected != 0) {
+        done = true;
+        
+        if (btnSelected == 1)
+            FLAlertLayer::onBtn1(btn1);
+        else if (btnSelected == 2)
+            FLAlertLayer::onBtn2(btn2);
+    }
+}
+
 void DeltaruneAlertLayer::progressText() {
     if (!m_mainLayer) return;
     if (!m_buttonMenu) return;
@@ -466,11 +459,7 @@ void DeltaruneAlertLayer::progressText() {
     auto const fields = m_fields.self();
 
     auto const deltaruneTextArea = fields->m_textArea;
-    auto const btn1 = fields->old_btn1;
-    auto const btn2 = fields->old_btn2;
-    int const btnSelected = fields->btnSelected;
     int& linesProgressed = fields->linesProgressed;
-    bool& done = fields->done;
     bool const noShadow = fields->noShadow;
 
     if (!deltaruneTextArea) return;
@@ -479,22 +468,9 @@ void DeltaruneAlertLayer::progressText() {
     if (!textArea) return;
     
     if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
-        if (!m_button2) {
-            auto const dialogLayer = fields->dialogLayer;
-            done = true;
-            if (fields->dialog && dialogLayer) {
-                dialogLayer->keyBackClicked();
-            }
-            FLAlertLayer::onBtn1(btn1);
+        this->pickChoice();
+        if (fields->done)
             return;
-        } else if (btnSelected != 0) {
-            done = true;
-            if (btnSelected == 1)
-                FLAlertLayer::onBtn1(btn1);
-            else if (btnSelected == 2)
-                FLAlertLayer::onBtn2(btn2);
-            return;
-        }
     }
     // Don't progress if there's only a choice left!
     if (getLinesLeft() - emptyLinesAmount(3) < 3 && m_button2)

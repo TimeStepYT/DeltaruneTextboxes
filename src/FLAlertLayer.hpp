@@ -55,6 +55,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::unordered_map<std::string, std::string_view> nameToSound;
 		std::unordered_map<std::string, int> nameToSoundRate;
 	};
+	void registerKeybinds();
 	void animateBG(float);
 	void changeBG();
 	void changeSingleButton(CCMenuItemSpriteExtra*, ButtonSprite*);
@@ -78,17 +79,11 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	ImageNode* createImageNode();
 	void handleAprilFools();
 	void progressText();
-	// I can't check for enter key so I guess I have to hook the buttons
+	void pickChoice();
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
 	void clickedOnButton(Button*, Button*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 	void playSound(char);
 	void updateRenderTexture();
-
-#if defined(DISABLE_KEYBOARD)
-	void keyDown(enumKeyCodes, double) override;
-#else 
-	void initCustomKeybinds();
-#endif
 };

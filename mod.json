@@ -82,6 +82,27 @@
         ]
     },
     "settings": {
+        "keybind-left": {
+            "type": "keybind",
+            "name": "Left Choice",
+            "default": ["Left", "Controller_Left", "Controller_LTHUMBSTICK_LEFT"]
+        },
+        "keybind-right": {
+            "type": "keybind",
+            "name": "Right Choice",
+            "default": ["Right", "Controller_Right", "Controller_LTHUMBSTICK_RIGHT"]
+        },
+        "keybind-confirm": {
+            "type": "keybind",
+            "name": "Confirm",
+            "default": ["Z", "Enter", "Controller_A"]
+        },
+        "keybind-skip": {
+            "type": "keybind",
+            "name": "Skip Text",
+            "default": ["X", "Shift+RightShift", "Shift+LeftShift"]
+        },
+
         "disableClickToProgress": {
             "name": "Don't progress by clicking",
             "type": "bool",

@@ -1,6 +1,14 @@
 ### v1.6.0
+- Updated to Geode v5.7.1
+- Added custom keybinds using the new Keybinds system in Geode
+- Reworked the way text gets rendered. (There is like one mod that probably breaks because of it)
+
+### v1.5.4
+- Fixed a touch prio bug
+
+### v1.5.3
 - Updated to GD 2.2081 and Geode v5.0.0
-- Disabled Custom Keybinds temporarily (remove once reenabled)
+- Disabled Custom Keybinds (dw, it will come back)
 
 ### v1.5.2
 - Tweaked the rate of the text sounds for some characters
