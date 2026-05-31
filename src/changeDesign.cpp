@@ -1,14 +1,18 @@
 #include <Geode/utils/cocos.hpp>
 #include <Geode/ui/Button.hpp>
+#include <alphalaneous.alphas-ui-pack/include/API.hpp>
 #include "FLAlertLayer.hpp"
-#include "include.hpp"
+#include "TextShaders.hpp"
+#include "Global.hpp"
+
+using namespace alpha::prelude;
 
 template <class I, class T>
 bool iteratorContains(I const& iterator, T const& value) {
     return std::find(iterator.begin(), iterator.end(), value) != iterator.end();
 }
 
-void capitalize(std::string& str) {
+void capitalize(std::string& str, bool toUpper = true) {
     bool disable = false;
     std::array<char, 5> constexpr nextFilter = {'c', 'd', '/', 'i', 's'};
 
@@ -24,7 +28,11 @@ void capitalize(std::string& str) {
             continue;
         }
         if (disable) continue;
-        c = toupper(c);
+        
+        if (toUpper)
+            c = toupper(c);
+        else
+            c = tolower(c);
     }
 }
 
@@ -54,6 +62,7 @@ void DeltaruneAlertLayer::changeBG() {
     auto const screenSize = m_fields->screenSize;
     auto const imageNode = m_fields->imageNode;
     auto const undertaleBG = Mod::get()->getSettingValue<bool>("undertaleBG");
+    auto* const director = CCDirector::sharedDirector();
 
     bg->removeFromParent();
 
@@ -62,9 +71,9 @@ void DeltaruneAlertLayer::changeBG() {
     else
         bg = CCScale9Sprite::create("deltaruneSquare_0.png"_spr);
 
-    bg->setContentHeight(140);
-    bg->setContentWidth(screenSize);
-    bg->setPosition(CCPoint{CCDirector::sharedDirector()->getWinSize().width / 2, 70});
+
+    bg->setContentSize({1334.f / 3, 376.f / 3}); // Measured from the game
+    bg->setPosition(CCPoint{screenSize / 2, bg->getContentHeight() / 2});
     bg->setID("background");
     bg->setZOrder(-1);
 
@@ -73,7 +82,7 @@ void DeltaruneAlertLayer::changeBG() {
 
     if (m_fields->dialog) {
         imageNode->setZOrder(bg->getZOrder() + 1);
-        imageNode->setPosition({bg->getPositionX() - screenSize / 2 + 68, bg->getPositionY()});
+        imageNode->setPosition({bg->getPositionX() - bg->getContentWidth() / 2 + 68, bg->getPositionY()});
     }
     m_mainLayer->addChild(bg);
 }
@@ -94,31 +103,34 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 
 void DeltaruneAlertLayer::changeButtons() {
     if (!m_buttonMenu) return;
+
+    auto* const fields = this->m_fields.self();
+    auto* const bg = fields->bg;
+    
+    m_buttonMenu->setPositionX(bg->getContentWidth() / 2);
     m_buttonMenu->setPositionY(32);
     m_buttonMenu->setVisible(false);
 
     if (!m_button2) return;
-    auto const bg = m_fields->bg;
-    float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - m_fields->screenSize / 2;
-
+    float const positionStart = bg->getPositionX() - m_buttonMenu->getPositionX() - fields->screenSize / 2;
     Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, "Determination.fnt"_spr);
-    newBtn1->setPositionX(positionStart + m_fields->screenSize / 4);
-    newBtn1->setPositionY(m_fields->old_btn1->getPositionY() + 2);
+    newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
+    newBtn1->setPositionY(fields->old_btn1->getPositionY() + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
         this->onBtn1(button);
     });
-    
+
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
-    newBtn2->setPositionX(positionStart + (m_fields->screenSize / 4) * 3);
-    newBtn2->setPositionY(m_fields->old_btn2->getPositionY() + 2);
+    newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
+    newBtn2->setPositionY(fields->old_btn2->getPositionY() + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
         this->onBtn2(button);
     });
-    
+
     newBtn1->setSelectCallback([this, newBtn2](Button* button){
         this->clickedOnButton(button, newBtn2, 1);
     });
@@ -129,22 +141,22 @@ void DeltaruneAlertLayer::changeButtons() {
     this->m_buttonMenu->addChild(newBtn1);
     this->m_buttonMenu->addChild(newBtn2);
 
-    m_fields->btn1 = newBtn1;
-    m_fields->btn2 = newBtn2;
+    fields->btn1 = newBtn1;
+    fields->btn2 = newBtn2;
 
-    m_fields->old_btn1->removeFromParent();
-    m_fields->old_btn2->removeFromParent();
+    fields->old_btn1->removeFromParent();
+    fields->old_btn2->removeFromParent();
 
     auto const heart = CCSprite::create("heart.png"_spr);
     heart->setVisible(false);
     heart->setPositionY(m_buttonMenu->getPositionY());
-    heart->setPositionX(m_buttonMenu->getPositionX());
+    heart->setPositionX(fields->screenSize / 2);
     heart->setID("heart"_spr);
     m_mainLayer->addChild(heart);
-    m_fields->heart = heart;
+    fields->heart = heart;
 
-    changeSingleButton(m_fields->old_btn1, m_button1);
-    changeSingleButton(m_fields->old_btn2, m_button2);
+    changeSingleButton(fields->old_btn1, m_button1);
+    changeSingleButton(fields->old_btn2, m_button2);
 }
 
 void DeltaruneAlertLayer::changeTitle() {
@@ -152,7 +164,7 @@ void DeltaruneAlertLayer::changeTitle() {
     auto const bg = m_fields->bg;
     title->setAnchorPoint(CCPoint{0, 0});
     title->setFntFile("Determination.fnt"_spr);
-    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, 138});
+    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, bg->getContentHeight() - 2.f});
 }
 
 void DeltaruneAlertLayer::handleSound() {
@@ -168,152 +180,80 @@ void DeltaruneAlertLayer::handleSound() {
     initSoundRate();
 }
 
-void DeltaruneAlertLayer::changeText() {
-    auto& textArea = m_fields->textArea;
-    if (!textArea) return;
-
-    auto const& sound = m_fields->textSound;
-    auto const size = m_fields->textSize;
-    bool& noShadow = m_fields->noShadow;
-
-    noShadow = Mod::get()->getSettingValue<bool>("noShadow") || sound == "Sans" || sound == "Papyrus";
+CCLabelBMFont* DeltaruneAlertLayer::createStar() {
+    auto const fields = m_fields.self();
+    bool const noShadow = fields->noShadow;
+    bool const noGradient = fields->noGradient;
+    float const screenSize = fields->screenSize;
+    auto const bg = fields->bg;
 
     CCLabelBMFont* const star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
-    CCLabelBMFont* starShadow = nullptr;
-    if (!noShadow) starShadow = CCLabelBMFont::create("*", "Determination.fnt"_spr);
 
-    auto& str = m_fields->text;
-    auto const screenSize = m_fields->screenSize;
-    auto const bg = m_fields->bg;
+    float xOffset = star->getContentWidth();
 
-    int xOffset = star->getContentWidth();
+    if (fields->dialog)
+        xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
-    DeltaruneAlertLayer::handleSound();
-
-    if (m_fields->dialog)
-        xOffset = m_fields->imageNode->getContentWidth() + star->getContentWidth();
-
-    star->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 27);
-    star->setPositionY(110);
+    star->setPositionX(xOffset - star->getContentWidth() + 27);
+    star->setPositionY(bg->getContentHeight() - 30.f);
     star->setZOrder(1);
     star->setID("star"_spr);
 
-    if (!noShadow) {
-        starShadow->setPositionX(bg->getPositionX() - screenSize / 2 + xOffset - star->getContentWidth() + 28);
-        starShadow->setPositionY(109);
-        starShadow->setZOrder(0);
-        starShadow->setID("starShadow"_spr);
-        auto const character = starShadow->getChildByType<CCSprite>(0);
-        character->setColor({15, 15, 127});
-    }
+    fields->contentXOffset = xOffset;
+    
+    return star;
+}
 
+void DeltaruneAlertLayer::changeText() {
+    auto const fields = m_fields.self();
+    auto& oldTextArea = fields->old_textArea;
+    if (!oldTextArea) return;
+
+    auto const& sound = fields->textSound;
+    auto const size = fields->textSize;
+    bool& noShadow = fields->noShadow;
+    bool& noGradient = fields->noGradient;
+
+    noShadow = Mod::get()->getSettingValue<bool>("noShadow");
+    noGradient = Mod::get()->getSettingValue<bool>("noGradientOverlay");
+
+    
+    auto& str = fields->text;
+    auto const screenSize = fields->screenSize;
+    auto const bg = fields->bg;
+    
+    
+    DeltaruneAlertLayer::handleSound();
+    
     std::string font = "Determination.fnt"_spr;
-
-    if (sound == "Sans") font = "ComicSans.fnt"_spr;
-    if (sound == "Papyrus") {
+    
+    if (sound == "Sans") {
+        font = "ComicSans.fnt"_spr;
+        capitalize(str, false);
+    }
+    else if (sound == "Papyrus") {
         font = "Papyrus.fnt"_spr;
         capitalize(str);
     }
+    
+    auto const star = this->createStar();
 
-    float creatingWidth = screenSize - 100 - xOffset;
-    auto const newDesc = TextArea::create(
+    float xOffset = fields->contentXOffset;
+    float creatingWidth = bg->getContentWidth() - 120 - xOffset;
+    auto const deltaruneTextArea = DeltaruneTextArea::create(
         str,
-        font.c_str(),
-        1,
+        font,
         creatingWidth,
-        CCPoint{0, 1},
-        size,
-        false);
-
-    newDesc->setContentWidth(creatingWidth);
-    newDesc->setAnchorPoint(CCPoint{0, 1});
-    newDesc->setPositionY(110);
-    newDesc->setZOrder(textArea->getZOrder());
+        size
+    );
+    auto const newDesc = deltaruneTextArea->getTextArea();
+    
+    newDesc->setPositionX(24 + xOffset + star->getContentWidth());
+    newDesc->setPositionY(bg->getContentHeight() - 20.f);
+    newDesc->setZOrder(oldTextArea->getZOrder());
     newDesc->setID("content-text-area");
 
-    TextArea* newDescGrad = nullptr;
-    TextArea* newDescShad = nullptr;
-    if (!Mod::get()->getSettingValue<bool>("noGradientOverlay") && sound != "Sans" && sound != "Papyrus") {
-        newDescGrad = TextArea::create(
-            str,
-            "DeterminationGradient.fnt"_spr,
-            1,
-            creatingWidth,
-            CCPoint{0, 1},
-            size,
-            false);
-        newDescGrad->setContentWidth(creatingWidth);
-        newDescGrad->setAnchorPoint(CCPoint{0, 1});
-        newDescGrad->setPositionY(110);
-        newDescGrad->setZOrder(textArea->getZOrder() + 1);
-        newDescGrad->setID("gradient-overlay"_spr);
-
-        auto const& linesGrad = newDescGrad->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
-        for (auto const line : linesGrad) {
-            auto const& letters = line->getChildrenExt<CCSprite>();
-            for (auto const& letter : letters) {
-                letter->setColor(ccColor3B{255, 255, 255});
-                letter->setVisible(false);
-            }
-        }
-    }
-    if (!noShadow) {
-        newDescShad = TextArea::create(
-            str,
-            font.c_str(),
-            1.f,
-            creatingWidth,
-            CCPoint{0, 1},
-            size,
-            false);
-        newDescShad->setContentWidth(creatingWidth);
-        newDescShad->setAnchorPoint(CCPoint{0, 1});
-        newDescShad->setPositionY(109);
-        newDescShad->setPositionX(newDescShad->getPositionX() + 1);
-        newDescShad->setZOrder(textArea->getZOrder() - 1);
-        newDescShad->setID("shadow"_spr);
-
-        auto const& linesShad = newDescShad->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
-        int i = 0;
-
-        for (auto const line : linesShad) {
-            auto const& letters = line->getChildrenExt<CCSprite>();
-            int j = 0;
-
-            for (auto const letter : letters) {
-                auto const origLinesParent = newDesc->getChildByType<MultilineBitmapFont>(0);
-                auto const origLine = origLinesParent->getChildByType<CCLabelBMFont>(i);
-                auto const origChar = origLine->getChildByType<CCSprite>(j);
-                auto const& color = origChar->getColor();
-
-                if (color == ccColor3B{255, 255, 255})
-                    letter->setColor({15, 15, 127});
-                else if (color == ccColor3B{255, 0, 255})
-                    letter->setColor({76, 0, 76});
-                else if (color == ccColor3B{255, 90, 90})
-                    letter->setColor({76, 0, 0});
-                else if (color == ccColor3B{255, 165, 75})
-                    letter->setColor({76, 38, 18});
-                else if (color == ccColor3B{255, 255, 0})
-                    letter->setColor({76, 76, 0});
-                else if (color == ccColor3B{64, 227, 72})
-                    letter->setColor({0, 76, 0});
-                else if (color == ccColor3B{74, 82, 255})
-                    letter->setColor({0, 0, 76});
-                else {
-                    uint8_t const red = color.r / 2;
-                    uint8_t const green = color.g / 2;
-                    uint8_t const blue = color.b / 2;
-                    letter->setColor(ccColor3B{red, green, blue});
-                }
-
-                letter->setVisible(false);
-                j++;
-            }
-            i++;
-        }
-    }
-    auto const& lines = newDesc->getChildByType<MultilineBitmapFont>(0)->getChildrenExt();
+    auto const& lines = deltaruneTextArea->getLines();
 
     for (auto const line : lines) {
         auto const& letters = line->getChildrenExt();
@@ -321,50 +261,66 @@ void DeltaruneAlertLayer::changeText() {
             letter->setVisible(false);
         }
     }
-    textArea->removeFromParent();
-    m_mainLayer->addChild(star);
-
-    if (!noShadow) m_mainLayer->addChild(starShadow);
-
-    auto const rect = CCLayerColor::create({0, 0, 0, 0}, bg->getContentWidth(), bg->getContentHeight() - 20);
+    oldTextArea->removeFromParent();
+    
+    auto const rect = CCLayerColor::create(
+        {0, 0, 0, 0},
+        0, 0
+    );
+    
     auto const clippingNode = CCClippingNode::create(rect);
-    clippingNode->setID("content-text-area"_spr);
-    clippingNode->setPositionY(10);
-    clippingNode->setPositionX(bg->getPositionX() - screenSize / 2 + 24 + xOffset);
-    clippingNode->addChild(newDesc);
+    clippingNode->setID("getoutijustneedyouforrendernodeandthebuttons"_spr);
+    clippingNode->setZOrder(bg->getZOrder() - 1);
+    clippingNode->setContentSize(rect->getContentSize());
+    
+    auto const textContentNode = CCNode::create();
+    textContentNode->setID("text-content"_spr);
+    textContentNode->setContentSize(bg->getContentSize());
+    textContentNode->setPosition(bg->getPosition());
+    textContentNode->setAnchorPoint({0.5f, 0.5f});
+    fields->textContentNode = textContentNode;
+    
+    textContentNode->addChild(star);
+    textContentNode->addChild(newDesc);
+    
+    this->m_buttonMenu->removeFromParentAndCleanup(false);
+    
+    textContentNode->addChild(this->m_buttonMenu);
+    
+    clippingNode->addChild(textContentNode);
+    this->m_mainLayer->addChild(clippingNode);
+
+    auto renderNode = RenderNode::create(textContentNode, true);
+    renderNode->setPosition(bg->getPosition());
+    renderNode->setZOrder(bg->getZOrder() + 1);
+    fields->renderedSprite = renderNode;
+
+    auto shaderInstance = DeltaruneTextShaders::create(bg);
+    auto program = shaderInstance.getShader(noShadow, noGradient);
+
+    if (program)
+        renderNode->setShaderProgram(program);
+
+    m_mainLayer->addChild(renderNode);
+
+    m_fields->m_textArea = std::move(deltaruneTextArea);
+    /*
     if (newDescGrad) clippingNode->addChild(newDescGrad);
-    if (!noShadow) clippingNode->addChild(newDescShad);
-
-    m_mainLayer->addChild(clippingNode);
-
-    m_fields->textAreaClippingNode = clippingNode;
-    textArea = newDesc;
-    m_fields->gradientOverlay = newDescGrad;
-    m_fields->shadow = newDescShad;
+    fields->gradientOverlay = newDescGrad;
+    */
 
     double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
 
-    m_fields->linesProgressed += emptyLinesAmount();
-    textArea->setPositionY(textArea->getPositionY() + m_fields->textSize * m_fields->linesProgressed);
-    if (newDescGrad) newDescGrad->setPositionY(textArea->getPositionY());
-    if (newDescShad) newDescShad->setPositionY(textArea->getPositionY() - 1);
+    fields->linesProgressed += emptyLinesAmount();
+    newDesc->setPositionY(newDesc->getPositionY() + fields->textSize * fields->linesProgressed);
+    /*
+    if (newDescGrad) newDescGrad->setPositionY(newDesc->getPositionY());
+    */
 
     schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
-void DeltaruneAlertLayer::removeControllerGlyphs() {
-    auto const mainLayer = this->m_mainLayer;
-    auto const backControllerGlyph = mainLayer->getChildByID("controller-back-hint");
-    auto const okControllerGlyph = mainLayer->getChildByID("controller-ok-hint");
-
-    if (backControllerGlyph)
-        backControllerGlyph->removeFromParentAndCleanup(true);
-    if (okControllerGlyph)
-        okControllerGlyph->removeFromParentAndCleanup(true);
-}
-
 void DeltaruneAlertLayer::changeLook() {
-    removeControllerGlyphs();
     changeBG();
     changeButtons();
     changeTitle();

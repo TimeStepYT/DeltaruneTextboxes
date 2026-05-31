@@ -1,3 +1,8 @@
+### v1.6.0
+- Updated to Geode v5.7.1
+- Added custom keybinds using the new Keybinds system in Geode
+- Reworked the way text gets rendered. (Sorry to all the QiblaFinder fans, your game will crash until ery gets his GitHub account back)
+
 ### v1.5.4
 - Fixed a touch prio bug
 

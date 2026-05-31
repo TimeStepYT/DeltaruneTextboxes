@@ -1,4 +1,4 @@
-#include "include.hpp"
+#include "Global.hpp"
 
 class $modify(DeltarunePurchaseItemPopup, PurchaseItemPopup) {
     struct Fields {

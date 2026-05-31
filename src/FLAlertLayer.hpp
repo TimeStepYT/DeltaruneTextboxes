@@ -1,7 +1,9 @@
 #include <Geode/ui/Button.hpp>
-#include "include.hpp"
+#include <Geode/ui/TextArea.hpp>
+#include "Global.hpp"
+#include "DeltaruneTextArea.hpp"
 #include "ImageNode.hpp"
-
+#include <alphalaneous.alphas-ui-pack/include/API.hpp>
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
 		bool clickedChoice = false;
@@ -10,35 +12,36 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		bool incompatible = false;
 		bool dialog = false;
 		bool noShadow = false;
+		bool noGradient = false;
 		bool doneRolling = false;
 		bool rolledPage = false;
 		bool done = false;
-		bool dontRestrictWidth = Mod::get()->getSettingValue<bool>("dontRestrictWidth");
 		bool disableClickToProgress = Mod::get()->getSettingValue<bool>("disableClickToProgress");
-		float screenSize = CCDirector::sharedDirector()->getWinSize().width;
+		float screenSize = 0.f;
 		float lostTime = 0;
+		float contentXOffset = 0.f;
 		int waitQueue = 0;
 		int frame = 0;
 		int rollingLine = 0;
 		int linesProgressed = 0;
 		int characterCount = 0;
-		int textSize = 36;
+		int textSize = 31;
 		int btnSelected = 0;
 		int dialogCount = 0;
 		int prevSoundNum = 200;
 		int soundRate = 2;
 		int soundTimer = 0;
-		CCMenuItemSpriteExtra* old_btn1;
-		CCMenuItemSpriteExtra* old_btn2;
-		Button* btn1;
-		Button* btn2;
-		CCClippingNode* textAreaClippingNode;
-		TextArea* textArea;
-		TextArea* gradientOverlay;
-		TextArea* shadow;
-		CCScale9Sprite* bg;
-		CCSprite* heart;
-		CCLabelBMFont* title;
+		CCMenuItemSpriteExtra* old_btn1 = nullptr;
+		CCMenuItemSpriteExtra* old_btn2 = nullptr;
+		Button* btn1 = nullptr;
+		Button* btn2 = nullptr;
+		CCNode* textContentNode = nullptr;
+		TextArea* old_textArea = nullptr;
+		std::shared_ptr<DeltaruneTextArea> m_textArea = nullptr;
+		CCScale9Sprite* bg = nullptr;
+		CCLabelBMFont* title = nullptr;
+		CCSprite* heart = nullptr;
+		alpha::ui::RenderNode* renderedSprite = nullptr;
 		ImageNode* imageNode;
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
@@ -52,13 +55,14 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::unordered_map<std::string, std::string_view> nameToSound;
 		std::unordered_map<std::string, int> nameToSoundRate;
 	};
+	void registerKeybinds();
 	void animateBG(float);
 	void changeBG();
 	void changeSingleButton(CCMenuItemSpriteExtra*, ButtonSprite*);
-	void removeControllerGlyphs();
 	void changeButtons();
 	void changeTitle();
 	void handleSound();
+	CCLabelBMFont* createStar();
 	void changeText();
 	void changeLook();
 	void decideToBlockKeys();
@@ -75,16 +79,11 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	ImageNode* createImageNode();
 	void handleAprilFools();
 	void progressText();
-	// I can't check for enter key so I guess I have to hook the buttons
+	void pickChoice();
 	void onBtn2(CCObject*);
 	void onBtn1(CCObject*);
 	void clickedOnButton(Button*, Button*, int);
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 	void playSound(char);
-
-#if defined(DISABLE_KEYBOARD)
-	void keyDown(enumKeyCodes, double) override;
-#else 
-	void initCustomKeybinds();
-#endif
+	void updateRenderTexture();
 };
