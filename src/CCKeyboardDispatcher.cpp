@@ -2,7 +2,7 @@
 
 #include <Geode/ui/Button.hpp>
 
-#include "Events.hpp"
+// #include "Events.hpp"
 
 class $modify(MyHookLol, CCKeyboardDispatcher) {
 	// Needed because BetterInfo has special FLAlertLayers that duplicate for some reason
@@ -19,11 +19,11 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 		// 	DeltaruneTextShaders::updateLastShader();
 		// }
 
-		auto debugButton = CircleButtonSprite::create(nullptr);
+		// auto debugButton = CircleButtonSprite::create(nullptr);
 
-		if (key == KEY_U) {
-			DeltaruneEvents::createDialogEvent.send(debugButton, "Button test", "Text in here\ntest\ntest\ntest\ntest");
-		}
+		// if (key == KEY_U) {
+		// 	DeltaruneEvents::createDialogEvent.send(debugButton, "Button test", "Text in here\ntest\ntest\ntest\ntest");
+		// }
 
 		if (global::blockKeys && Loader::get()->isModLoaded("cvolton.betterinfo")) {
 			if (key == KEY_Left || key == KEY_Right)
