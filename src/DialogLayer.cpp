@@ -26,7 +26,7 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 				text = fmt::format("{}\n\n\n\n{}", text, static_cast<DialogObject*>(objects->objectAtIndex(i))->m_text);
 		}
 	}
-	auto const unmodifiedAlert = FLAlertLayer::create(title, text, "OK");
+	auto const unmodifiedAlert = DeltaruneAlertLayer::create(title, text, "OK");
 	auto const alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 	auto const imageNode = alert->createImageNode();
 
@@ -51,15 +51,16 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 	m_fields->alert = unmodifiedAlert;
 	alert->m_fields->dialog = true;
 	alert->m_fields->dialogLayer = this;
+	
+	alert->show();
 
 	Loader::get()->queueInMainThread([this, alert] {
 		this->setVisible(false);
 		if (!this->getParent()) {
 			alert->addChild(this);
 		}
-		});
+	});
 
-	alert->show();
 	return true;
 }
 void DeltaruneDialogLayer::displayNextObject() {

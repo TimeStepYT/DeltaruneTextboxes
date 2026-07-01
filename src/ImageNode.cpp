@@ -1,5 +1,7 @@
 #include "ImageNode.hpp"
 
+using namespace geode::prelude;
+
 ImageNode* ImageNode::create() {
     auto ret = new ImageNode();
 
@@ -24,7 +26,7 @@ bool ImageNode::init() {
     return true;
 }
 
-void ImageNode::handleCharacterImage(CCSprite* newChar) {
+void ImageNode::handleCharacterImage(CCNode* newChar) {
     float const contentWidth = this->getContentWidth();
     float const contentHeight = this-> getContentHeight();
     auto const& anchorPoint = this->getAnchorPoint();
@@ -58,4 +60,8 @@ void ImageNode::setCharacterImage(CCTexture2D* spriteTexture) {
         newChar = CCSpriteGrayscale::createWithTexture(spriteTexture);
 
     this->handleCharacterImage(newChar);
+}
+
+void ImageNode::setCharacterImage(CCNode* node) {
+    this->handleCharacterImage(node);
 }
