@@ -1,3 +1,6 @@
+### v1.7.0
+- Added an event for other mods to be able to add any node where a character portrait would be.
+
 ### v1.6.0
 - Updated to Geode v5.7.1
 - Added custom keybinds using the new Keybinds system in Geode

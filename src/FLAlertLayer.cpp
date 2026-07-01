@@ -148,9 +148,7 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     textArea = static_cast<TextArea*>(m_mainLayer->getChildByID("content-text-area"));
     bg = static_cast<CCScale9Sprite*>(m_mainLayer->getChildByID("background"));
     titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
-#if !defined(DISABLE_KEYBOARD)
-    initCustomKeybinds();
-#endif
+
     Loader::get()->queueInMainThread([bg, titleNode, textArea, this] {
         if (m_fields->incompatible) return;
         if (m_fields->showing) return;
@@ -417,17 +415,22 @@ int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
 
 // Adds the ImageNode to the dialog and returns it as well!
 ImageNode* DeltaruneAlertLayer::createImageNode() {
+    if (this->m_fields->imageNode) {
+        log::debug("Skipped creating an ImageNode again");
+        return this->m_fields->imageNode;
+    }
+    
     auto const newImageNode = ImageNode::create();
 
     newImageNode->setID("image-node"_spr);
-    m_mainLayer->addChild(newImageNode);
+    this->m_mainLayer->addChild(newImageNode);
 
-    m_fields->imageNode = newImageNode;
+    this->m_fields->imageNode = newImageNode;
     return newImageNode;
 }
 
 void DeltaruneAlertLayer::pickChoice() {
-    auto fields = m_fields.self();
+    auto fields = this->m_fields.self();
     bool& done = fields->done;
     auto const btn1 = fields->old_btn1;
     auto const btn2 = fields->old_btn2;
@@ -467,13 +470,13 @@ void DeltaruneAlertLayer::progressText() {
     auto const textArea = deltaruneTextArea->getTextArea();
     if (!textArea) return;
     
-    if (getLinesLeft() - emptyLinesAmount(3) <= 3) {
+    if (this->getLinesLeft() - this->emptyLinesAmount(3) <= 3) {
         this->pickChoice();
         if (fields->done)
             return;
     }
     // Don't progress if there's only a choice left!
-    if (getLinesLeft() - emptyLinesAmount(3) < 3 && m_button2)
+    if (this->getLinesLeft() - this->emptyLinesAmount(3) < 3 && m_button2)
         return;
 
     // Move EVERYTHING up
@@ -481,29 +484,30 @@ void DeltaruneAlertLayer::progressText() {
     int offset;
     fields->textContentNode->getChildByID("star"_spr)->setVisible(false);
 
-    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+    this->unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
     fields->characterCount = 0;
     fields->rollingLine = 0;
 
-    if (getLinesLeft() > 3)
+    if (this->getLinesLeft() > 3)
         offset = 3;
-    else if (getLinesLeft() == 3)
+    else if (this->getLinesLeft() == 3)
         offset = 1;
 
-    int const emptyLines = emptyLinesAmount(offset);
+    int const emptyLines = this->emptyLinesAmount(offset);
     offset += emptyLines;
 
     auto const& characters = fields->characterSpriteNames;
     int& dialogCount = fields->dialogCount;
     bool const progressDialog = emptyLines > 0 && characters.size() > 1;
     
+    // Only applies if it comes from a DialogLayer
     if (progressDialog) {
         dialogCount++;
         auto const& spriteName = characters[dialogCount];
         auto const imageNode = fields->imageNode;
 
         if (!imageNode)  // Just in case! I have no idea what other mods will do to my stuff...
-            createImageNode();
+            this->createImageNode();
 
         imageNode->removeAllChildrenWithCleanup(true);
         imageNode->setCharacterImage(spriteName);
@@ -523,9 +527,9 @@ void DeltaruneAlertLayer::progressText() {
     linesProgressed += offset;
     textArea->setPositionY(textArea->getPositionY() + fields->textSize * offset);
 
-    showButtons();
+    this->showButtons();
     float const pause = Mod::get()->getSettingValue<double>("textRollingPause");
-    schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
+    this->schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
 }
 
 time_t const& t = time(nullptr);

@@ -80,7 +80,7 @@ void DeltaruneAlertLayer::changeBG() {
     if (!Mod::get()->getSettingValue<bool>("noAnimation") && !undertaleBG)
         schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
 
-    if (m_fields->dialog) {
+    if (m_fields->imageNode) {
         imageNode->setZOrder(bg->getZOrder() + 1);
         imageNode->setPosition({bg->getPositionX() - bg->getContentWidth() / 2 + 68, bg->getPositionY()});
     }
@@ -191,7 +191,7 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
 
     float xOffset = star->getContentWidth();
 
-    if (fields->dialog)
+    if (fields->imageNode)
         xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
     star->setPositionX(xOffset - star->getContentWidth() + 27);
