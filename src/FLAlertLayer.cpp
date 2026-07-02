@@ -519,7 +519,7 @@ void DeltaruneAlertLayer::progressText() {
         // Getting the right text sound based on the character name
         auto&& nameToSound = fields->nameToSound;
         if (nameToSound.find(title.c_str()) != nameToSound.end())
-            fields->textSound = nameToSound[title.c_str()];
+            fields->textSound = nameToSound[title];
         else
             fields->textSound = "Default";
     }
@@ -673,9 +673,10 @@ void DeltaruneAlertLayer::playSound(char character) {
     auto& prevSoundNum = m_fields->prevSoundNum;
     auto const& resFolder = Mod::get()->getResourcesDir();
 
-    if (nameToFile.find(textSound) == nameToFile.end()) return;
+    if (nameToFile.find(textSound) == nameToFile.end())
+        return;
 
-    handleAprilFools();
+    this->handleAprilFools();
 
     float pitch = 1.f;
 
@@ -714,4 +715,8 @@ void DeltaruneAlertLayer::playSound(char character) {
     channel->setPitch(pitch);
     channel->setVolumeRamp(false);
     channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
+}
+
+void DeltaruneAlertLayer::setTextSound(std::string const& textSound) {
+    this->m_fields->textSound = textSound;
 }

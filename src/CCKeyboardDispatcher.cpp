@@ -22,7 +22,8 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 		// auto debugButton = CircleButtonSprite::create(nullptr);
 
 		// if (key == KEY_U) {
-		// 	DeltaruneEvents::createDialogEvent.send(debugButton, "Button test", "Text in here\ntest\ntest\ntest\ntest");
+		// 	FLAlertLayer* alert = nullptr;
+		// 	DeltaruneEvents::createDialogWithVoiceEvent.send(alert, nullptr, "Sans", "Button test", "Text in here\ntest\ntest\ntest\ntest");
 		// }
 
 		if (global::blockKeys && Loader::get()->isModLoaded("cvolton.betterinfo")) {
