@@ -22,18 +22,19 @@ DeltaruneAlertLayer* DeltaruneEvents::createDialogBox(cocos2d::CCNode* character
 }
 
 DeltaruneAlertLayer* DeltaruneEvents::createDialogBoxReturn(
-    FLAlertLayer*& output, 
+    FLAlertLayer** output, 
     cocos2d::CCNode* characterPortrait, 
     std::string const& title, 
     std::string const& text
 ) {
     auto alert = DeltaruneEvents::createDialogBox(characterPortrait, title, text);
-    output = alert;
+    if (output)
+        *output = alert;
     return alert;
 }
 
 void DeltaruneEvents::createDialogWithVoice(
-    FLAlertLayer*& output,
+    FLAlertLayer** output,
     cocos2d::CCNode* characterPortrait,
     std::string const& voice,
     std::string const& title,
@@ -41,5 +42,6 @@ void DeltaruneEvents::createDialogWithVoice(
 ) {
     auto alert = DeltaruneEvents::createDialogBox(characterPortrait, title, text);
     alert->setTextSound(voice);
-    output = alert;
+    if (output)
+        *output = alert;
 }
