@@ -13,6 +13,17 @@ Keybinds are changeable in the mod's settings!
 
 Apply using the Geode mod loader!
 
+## For mod developers
+This mod provides a couple of **events** you can use for better support with your mods!
+(For more detailed info, please check Events.hpp)
+
+- timestepyt.deltarune_textboxes/create-dialog-box
+	- Creates a dialog box with a node you provide where the character sprite would be. (nullptr for no node)
+- timestepyt.deltarune_textboxes/create-dialog-box-return
+	- The same as before but with an extra parameter to store the created FLAlertLayer in, if you want to modify it yourself.
+- timestepyt.deltarune_textboxes/create-dialog-with-voice
+	- The same as before but with an extra parameter to set the voice blips
+
 ![[This should show a screenshot]](previews/preview-1.png)
 
 ## Sources:

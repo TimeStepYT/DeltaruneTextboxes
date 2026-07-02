@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Geode/ui/Button.hpp>
 #include <Geode/ui/TextArea.hpp>
 #include "Global.hpp"
@@ -86,4 +88,5 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	bool ccTouchBegan(CCTouch*, CCEvent*) override;
 	void playSound(char);
 	void updateRenderTexture();
+	void setTextSound(std::string const& textSound);
 };
