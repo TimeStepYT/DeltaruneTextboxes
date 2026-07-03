@@ -1,3 +1,6 @@
+### v1.7.1
+- Added more events for mod developers that probably will never be used... oh well.
+
 ### v1.7.0
 - Added an event for other mods to be able to add any node where a character portrait would be.
 
