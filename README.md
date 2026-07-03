@@ -23,6 +23,9 @@ This mod provides a couple of **events** you can use for better support with you
 	- The same as before but with an extra parameter to store the created FLAlertLayer in, if you want to modify it yourself.
 - timestepyt.deltarune_textboxes/create-dialog-with-voice
 	- The same as before but with an extra parameter to set the voice blips
+- CreateDialogFull
+	- This event requires you to add DeltaruneTextboxes to your mod's dependencies with `"required": false`
+	- You can create full conversations with changing voices and character sprites with it
 
 ![[This should show a screenshot]](previews/preview-1.png)
 
