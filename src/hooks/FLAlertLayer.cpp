@@ -1,9 +1,12 @@
 #include <Geode/utils/cocos.hpp>
+#include "../TextShaders.hpp"
+#include "../ImageNode.hpp"
+#include "../Global.hpp"
 #include "FLAlertLayer.hpp"
-#include "TextShaders.hpp"
 #include "DialogLayer.hpp"
-#include "ImageNode.hpp"
 #include "PlatformToolbox.hpp"
+
+using namespace geode::prelude;
 
 static std::mt19937 mt{std::random_device{}()};
 
@@ -21,66 +24,92 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
     return result;
 }
 
-void DeltaruneAlertLayer::initMaps() {
-    auto&& nameToFile = m_fields->nameToFile;
-    auto&& nameToSound = m_fields->nameToSound;
-    auto&& nameToSoundRate = m_fields->nameToSoundRate;
+$on_mod(Loaded) {
+    DeltaruneMaps::init();
+}
 
-    nameToFile.reserve(22);
+void DeltaruneMaps::init() {
+    auto& nameToChar = DeltaruneMaps::nameToCharacter;
+    auto& charToData = DeltaruneMaps::characterToData;
+    auto& titleToChar = DeltaruneMaps::titleToCharacter;
 
-    nameToFile["Default"] = "SND_TXT1";
-    nameToFile["Typewriter"] = "SND_TXT2";
-    nameToFile["Toriel"] = "snd_txttor";
-    nameToFile["Sans"] = "snd_txtsans";
-    nameToFile["Papyrus"] = "snd_txtpap";
-    nameToFile["Undyne"] = "snd_txtund";
-    nameToFile["Alphys"] = "snd_txtal";
-    nameToFile["Asgore"] = "snd_txtasg";
-    nameToFile["Asriel"] = "snd_txtasr";
-    nameToFile["Susie"] = "snd_txtsus";
-    nameToFile["Ralsei"] = "snd_txtral";
-    nameToFile["Lancer"] = "snd_txtlan";
-    nameToFile["Noelle"] = "snd_txtnoe";
-    nameToFile["Berdly"] = "snd_txtber";
-    nameToFile["Spamton"] = "snd_txtspam";
-    nameToFile["Spamton NEO"] = "snd_txtspam2";
-    nameToFile["Jevil"] = "snd_txtjok";
-    nameToFile["Queen"] = "snd_txtq";
-    nameToFile["Tenna"] = "snd_txtten1";  // fallback if my random sound code doesn't work for some reason
-    nameToFile["Carol"] = "snd_txtcar";
-    nameToFile["Gerson"] = "snd_txtger";
-    nameToFile["Jackenstein"] = "snd_txtjack";
+    using namespace DeltaruneMaps;
 
-    nameToSound.reserve(9);
+    nameToChar.reserve(Character::NUM_CHARACTERS);
 
-    nameToSound["The Mechanic"] = "Alphys";
-    nameToSound["The Shopkeeper"] = "Gerson";
-    nameToSound["Scratch"] = "Lancer";
-    nameToSound["Potbor"] = "Spamton NEO";
-    nameToSound["Diamond Shopkeeper"] = "Jackenstein";
-    nameToSound["The Keymaster"] = "Susie";
-    nameToSound["Globed"] = "Tenna";
-    nameToSound["Globed Error"] = "Tenna";
-    nameToSound["Globed notice"] = "Tenna";  // I thought it was funny
+    nameToChar["Default"] = Character::DEFAULT; 
+    nameToChar["Typewriter"] = Character::TYPEWRITER; 
+    nameToChar["Toriel"] = Character::TORIEL; 
+    nameToChar["Sans"] = Character::SANS; 
+    nameToChar["Papyrus"] = Character::PAPYRUS; 
+    nameToChar["Undyne"] = Character::UNDYNE; 
+    nameToChar["Alphys"] = Character::ALPHYS; 
+    nameToChar["Asgore"] = Character::ASGORE; 
+    nameToChar["Asriel"] = Character::ASRIEL; 
+    nameToChar["Susie"] = Character::SUSIE; 
+    nameToChar["Ralsei"] = Character::RALSEI; 
+    nameToChar["Lancer"] = Character::LANCER; 
+    nameToChar["Noelle"] = Character::NOELLE; 
+    nameToChar["Berdly"] = Character::BERDLY; 
+    nameToChar["Spamton"] = Character::SPAMTON; 
+    nameToChar["Spamton NEO"] = Character::SPAMTON_NEO;
+    nameToChar["Jevil"] = Character::JEVIL;
+    nameToChar["Queen"] = Character::QUEEN;
+    nameToChar["Tenna"] = Character::TENNA;
+    nameToChar["Carol"] = Character::CAROL;
+    nameToChar["Gerson"] = Character::GERSON;
+    nameToChar["Jackenstein"] = Character::JACKENSTEIN;
+    nameToChar["Flowery"] = Character::FLOWERY;
 
-    nameToSoundRate.reserve(4);
+    charToData.reserve(Character::NUM_CHARACTERS);
 
-    nameToSoundRate["Tenna"] = 3;
-    nameToSoundRate["Jackenstein"] = 4;
-    nameToSoundRate["Gerson"] = 3;
-    nameToSoundRate["Queen"] = 3;
+    charToData[Character::DEFAULT] = {"SND_TXT1"};
+    charToData[Character::TYPEWRITER] = {"SND_TXT2"};
+    charToData[Character::TORIEL] = {"snd_txttor"};
+    charToData[Character::SANS] = {"snd_txtsans"};
+    charToData[Character::PAPYRUS] = {"snd_txtpap"};
+    charToData[Character::UNDYNE] = {"snd_txtund"};
+    charToData[Character::ALPHYS] = {"snd_txtal"};
+    charToData[Character::ASGORE] = {"snd_txtasg"};
+    charToData[Character::ASRIEL] = {"snd_txtasr"};
+    charToData[Character::SUSIE] = {"snd_txtsus"};
+    charToData[Character::RALSEI] = {"snd_txtral"};
+    charToData[Character::LANCER] = {"snd_txtlan"};
+    charToData[Character::NOELLE] = {"snd_txtnoe"};
+    charToData[Character::BERDLY] = {"snd_txtber"};
+    charToData[Character::SPAMTON] = {"snd_txtspam"};
+    charToData[Character::SPAMTON_NEO] = {"snd_txtspam2"};
+    charToData[Character::JEVIL] = {"snd_txtjok"};
+    charToData[Character::QUEEN] = {"snd_txtq", 3, true};
+    charToData[Character::TENNA] = {"", 3, true};
+    charToData[Character::CAROL] = {"snd_txtcar"};
+    charToData[Character::GERSON] = {"snd_txtger", 3, true};
+    charToData[Character::JACKENSTEIN] = {"snd_txtjack", 4, true};
+    charToData[Character::FLOWERY] = {"", 3, true};
+
+    titleToChar.reserve(9);
+
+    titleToChar["The Mechanic"] = Character::ALPHYS;
+    titleToChar["The Shopkeeper"] = Character::GERSON;
+    titleToChar["Scratch"] = Character::LANCER;
+    titleToChar["Potbor"] = Character::SPAMTON_NEO;
+    titleToChar["Diamond Shopkeeper"] = Character::JACKENSTEIN;
+    titleToChar["The Keymaster"] = Character::SUSIE;
+    titleToChar["Globed"] = Character::TENNA;
+    titleToChar["Globed Error"] = Character::TENNA;
+    titleToChar["Globed notice"] = Character::TENNA; // I thought it was funny
 }
 
 void DeltaruneAlertLayer::initSoundRate() {
     int& soundRate = m_fields->soundRate;
     int& soundTimer = m_fields->soundTimer;
     auto const& textSound = m_fields->textSound;
-    auto&& nameToSoundRate = m_fields->nameToSoundRate;
+    auto const& charToData = DeltaruneMaps::characterToData;
     
-    if (nameToSoundRate.find(textSound) == nameToSoundRate.end())
+    if (charToData.find(textSound) == charToData.end())
         return;
 
-    soundRate = nameToSoundRate[textSound];
+    soundRate = charToData.at(textSound).soundRate;
     soundTimer = soundRate;
 }
 
@@ -137,8 +166,11 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     auto& bg = m_fields->bg;
     auto& titleNode = m_fields->title;
 
-    this->initMaps();  // for sounds
-    this->registerKeybinds();
+    auto const& nameToChar = DeltaruneMaps::nameToCharacter;
+    auto const& textSoundStr = Mod::get()->getSettingValue<std::string>("textSound");
+
+    if (nameToChar.find(textSoundStr) != nameToChar.end())
+        this->m_fields->textSound = nameToChar.at(textSoundStr);
 
     this->m_noElasticity = true;
 
@@ -279,6 +311,29 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
     }
 
     global::blockKeys = false;
+
+    auto const& nextAlerts = this->m_fields->nextAlerts;
+    if (!this->m_button2 && nextAlerts.size() != 0) {
+        auto const& nextAlertObject = nextAlerts.at(0);
+        FLAlertLayer* unmodifiedAlert = nullptr;
+
+        DeltaruneEvents::createDialogWithVoice(
+            &unmodifiedAlert,
+            nextAlertObject.m_characterSprite,
+            nextAlertObject.m_voice, 
+            nextAlertObject.m_title, 
+            nextAlertObject.m_text
+        );
+
+        std::vector<DeltaruneDialogObject> objects(nextAlerts.begin() + 1, nextAlerts.end());
+        
+        if (objects.size() != 0) {
+            auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
+
+            alert->setNextAlerts(objects);
+        }
+    }
+
     FLAlertLayer::onBtn1(sender);
 }
 
@@ -300,13 +355,18 @@ void DeltaruneAlertLayer::show() {
     FLAlertLayer::show();
 
     if (showing) return;
-    showing = true;
     if (incompatible) return;
+    
+    showing = true;
 
     if (!m_fields->bg) return;
     if (!titleNode) return;
     if (!m_fields->old_textArea) return;
     if (!m_mainLayer) return;
+    
+    Loader::get()->queueInMainThread([this](){
+        this->registerKeybinds();
+    });
 
     decideToBlockKeys();
     changeLook();
@@ -334,7 +394,7 @@ void DeltaruneAlertLayer::clickedOnButton(Button* activatedButton, Button* other
 
     label->setColor(ccColor3B{255, 255, 0});
     m_fields->btnSelected = btnSelected;
-    setHeartPosition(activatedButton);
+    this->setHeartPosition(activatedButton);
     otherLabel->setColor(ccColor3B{255, 255, 255});
 }
 
@@ -352,9 +412,9 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 }
 
 void DeltaruneAlertLayer::skipText() {
-    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
-
     auto const fields = this->m_fields.self();
+    
+    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
 
     int const linesProgressed = fields->linesProgressed;
     bool& doneRolling = fields->doneRolling;
@@ -430,7 +490,7 @@ ImageNode* DeltaruneAlertLayer::createImageNode() {
 }
 
 void DeltaruneAlertLayer::pickChoice() {
-    auto fields = this->m_fields.self();
+    auto const fields = this->m_fields.self();
     bool& done = fields->done;
     auto const btn1 = fields->old_btn1;
     auto const btn2 = fields->old_btn2;
@@ -443,7 +503,7 @@ void DeltaruneAlertLayer::pickChoice() {
         
         if (fields->dialog && dialogLayer)
             dialogLayer->keyBackClicked();
-        
+
         FLAlertLayer::onBtn1(btn1);
     } else if (btnSelected != 0) {
         done = true;
@@ -456,10 +516,10 @@ void DeltaruneAlertLayer::pickChoice() {
 }
 
 void DeltaruneAlertLayer::progressText() {
+    auto const fields = m_fields.self();
+    
     if (!m_mainLayer) return;
     if (!m_buttonMenu) return;
-
-    auto const fields = m_fields.self();
 
     auto const deltaruneTextArea = fields->m_textArea;
     int& linesProgressed = fields->linesProgressed;
@@ -517,11 +577,11 @@ void DeltaruneAlertLayer::progressText() {
         fields->title->setString(title.c_str());
 
         // Getting the right text sound based on the character name
-        auto&& nameToSound = fields->nameToSound;
-        if (nameToSound.find(title.c_str()) != nameToSound.end())
-            fields->textSound = nameToSound[title];
+        auto const& nameToChar = DeltaruneMaps::nameToCharacter;
+        if (nameToChar.find(title.c_str()) != nameToChar.end())
+            fields->textSound = nameToChar.at(title);
         else
-            fields->textSound = "Default";
+            fields->textSound = DeltaruneMaps::Character::DEFAULT;
     }
 
     linesProgressed += offset;
@@ -539,10 +599,10 @@ void DeltaruneAlertLayer::handleAprilFools() {
     if (now.tm_mon != 3 || now.tm_mday != 1)
         return;
 
-    auto const& nameToFile = m_fields->nameToFile;
-    auto randomSound = nameToFile.begin();
+    auto const& charToData = DeltaruneMaps::characterToData;
+    auto randomSound = charToData.begin();
 
-    std::advance(randomSound, mt() % nameToFile.size());
+    std::advance(randomSound, mt() % DeltaruneMaps::Character::NUM_CHARACTERS);
     m_fields->textSound = randomSound->first;
 }
 
@@ -620,12 +680,12 @@ void DeltaruneAlertLayer::rollText(float dt) {
                     [[fallthrough]];
                 case ';':
                     [[fallthrough]];
-                    case '?':
+                case '?':
                     [[fallthrough]];
-                    case '!':
+                case '!':
                     waitQueue = 2;
                     break;
-                    default:
+                default:
                     waitQueue = 0;
                     break;
             }
@@ -661,20 +721,22 @@ void DeltaruneAlertLayer::rollText(float dt) {
 }
 
 void DeltaruneAlertLayer::updateRenderTexture() {
-    auto fields = this->m_fields.self();
+    // auto fields = this->m_fields.self();
 
     // fields->renderedSprite->render();
 }
 
 void DeltaruneAlertLayer::playSound(char character) {
-    auto&& nameToFile = m_fields->nameToFile;
+    auto const& charToData = DeltaruneMaps::characterToData;
     auto const& textSound = m_fields->textSound;
     auto& soundTimer = m_fields->soundTimer;
     auto& prevSoundNum = m_fields->prevSoundNum;
     auto const& resFolder = Mod::get()->getResourcesDir();
 
-    if (nameToFile.find(textSound) == nameToFile.end())
+    if (charToData.find(textSound) == charToData.end())
         return;
+
+    auto const& charData = charToData.at(textSound);
 
     this->handleAprilFools();
 
@@ -683,10 +745,10 @@ void DeltaruneAlertLayer::playSound(char character) {
     soundTimer = 0;
 
     std::string file;
-    if (textSound == "Queen" || textSound == "Gerson" || textSound == "Jackenstein")
+    if (charData.hasPitchVariation)
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 
-    if (textSound == "Tenna") {
+    if (textSound == DeltaruneMaps::Character::TENNA) {
         int const numSounds = 10;
         int soundNumber;
 
@@ -703,13 +765,26 @@ void DeltaruneAlertLayer::playSound(char character) {
 
         file = fmt::format("snd_txtten{}", soundNumber);
     }
-    else file = nameToFile[textSound];
+    else if (textSound == DeltaruneMaps::Character::FLOWERY) {
+        int const numSounds = 3;
+        int soundNumber;
+
+        soundNumber = mt() % numSounds + 1;
+        while (prevSoundNum == soundNumber) {
+            soundNumber = mt() % numSounds + 1;
+        }
+
+        prevSoundNum = soundNumber;
+
+        file = fmt::format("snd_flowery_voicenoise_{}", soundNumber);
+    }
+    else file = charToData.at(textSound).sound;
 
     auto system = m_fields->system;
     auto channel = m_fields->channel;
     auto sound = m_fields->sound;
 
-    auto const& path = resFolder / fmt::format("{}.wav", std::string_view(file));
+    auto const path = resFolder / fmt::format("{}.wav", std::string_view(file));
     system->createSound(string::pathToString(path).c_str(), FMOD_DEFAULT, nullptr, &sound);
     system->playSound(sound, nullptr, false, &channel);
     channel->setPitch(pitch);
@@ -717,6 +792,10 @@ void DeltaruneAlertLayer::playSound(char character) {
     channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
 }
 
-void DeltaruneAlertLayer::setTextSound(std::string const& textSound) {
+void DeltaruneAlertLayer::setTextSound(DeltaruneMaps::Character textSound) {
     this->m_fields->textSound = textSound;
+}
+
+void DeltaruneAlertLayer::setNextAlerts(std::vector<DeltaruneDialogObject> const& nextAlerts) {
+    this->m_fields->nextAlerts = nextAlerts;
 }

@@ -1,11 +1,11 @@
 #include <Geode/utils/cocos.hpp>
 #include <Geode/ui/Button.hpp>
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
-#include "FLAlertLayer.hpp"
+#include "hooks/FLAlertLayer.hpp"
 #include "TextShaders.hpp"
 #include "Global.hpp"
 
-using namespace alpha::prelude;
+using namespace geode::prelude;
 
 template <class I, class T>
 bool iteratorContains(I const& iterator, T const& value) {
@@ -119,7 +119,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
-        this->onBtn1(button);
+        FLAlertLayer::onBtn1(button);
     });
 
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
@@ -128,7 +128,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
-        this->onBtn2(button);
+        FLAlertLayer::onBtn2(button);
     });
 
     newBtn1->setSelectCallback([this, newBtn2](Button* button){
@@ -168,14 +168,14 @@ void DeltaruneAlertLayer::changeTitle() {
 }
 
 void DeltaruneAlertLayer::handleSound() {
-    auto&& nameToSound = m_fields->nameToSound;
+    auto const& titleToChar = DeltaruneMaps::titleToCharacter;
     auto const titleString = m_fields->title->getString();
     auto& sound = m_fields->textSound;
 
-    if (nameToSound.find(titleString) != nameToSound.end())
-        sound = nameToSound[titleString];
+    if (titleToChar.find(titleString) != titleToChar.end())
+        sound = titleToChar.at(titleString);
     else if (m_fields->dialog)
-        sound = "Default";
+        sound = DeltaruneMaps::Character::DEFAULT;
 
     initSoundRate();
 }
@@ -227,11 +227,11 @@ void DeltaruneAlertLayer::changeText() {
     
     std::string font = "Determination.fnt"_spr;
     
-    if (sound == "Sans") {
+    if (sound == DeltaruneMaps::Character::SANS) {
         font = "ComicSans.fnt"_spr;
         capitalize(str, false);
     }
-    else if (sound == "Papyrus") {
+    else if (sound == DeltaruneMaps::Character::PAPYRUS) {
         font = "Papyrus.fnt"_spr;
         capitalize(str);
     }
@@ -290,7 +290,7 @@ void DeltaruneAlertLayer::changeText() {
     clippingNode->addChild(textContentNode);
     this->m_mainLayer->addChild(clippingNode);
 
-    auto renderNode = RenderNode::create(textContentNode, true);
+    auto renderNode = alpha::ui::RenderNode::create(textContentNode, true);
     renderNode->setPosition(bg->getPosition());
     renderNode->setZOrder(bg->getZOrder() + 1);
     fields->renderedSprite = renderNode;

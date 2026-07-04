@@ -1,5 +1,7 @@
 #include "PurchaseItemPopup.hpp"
 
+using namespace geode::prelude;
+
 void DeltarunePurchaseItemPopup::handlePurchasePopup() {
     auto& quickPopup = m_fields->quickPopup;
     auto itemIcon = m_mainLayer->getChildByType<GJItemIcon>(0);

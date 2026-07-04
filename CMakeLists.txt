@@ -11,16 +11,16 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 project(DeltaruneTextboxes VERSION 1.7.0)
 
 add_library(${PROJECT_NAME} SHARED
-    src/FLAlertLayer.cpp
-    src/DialogLayer.cpp
-    src/CCKeyboardDispatcher.cpp
+    src/hooks/FLAlertLayer.cpp
+    src/hooks/DialogLayer.cpp
+    src/hooks/CCKeyboardDispatcher.cpp
+    src/hooks/PurchaseItemPopup.cpp
+    src/hooks/PlatformToolbox.cpp
     src/changeDesign.cpp
-    src/PurchaseItemPopup.cpp
     src/ImageNode.cpp
     src/TextShaders.cpp
     src/DeltaruneTextArea.cpp
-    src/PlatformToolbox.cpp
-    api/Events.cpp
+    src/Events.cpp
     # Add any extra C++ source files here
 )
 
