@@ -1,4 +1,6 @@
-#include "Global.hpp"
+#pragma once
+
+#include <Geode/modify/PurchaseItemPopup.hpp>
 
 class $modify(DeltarunePurchaseItemPopup, PurchaseItemPopup) {
     struct Fields {

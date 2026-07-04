@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.7.1-alpha.1",
+    "version": "v1.7.1",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {
@@ -51,37 +51,7 @@
             }
         },
         "files": [
-            "resources/sounds/SND_TXT1.wav",
-            "resources/sounds/SND_TXT2.wav",
-            "resources/sounds/snd_txtal.wav",
-            "resources/sounds/snd_txtasg.wav",
-            "resources/sounds/snd_txtasr.wav",
-            "resources/sounds/snd_txtsans.wav",
-            "resources/sounds/snd_txtpap.wav",
-            "resources/sounds/snd_txtund.wav",
-            "resources/sounds/snd_txttor.wav",
-            "resources/sounds/snd_txtsus.wav",
-            "resources/sounds/snd_txtral.wav",
-            "resources/sounds/snd_txtlan.wav",
-            "resources/sounds/snd_txtnoe.wav",
-            "resources/sounds/snd_txtber.wav",
-            "resources/sounds/snd_txtjok.wav",
-            "resources/sounds/snd_txtspam.wav",
-            "resources/sounds/snd_txtspam2.wav",
-            "resources/sounds/snd_txtq.wav",
-            "resources/sounds/snd_txtger.wav",
-            "resources/sounds/snd_txtcar.wav",
-            "resources/sounds/snd_txtjack.wav",
-            "resources/sounds/snd_txtten1.wav",
-            "resources/sounds/snd_txtten2.wav",
-            "resources/sounds/snd_txtten3.wav",
-            "resources/sounds/snd_txtten4.wav",
-            "resources/sounds/snd_txtten5.wav",
-            "resources/sounds/snd_txtten6.wav",
-            "resources/sounds/snd_txtten7.wav",
-            "resources/sounds/snd_txtten8.wav",
-            "resources/sounds/snd_txtten9.wav",
-            "resources/sounds/snd_txtten10.wav",
+            "resources/sounds/*.wav",
             "resources/shaders/*",
             "resources/g.jpg"
         ]
@@ -188,6 +158,7 @@
                 "Carol",
                 "Gerson",
                 "Jackenstein",
+                "Flowery",
                 "No Sound"
             ]
         }

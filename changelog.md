@@ -1,4 +1,5 @@
 ### v1.7.1
+- The new voice blips have been added and some of the old ones were missing pitch variation
 - Added more events for mod developers that probably will never be used... oh well.
 
 ### v1.7.0

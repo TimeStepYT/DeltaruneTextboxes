@@ -63,5 +63,8 @@ void ImageNode::setCharacterImage(CCTexture2D* spriteTexture) {
 }
 
 void ImageNode::setCharacterImage(CCNode* node) {
+    if (!node)
+        return;
+    
     this->handleCharacterImage(node);
 }

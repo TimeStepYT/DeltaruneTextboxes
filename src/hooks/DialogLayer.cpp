@@ -1,6 +1,8 @@
 #include "DialogLayer.hpp"
 #include "FLAlertLayer.hpp"
 
+using namespace geode::prelude;
+
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
 	CCArray* const objects = CCArray::create();
 	if (objectsOriginal) objects->addObjectsFromArray(objectsOriginal);
