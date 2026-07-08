@@ -3,9 +3,10 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/ui/Button.hpp>
 
-// #include "../Events.hpp"
+#include "../../api/API.hpp"
 
 using namespace geode::prelude;
+using namespace deltarune_textboxes;
 
 class $modify(MyHookLol, CCKeyboardDispatcher) {
 	// Needed because BetterInfo has special FLAlertLayers that duplicate for some reason
@@ -26,13 +27,15 @@ class $modify(MyHookLol, CCKeyboardDispatcher) {
 		// if (key == KEY_U) {
 		// 	auto characterSprite1 = CircleButtonSprite::create(nullptr, CircleBaseColor::Blue, CircleBaseSize::Large);
 		// 	auto characterSprite2 = CircleButtonSprite::create(nullptr, CircleBaseColor::Cyan, CircleBaseSize::Large);
-		// 	std::vector<DeltaruneDialogObject> objects;
-		// 	objects.emplace_back(characterSprite1, "Queen", "Queen", "Poor Noelle She Would Love Hitting All These Cars");
-		// 	objects.emplace_back(characterSprite2, "Noelle", "Noelle", "Umm, actually, I... she, um, might not, um...");
-		// 	objects.emplace_back(characterSprite1, "Queen", "Queen", "Stop Everything");
-		// 	objects.emplace_back(characterSprite1, "Queen", "Queen", "Kris Get The Banana");
-		// 	objects.emplace_back(characterSprite1, "Queen", "Queen", "Potassium");
-		// 	CreateDialogFull().send(nullptr, objects);
+		// 	std::vector<std::shared_ptr<DeltaruneDialogObject>> objects;
+		// 	objects.push_back(createDialogObject(characterSprite1, "Queen", "Queen", "Poor Noelle She Would Love Hitting All These Cars").unwrap());
+		// 	objects.push_back(createDialogObject(characterSprite2, "Noelle", "Noelle", "Umm, actually, I... she, um, might not, um...").unwrap());
+		// 	objects.push_back(createDialogObject(characterSprite1, "Queen", "Queen", "Stop Everything").unwrap());
+		// 	objects.push_back(createDialogObject(characterSprite1, "Queen", "Queen", "Kris Get The Banana").unwrap());
+		// 	objects.push_back(createDialogObject(characterSprite1, "Queen", "Queen", "Potassium").unwrap());
+			
+		// 	Result<FLAlertLayer*> res = deltarune_textboxes::createFullDialog(objects);
+			
 		// }
 
 		if (global::blockKeys && Loader::get()->isModLoaded("cvolton.betterinfo")) {

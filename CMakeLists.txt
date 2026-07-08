@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
     src/TextShaders.cpp
     src/DeltaruneTextArea.cpp
     src/Events.cpp
+    src/API.cpp
     # Add any extra C++ source files here
 )
 

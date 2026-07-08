@@ -1,9 +1,6 @@
 #pragma once
 
 #include <Geode/loader/Dispatch.hpp>
-#include "../api/API.hpp"
-
-using namespace deltarune_textboxes;
 
 namespace DeltaruneEvents {
     inline geode::Dispatch<cocos2d::CCNode*, std::string const&, std::string const&>
@@ -28,7 +25,4 @@ namespace DeltaruneEvents {
         std::string const& title,
         std::string const& text
     );
-    
-    // Creates a dialog box with the possibility of multiple characters speaking
-    void createDialogFull(FLAlertLayer* output, std::span<DeltaruneDialogObject> const&);
 }

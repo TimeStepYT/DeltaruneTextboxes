@@ -7,7 +7,9 @@
 #include "../DeltaruneTextArea.hpp"
 #include "../ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
-#include "../Events.hpp"
+#include "../../api/API.hpp"
+
+using namespace deltarune_textboxes;
 
 namespace DeltaruneMaps {
 	enum Character {
@@ -98,7 +100,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::vector<std::string> titles;
 		std::string text = "";
 		DeltaruneMaps::Character textSound = DeltaruneMaps::Character::NONE;
-		std::vector<DeltaruneDialogObject> nextAlerts;
+		std::vector<std::shared_ptr<DeltaruneDialogObject>> nextAlerts;
 	};
 	void registerKeybinds();
 	void animateBG(float);
@@ -132,5 +134,5 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void updateRenderTexture();
 	void setTextSound(DeltaruneMaps::Character textSound);
 	// A function to execute after the textbox is closed
-	void setNextAlerts(std::vector<DeltaruneDialogObject> const& nextAlerts);
+	void setNextAlerts(std::vector<std::shared_ptr<DeltaruneDialogObject>> const& nextAlerts);
 };

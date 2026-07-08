@@ -7,7 +7,6 @@ $on_mod(Loaded) {
     DeltaruneEvents::createDialogEvent.listen(DeltaruneEvents::createDialogBox).leak();
     DeltaruneEvents::createDialogReturnEvent.listen(DeltaruneEvents::createDialogBoxReturn).leak();
     DeltaruneEvents::createDialogWithVoiceEvent.listen(DeltaruneEvents::createDialogWithVoice).leak();
-    CreateDialogFull().listen(DeltaruneEvents::createDialogFull).leak();
 }
 
 // Only here to help the events to work. I don't need this in a header file.
@@ -82,24 +81,4 @@ void DeltaruneEvents::createDialogWithVoice(
 
     if (output)
         *output = alert;
-}
-
-void DeltaruneEvents::createDialogFull(FLAlertLayer* output, std::span<DeltaruneDialogObject> const& objects) {
-    if (objects.size() == 0)
-        return;
-
-    auto const& firstObject = objects[0];
-    
-    FLAlertLayer* unmodifiedAlert = nullptr;
-    DeltaruneEvents::createDialogWithVoice(
-        &unmodifiedAlert,
-        firstObject.m_characterSprite,
-        firstObject.m_voice,
-        firstObject.m_title,
-        firstObject.m_text
-    );
-
-    auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
-
-    alert->setNextAlerts({objects.begin() + 1, objects.end()});
 }

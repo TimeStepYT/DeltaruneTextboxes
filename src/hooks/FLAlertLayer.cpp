@@ -5,6 +5,8 @@
 #include "FLAlertLayer.hpp"
 #include "DialogLayer.hpp"
 #include "PlatformToolbox.hpp"
+#include "../Events.hpp"
+#include "../DeltaruneDialogObject.hpp"
 
 using namespace geode::prelude;
 
@@ -314,18 +316,18 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 
     auto const& nextAlerts = this->m_fields->nextAlerts;
     if (!this->m_button2 && nextAlerts.size() != 0) {
-        auto const& nextAlertObject = nextAlerts.at(0);
+        auto nextAlertObject = nextAlerts.at(0);
         FLAlertLayer* unmodifiedAlert = nullptr;
 
         DeltaruneEvents::createDialogWithVoice(
             &unmodifiedAlert,
-            nextAlertObject.m_characterSprite,
-            nextAlertObject.m_voice, 
-            nextAlertObject.m_title, 
-            nextAlertObject.m_text
+            nextAlertObject->m_characterSprite,
+            nextAlertObject->m_voice, 
+            nextAlertObject->m_title, 
+            nextAlertObject->m_text
         );
 
-        std::vector<DeltaruneDialogObject> objects(nextAlerts.begin() + 1, nextAlerts.end());
+        std::vector<std::shared_ptr<DeltaruneDialogObject>> objects(nextAlerts.begin() + 1, nextAlerts.end());
         
         if (objects.size() != 0) {
             auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
@@ -796,6 +798,6 @@ void DeltaruneAlertLayer::setTextSound(DeltaruneMaps::Character textSound) {
     this->m_fields->textSound = textSound;
 }
 
-void DeltaruneAlertLayer::setNextAlerts(std::vector<DeltaruneDialogObject> const& nextAlerts) {
+void DeltaruneAlertLayer::setNextAlerts(std::vector<std::shared_ptr<DeltaruneDialogObject>> const& nextAlerts) {
     this->m_fields->nextAlerts = nextAlerts;
 }

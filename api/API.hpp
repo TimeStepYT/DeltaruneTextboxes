@@ -1,24 +1,25 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
+#include <Geode/loader/Dispatch.hpp>
+#include <Geode/binding/FLAlertLayer.hpp>
+
+#undef MY_MOD_ID
+#define MY_MOD_ID "timestepyt.deltarune_textboxes"
 
 namespace deltarune_textboxes {
-    class DeltaruneDialogObject {
-    public:
-        geode::Ref<cocos2d::CCNode> m_characterSprite = nullptr;
-        std::string m_voice;
-        std::string m_title;
-        std::string m_text;
-        
-        DeltaruneDialogObject(cocos2d::CCNode* characterSprite, std::string voice, std::string title, std::string text) :
-            m_characterSprite(characterSprite), 
-            m_voice(std::move(voice)), 
-            m_title(std::move(title)),
-            m_text(std::move(text)) {}
-    };
-    // The first parameter is an optional return value that stores the first alert. If you don't need it then just pass nullptr!
-    class CreateDialogFull : public geode::Event<CreateDialogFull, bool(FLAlertLayer*, std::span<DeltaruneDialogObject> const)> {
-    public:
-        using Event::Event;
-    };
+    class DeltaruneDialogObject;
+
+    using DialogObjectPtr = std::shared_ptr<DeltaruneDialogObject>;
+
+    inline geode::Result<DialogObjectPtr> createDialogObject(
+        cocos2d::CCNode* characterPortrait, 
+        std::string const& voice, 
+        std::string const& title, 
+        std::string const& text
+    )
+    GEODE_EVENT_EXPORT(&createDialogObject, (characterPortrait, voice, title, text));
+    
+    inline geode::Result<FLAlertLayer*> createFullDialog(std::span<DialogObjectPtr> const& objects) 
+    GEODE_EVENT_EXPORT(&createFullDialog, (objects));
 }
