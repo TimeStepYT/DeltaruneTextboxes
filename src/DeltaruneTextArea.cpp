@@ -9,7 +9,7 @@ std::shared_ptr<DeltaruneTextArea> DeltaruneTextArea::create(std::string const& 
 
     instance->m_textArea = newTextArea;
 
-    return std::move(instance);
+    return instance;
 }
 
 TextArea* DeltaruneTextArea::getTextArea() {
@@ -26,5 +26,5 @@ std::vector<cocos2d::CCLabelBMFont*> DeltaruneTextArea::getLines() {
         res.push_back(static_cast<cocos2d::CCLabelBMFont*>(child));
     }
     
-    return std::move(res);
+    return res;
 }

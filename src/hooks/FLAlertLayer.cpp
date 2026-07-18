@@ -37,7 +37,7 @@ void DeltaruneMaps::init() {
 
     using namespace DeltaruneMaps;
 
-    nameToChar.reserve(Character::NUM_CHARACTERS);
+    nameToChar.reserve(static_cast<int>(Character::NUM_CHARACTERS));
 
     nameToChar["Default"] = Character::DEFAULT; 
     nameToChar["Typewriter"] = Character::TYPEWRITER; 
@@ -63,31 +63,31 @@ void DeltaruneMaps::init() {
     nameToChar["Jackenstein"] = Character::JACKENSTEIN;
     nameToChar["Flowery"] = Character::FLOWERY;
 
-    charToData.reserve(Character::NUM_CHARACTERS);
+    charToData.reserve(static_cast<int>(Character::NUM_CHARACTERS));
 
-    charToData[Character::DEFAULT] = {"SND_TXT1"};
-    charToData[Character::TYPEWRITER] = {"SND_TXT2"};
-    charToData[Character::TORIEL] = {"snd_txttor"};
-    charToData[Character::SANS] = {"snd_txtsans"};
-    charToData[Character::PAPYRUS] = {"snd_txtpap"};
-    charToData[Character::UNDYNE] = {"snd_txtund"};
-    charToData[Character::ALPHYS] = {"snd_txtal"};
-    charToData[Character::ASGORE] = {"snd_txtasg"};
-    charToData[Character::ASRIEL] = {"snd_txtasr"};
-    charToData[Character::SUSIE] = {"snd_txtsus"};
-    charToData[Character::RALSEI] = {"snd_txtral"};
-    charToData[Character::LANCER] = {"snd_txtlan"};
-    charToData[Character::NOELLE] = {"snd_txtnoe"};
-    charToData[Character::BERDLY] = {"snd_txtber"};
-    charToData[Character::SPAMTON] = {"snd_txtspam"};
-    charToData[Character::SPAMTON_NEO] = {"snd_txtspam2"};
-    charToData[Character::JEVIL] = {"snd_txtjok"};
-    charToData[Character::QUEEN] = {"snd_txtq", 3, true};
-    charToData[Character::TENNA] = {"", 3, true};
-    charToData[Character::CAROL] = {"snd_txtcar"};
-    charToData[Character::GERSON] = {"snd_txtger", 3, true};
-    charToData[Character::JACKENSTEIN] = {"snd_txtjack", 4, true};
-    charToData[Character::FLOWERY] = {"", 3, true};
+    charToData[Character::DEFAULT] = CharacterData::create("SND_TXT1");
+    charToData[Character::TYPEWRITER] = CharacterData::create("SND_TXT2");
+    charToData[Character::TORIEL] = CharacterData::create("snd_txttor");
+    charToData[Character::SANS] = CharacterData::create("snd_txtsans");
+    charToData[Character::PAPYRUS] = CharacterData::create("snd_txtpap");
+    charToData[Character::UNDYNE] = CharacterData::create("snd_txtund");
+    charToData[Character::ALPHYS] = CharacterData::create("snd_txtal");
+    charToData[Character::ASGORE] = CharacterData::create("snd_txtasg");
+    charToData[Character::ASRIEL] = CharacterData::create("snd_txtasr");
+    charToData[Character::SUSIE] = CharacterData::create("snd_txtsus");
+    charToData[Character::RALSEI] = CharacterData::create("snd_txtral");
+    charToData[Character::LANCER] = CharacterData::create("snd_txtlan");
+    charToData[Character::NOELLE] = CharacterData::create("snd_txtnoe");
+    charToData[Character::BERDLY] = CharacterData::create("snd_txtber");
+    charToData[Character::SPAMTON] = CharacterData::create("snd_txtspam");
+    charToData[Character::SPAMTON_NEO] = CharacterData::create("snd_txtspam2");
+    charToData[Character::JEVIL] = CharacterData::create("snd_txtjok");
+    charToData[Character::QUEEN] = CharacterData::create("snd_txtq", 3, true);
+    charToData[Character::TENNA] = CharacterData::create("", 3, true);
+    charToData[Character::CAROL] = CharacterData::create("snd_txtcar");
+    charToData[Character::GERSON] = CharacterData::create("snd_txtger", 3, true);
+    charToData[Character::JACKENSTEIN] = CharacterData::create("snd_txtjack", 4, true);
+    charToData[Character::FLOWERY] = CharacterData::create("", 3, true);
 
     titleToChar.reserve(9);
 
@@ -111,7 +111,7 @@ void DeltaruneAlertLayer::initSoundRate() {
     if (charToData.find(textSound) == charToData.end())
         return;
 
-    soundRate = charToData.at(textSound).soundRate;
+    soundRate = charToData.at(textSound).m_soundRate;
     soundTimer = soundRate;
 }
 
@@ -314,33 +314,54 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
 
     global::blockKeys = false;
 
-    auto const& nextAlerts = this->m_fields->nextAlerts;
-    if (!this->m_button2 && nextAlerts.size() != 0) {
-        auto nextAlertObject = nextAlerts.at(0);
-        FLAlertLayer* unmodifiedAlert = nullptr;
+    if (this->m_button2) {
+        FLAlertLayer::onBtn1(sender);
+        return;
+    }
 
+    auto& nextAlerts = this->m_fields->nextAlerts;
+    
+    size_t skippedCount = 0;
+    for (auto const& alert : nextAlerts) {
+        if (!alert) {
+            skippedCount++;
+            continue;
+        }
+        
+        FLAlertLayer* unmodifiedAlert = nullptr;
         DeltaruneEvents::createDialogWithVoice(
             &unmodifiedAlert,
-            nextAlertObject->m_characterSprite,
-            nextAlertObject->m_voice, 
-            nextAlertObject->m_title, 
-            nextAlertObject->m_text
+            alert->m_characterSprite,
+            alert->m_voice, 
+            alert->m_title, 
+            alert->m_text
         );
+        
+        if (!unmodifiedAlert) {
+            skippedCount++;
+            continue;
+        }
 
-        std::vector<std::shared_ptr<DeltaruneDialogObject>> objects(nextAlerts.begin() + 1, nextAlerts.end());
+        std::vector<DialogObjectPtr> objects;
+        objects.reserve(nextAlerts.size() - 1 - skippedCount);
+
+        for (size_t i = 1 + skippedCount; i < nextAlerts.size(); ++i) {
+            objects.push_back(std::move(nextAlerts[i]));
+        }
         
         if (objects.size() != 0) {
             auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
             alert->setNextAlerts(objects);
         }
+        break;
     }
 
     FLAlertLayer::onBtn1(sender);
 }
 
 int DeltaruneAlertLayer::getLinesLeft() {
-    auto const textArea = m_fields->m_textArea;
+    auto const& textArea = m_fields->m_textArea;
 
     if (!textArea) return 0;
 
@@ -381,9 +402,7 @@ void DeltaruneAlertLayer::setHeartPosition(Button* button) {
     if (!text) return;
 
     float const distanceFromText = 5.f;
-
     float const buttonLeftSide = button->getPositionX() - text->getContentWidth() / 2;
-
     float const xPos = m_fields->screenSize / 2 + buttonLeftSide - heart->getContentWidth() / 2 - distanceFromText;
 
     heart->setPositionX(xPos);
@@ -416,7 +435,7 @@ bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 void DeltaruneAlertLayer::skipText() {
     auto const fields = this->m_fields.self();
     
-    unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+    this->setState(TextboxState::WAITING);
 
     int const linesProgressed = fields->linesProgressed;
     bool& doneRolling = fields->doneRolling;
@@ -426,7 +445,7 @@ void DeltaruneAlertLayer::skipText() {
     if (!textArea)
         return;
 
-    auto lines = std::move(textArea->getLines());
+    auto const lines = textArea->getLines();
 
     for (int i = linesProgressed + fields->rollingLine; i < lines.size() && i < linesProgressed + 3; i++) {
         auto const line = lines[i];
@@ -450,11 +469,11 @@ void DeltaruneAlertLayer::skipText() {
 
 int DeltaruneAlertLayer::emptyLinesAmount(int offset) {
     auto const textArea = m_fields->m_textArea;
-    auto const linesProgressed = m_fields->linesProgressed;
+    int const linesProgressed = m_fields->linesProgressed;
     int lineCount = 0;
 
     while (true) {
-        auto lines = std::move(textArea->getLines());
+        auto const lines = textArea->getLines();
         if (linesProgressed + lineCount + offset >= lines.size()) break;
 
         auto const topLine = lines.at(linesProgressed + lineCount + offset);
@@ -546,7 +565,7 @@ void DeltaruneAlertLayer::progressText() {
     int offset;
     fields->textContentNode->getChildByID("star"_spr)->setVisible(false);
 
-    this->unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+    //this->unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
     fields->characterCount = 0;
     fields->rollingLine = 0;
 
@@ -590,8 +609,7 @@ void DeltaruneAlertLayer::progressText() {
     textArea->setPositionY(textArea->getPositionY() + fields->textSize * offset);
 
     this->showButtons();
-    float const pause = Mod::get()->getSettingValue<double>("textRollingPause");
-    this->schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
+    this->setState(TextboxState::ROLLING_TEXT);
 }
 
 time_t const& t = time(nullptr);
@@ -604,7 +622,7 @@ void DeltaruneAlertLayer::handleAprilFools() {
     auto const& charToData = DeltaruneMaps::characterToData;
     auto randomSound = charToData.begin();
 
-    std::advance(randomSound, mt() % DeltaruneMaps::Character::NUM_CHARACTERS);
+    std::advance(randomSound, mt() % static_cast<int>(DeltaruneMaps::Character::NUM_CHARACTERS));
     m_fields->textSound = randomSound->first;
 }
 
@@ -644,7 +662,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
         }
         
         if (rollingLine == 3) {
-            unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+            this->setState(TextboxState::WAITING);
             rolledPage = true;
             return;
         }
@@ -652,15 +670,15 @@ void DeltaruneAlertLayer::rollText(float dt) {
 
         auto const textArea = fields->m_textArea;
         
-        auto lines = std::move(textArea->getLines());
+        auto const lines = textArea->getLines();
         int currentLine = linesProgressed + rollingLine;
 
         if (currentLine < lines.size() && currentLine < linesProgressed + 3) {
             auto const line = lines.at(currentLine);
-            auto letters = std::move(line->getChildrenExt<CCSprite>());
+            auto letters = line->getChildrenExt<CCSprite>();
             auto const letter = letters[characterCount];
             if (letter->isVisible()) {
-                unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+                this->setState(TextboxState::WAITING);
                 doneRolling = true;
                 rolledPage = true;
                 showButtons();
@@ -695,7 +713,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
                 newLine = true;
             }
         } else {
-            unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+            this->setState(TextboxState::WAITING);
             doneRolling = true;
             rolledPage = true;
             showButtons();
@@ -719,7 +737,11 @@ void DeltaruneAlertLayer::rollText(float dt) {
         return;
     }
 
-    DeltaruneAlertLayer::playSound(character);
+    if (fields->externalSound.has_value()) {
+        DeltaruneAlertLayer::playExternalSound(character);
+    }
+    else
+        DeltaruneAlertLayer::playSound(character);
 }
 
 void DeltaruneAlertLayer::updateRenderTexture() {
@@ -728,15 +750,37 @@ void DeltaruneAlertLayer::updateRenderTexture() {
     // fields->renderedSprite->render();
 }
 
+void DeltaruneAlertLayer::playExternalSound(char character) {
+    auto const& textSound = m_fields->externalSound.value();
+    auto& soundTimer = m_fields->soundTimer;
+    
+    if (DeltaruneMaps::externalNameToData.find(textSound) == DeltaruneMaps::externalNameToData.end()) {
+        return;
+    }
+    
+    auto const& data = DeltaruneMaps::externalNameToData.at(textSound);
+    float pitch = 1.f;
+    soundTimer = 0;
+
+    m_fields->soundRate = data.m_soundRate;
+
+    if (data.m_hasPitchVariation)
+        pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
+
+    this->doTheSoundPlaying(data.m_sounds, pitch);
+}
+
 void DeltaruneAlertLayer::playSound(char character) {
     auto const& charToData = DeltaruneMaps::characterToData;
     auto const& textSound = m_fields->textSound;
     auto& soundTimer = m_fields->soundTimer;
     auto& prevSoundNum = m_fields->prevSoundNum;
+
     auto const& resFolder = Mod::get()->getResourcesDir();
 
-    if (charToData.find(textSound) == charToData.end())
+    if (charToData.find(textSound) == charToData.end()) {
         return;
+    }
 
     auto const& charData = charToData.at(textSound);
 
@@ -746,8 +790,8 @@ void DeltaruneAlertLayer::playSound(char character) {
 
     soundTimer = 0;
 
-    std::string file;
-    if (charData.hasPitchVariation)
+    std::string file = charToData.at(textSound).m_sounds.at(0);
+    if (charData.m_hasPitchVariation)
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 
     if (textSound == DeltaruneMaps::Character::TENNA) {
@@ -769,9 +813,8 @@ void DeltaruneAlertLayer::playSound(char character) {
     }
     else if (textSound == DeltaruneMaps::Character::FLOWERY) {
         int const numSounds = 3;
-        int soundNumber;
+        int soundNumber = mt() % numSounds + 1;
 
-        soundNumber = mt() % numSounds + 1;
         while (prevSoundNum == soundNumber) {
             soundNumber = mt() % numSounds + 1;
         }
@@ -780,14 +823,47 @@ void DeltaruneAlertLayer::playSound(char character) {
 
         file = fmt::format("snd_flowery_voicenoise_{}", soundNumber);
     }
-    else file = charToData.at(textSound).sound;
+
+    auto filePath = Mod::get()->getResourcesDir() / fmt::format("{}.wav", std::string_view(file));
+
+    this->doTheSoundPlaying(string::pathToString(filePath), pitch);
+}
+
+void DeltaruneAlertLayer::doTheSoundPlaying(std::span<std::string const> files, float pitch) {
+    auto const& resFolder = Mod::get()->getResourcesDir();
+    auto& prevSoundNum = m_fields->prevSoundNum;
 
     auto system = m_fields->system;
     auto channel = m_fields->channel;
     auto sound = m_fields->sound;
 
-    auto const path = resFolder / fmt::format("{}.wav", std::string_view(file));
+    int const numSounds = files.size();
+    int soundNumber = 0;
+
+    if (numSounds > 1) {
+        soundNumber = mt() % numSounds;
+
+        while (prevSoundNum == soundNumber) {
+            soundNumber = mt() % numSounds;
+        }
+
+        prevSoundNum = soundNumber;
+    }
+
+    auto const path = files[soundNumber];
     system->createSound(string::pathToString(path).c_str(), FMOD_DEFAULT, nullptr, &sound);
+    system->playSound(sound, nullptr, false, &channel);
+    channel->setPitch(pitch);
+    channel->setVolumeRamp(false);
+    channel->setVolume(FMODAudioEngine::sharedEngine()->m_sfxVolume);
+}
+
+void DeltaruneAlertLayer::doTheSoundPlaying(std::string const& file, float pitch) {
+    auto system = m_fields->system;
+    auto channel = m_fields->channel;
+    auto sound = m_fields->sound;
+
+    system->createSound(file.c_str(), FMOD_DEFAULT, nullptr, &sound);
     system->playSound(sound, nullptr, false, &channel);
     channel->setPitch(pitch);
     channel->setVolumeRamp(false);
@@ -798,6 +874,36 @@ void DeltaruneAlertLayer::setTextSound(DeltaruneMaps::Character textSound) {
     this->m_fields->textSound = textSound;
 }
 
-void DeltaruneAlertLayer::setNextAlerts(std::vector<std::shared_ptr<DeltaruneDialogObject>> const& nextAlerts) {
-    this->m_fields->nextAlerts = nextAlerts;
+void DeltaruneAlertLayer::setNextAlerts(std::span<DialogObjectPtr> newNextAlerts) {
+    auto const fields = this->m_fields.self();
+    auto& nextAlerts = fields->nextAlerts;
+    auto size = newNextAlerts.size();
+
+    nextAlerts.reserve(size);
+    
+    for (size_t i = 0; i < size; ++i) {
+        nextAlerts.push_back(std::move(newNextAlerts[i]));
+    }
+}
+
+void DeltaruneAlertLayer::setState(TextboxState newState) {
+    auto& state = this->m_fields->state;
+
+    if (state == newState)
+        return;
+
+    switch (newState) {
+        case TextboxState::ROLLING_TEXT:
+        {
+            double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
+            this->schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
+            break;
+        }
+        case TextboxState::WAITING:
+            this->unschedule(schedule_selector(DeltaruneAlertLayer::rollText));
+            break;
+        default:
+            break;
+    }
+    state = newState;
 }

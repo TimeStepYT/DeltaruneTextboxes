@@ -78,7 +78,7 @@ void DeltaruneAlertLayer::changeBG() {
     bg->setZOrder(-1);
 
     if (!Mod::get()->getSettingValue<bool>("noAnimation") && !undertaleBG)
-        schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1 / 5.f);
+        schedule(schedule_selector(DeltaruneAlertLayer::animateBG), 1.f / 5.f);
 
     if (m_fields->imageNode) {
         imageNode->setZOrder(bg->getZOrder() + 1);
@@ -309,15 +309,13 @@ void DeltaruneAlertLayer::changeText() {
     fields->gradientOverlay = newDescGrad;
     */
 
-    double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
-
     fields->linesProgressed += emptyLinesAmount();
     newDesc->setPositionY(newDesc->getPositionY() + fields->textSize * fields->linesProgressed);
     /*
     if (newDescGrad) newDescGrad->setPositionY(newDesc->getPositionY());
     */
 
-    schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
+    this->setState(TextboxState::ROLLING_TEXT);
 }
 
 void DeltaruneAlertLayer::changeLook() {

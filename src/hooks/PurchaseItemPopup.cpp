@@ -3,7 +3,7 @@
 using namespace geode::prelude;
 
 void DeltarunePurchaseItemPopup::handlePurchasePopup() {
-    auto& quickPopup = m_fields->quickPopup;
+    auto quickPopup = m_fields->quickPopup;
     auto itemIcon = m_mainLayer->getChildByType<GJItemIcon>(0);
     auto bg = quickPopup->m_mainLayer->getChildByID("background");
 
@@ -41,7 +41,7 @@ bool DeltarunePurchaseItemPopup::init(GJStoreItem* p0) {
     auto const textArea = this->m_mainLayer->getChildByType<TextArea>(0);
 
     auto const mlbmf = textArea->getChildByType<MultilineBitmapFont>(0);
-    auto const& contentParent = mlbmf->getChildrenExt<CCLabelBMFont>();
+    auto const contentParent = mlbmf->getChildrenExt<CCLabelBMFont>();
 
     for (auto const label : contentParent) {
         content.append(label->getString());

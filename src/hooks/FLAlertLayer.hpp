@@ -12,7 +12,7 @@
 using namespace deltarune_textboxes;
 
 namespace DeltaruneMaps {
-	enum Character {
+	enum class Character {
 		DEFAULT,
 		TYPEWRITER,
 		TORIEL,
@@ -40,18 +40,42 @@ namespace DeltaruneMaps {
 		NONE // This is after NUM_CHARACTERS intentionally because it's a special case
 	};
 	
-	struct CharacterData {
-		std::string sound = "SND_TXT1";
-		int soundRate = 2;
-		bool hasPitchVariation = false;
+	class CharacterData {
+		public:
+		std::vector<std::string> m_sounds;
+		int m_soundRate = 2;
+		bool m_hasPitchVariation = false;
+
+		static CharacterData create(std::vector<std::string> const& sounds, int soundRate = 2, bool hasPitchVariation = false) {
+			CharacterData res;
+			res.m_sounds = sounds;
+			res.m_soundRate = soundRate;
+			res.m_hasPitchVariation = hasPitchVariation;
+			return res;
+		};
+		
+		static CharacterData create(std::string const& sound, int soundRate = 2, bool hasPitchVariation = false) {
+			CharacterData res;
+			res.m_sounds = {sound};
+			res.m_soundRate = soundRate;
+			res.m_hasPitchVariation = hasPitchVariation;
+			return res;
+		}
 	};
 
 	inline std::unordered_map<Character, CharacterData> characterToData;
 	inline std::unordered_map<std::string, Character> nameToCharacter;
 	inline std::unordered_map<std::string, Character> titleToCharacter;
+	inline std::unordered_map<std::string, CharacterData> externalNameToData;
 
 	void init();
 }
+
+enum class TextboxState {
+	INIT,
+	ROLLING_TEXT,
+	WAITING
+};
 
 class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	struct Fields {
@@ -99,8 +123,10 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		std::vector<std::string> characterSpriteNames;
 		std::vector<std::string> titles;
 		std::string text = "";
+		std::optional<std::string> externalSound;
 		DeltaruneMaps::Character textSound = DeltaruneMaps::Character::NONE;
-		std::vector<std::shared_ptr<DeltaruneDialogObject>> nextAlerts;
+		std::vector<DialogObjectPtr> nextAlerts;
+		TextboxState state = TextboxState::INIT;
 	};
 	void registerKeybinds();
 	void animateBG(float);
@@ -131,8 +157,12 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void clickedOnButton(geode::Button*, geode::Button*, int);
 	bool ccTouchBegan(cocos2d::CCTouch*, cocos2d::CCEvent*) override;
 	void playSound(char);
+	void playExternalSound(char);
+	void doTheSoundPlaying(std::span<std::string const> files, float pitch);
+	void doTheSoundPlaying(std::string const& files, float pitch);
 	void updateRenderTexture();
+	void setState(TextboxState state);
 	void setTextSound(DeltaruneMaps::Character textSound);
 	// A function to execute after the textbox is closed
-	void setNextAlerts(std::vector<std::shared_ptr<DeltaruneDialogObject>> const& nextAlerts);
+	void setNextAlerts(std::span<DialogObjectPtr> nextAlerts);
 };

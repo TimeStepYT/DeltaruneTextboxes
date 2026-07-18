@@ -38,17 +38,27 @@ FLAlertLayer* createDialogWithVoiceUnshown(
     std::string const& text
 ) {
     auto const& nameToChar = DeltaruneMaps::nameToCharacter;
+    bool isExternal = false;
 
     if (voice.size() != 0 && nameToChar.find(voice) == nameToChar.end()) {
-        log::error("Character \"{}\" does not exist! Use \"\" for no sound.", voice);
-        return nullptr;
+        auto const& extNameToData = DeltaruneMaps::externalNameToData;
+        if (extNameToData.find(voice) != extNameToData.end()) {
+            isExternal = true;
+        }
+        else {
+            log::error("Character \"{}\" does not exist! Use \"\" for no sound.", voice);
+            return nullptr;
+        }
     }
 
     auto unmodifiedAlert = createDialogBoxUnshown(characterPortrait, title, text);
     auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
     if (voice.size() != 0)
-        alert->setTextSound(nameToChar.at(voice));
+        if (isExternal)
+            alert->m_fields->externalSound = voice;
+        else
+            alert->setTextSound(nameToChar.at(voice));
     else
         alert->setTextSound(DeltaruneMaps::Character::NONE);
     
@@ -78,6 +88,8 @@ void DeltaruneEvents::createDialogWithVoice(
     
     if (alert)
         alert->show();
+    else
+        log::error("Couldn't create {}'s dialog", title);
 
     if (output)
         *output = alert;
