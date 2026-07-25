@@ -1,3 +1,7 @@
+### v1.7.2
+- Added a "Voiceclips" option of one of the text sounds
+- Added a lot of API stuff that noone will use
+
 ### v1.7.1
 - The new voice blips have been added and some of the old ones were missing pitch variation
 - Added more events for mod developers that probably will never be used... oh well.

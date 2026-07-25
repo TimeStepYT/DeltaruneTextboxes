@@ -81,6 +81,24 @@ namespace deltarune_textboxes {
         return geode::Ok(unmodifiedAlert);
     }
 
+    geode::Result<float> getCharacterSpriteScaleFrom(CCNode *characterSpriteNode) {
+        if (!characterSpriteNode)
+            return geode::Err("Character sprite node is nullptr");
+
+        float constexpr imageNodeSize = 100.f;
+        float const nodeWidth = characterSpriteNode->getContentWidth();
+        float const nodeHeight = characterSpriteNode->getContentHeight();
+
+        if (nodeHeight > nodeWidth) {
+            float const res = imageNodeSize / nodeHeight;
+            return geode::Ok(res);
+        }
+        else {
+            float const res = imageNodeSize / nodeWidth;
+            return geode::Ok(res);
+        }
+    }
+
     geode::Result<DialogObjectPtr> copyDialogObject(DeltaruneDialogObject const& object) {
         auto copied = newDialogObject(object.m_characterSprite, object.m_voice, object.m_title, object.m_text);
         return geode::Ok(std::move(copied));

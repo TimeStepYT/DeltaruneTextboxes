@@ -36,6 +36,7 @@ namespace DeltaruneMaps {
 		GERSON,
 		JACKENSTEIN,
 		FLOWERY,
+		FLOWERY_VOICECLIPS,
 		NUM_CHARACTERS,
 		NONE // This is after NUM_CHARACTERS intentionally because it's a special case
 	};

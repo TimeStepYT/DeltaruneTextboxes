@@ -62,6 +62,7 @@ void DeltaruneMaps::init() {
     nameToChar["Gerson"] = Character::GERSON;
     nameToChar["Jackenstein"] = Character::JACKENSTEIN;
     nameToChar["Flowery"] = Character::FLOWERY;
+    nameToChar["Flowery (Voiceclips)"] = Character::FLOWERY_VOICECLIPS;
 
     charToData.reserve(static_cast<int>(Character::NUM_CHARACTERS));
 
@@ -83,11 +84,105 @@ void DeltaruneMaps::init() {
     charToData[Character::SPAMTON_NEO] = CharacterData::create("snd_txtspam2");
     charToData[Character::JEVIL] = CharacterData::create("snd_txtjok");
     charToData[Character::QUEEN] = CharacterData::create("snd_txtq", 3, true);
-    charToData[Character::TENNA] = CharacterData::create("", 3, true);
+    charToData[Character::TENNA] = CharacterData::create(std::vector<std::string>{
+        "snd_txtten1",
+        "snd_txtten2",
+        "snd_txtten3",
+        "snd_txtten4",
+        "snd_txtten5",
+        "snd_txtten6",
+        "snd_txtten7",
+        "snd_txtten8",
+        "snd_txtten9",
+        "snd_txtten10"
+    }, 3, true);
     charToData[Character::CAROL] = CharacterData::create("snd_txtcar");
     charToData[Character::GERSON] = CharacterData::create("snd_txtger", 3, true);
     charToData[Character::JACKENSTEIN] = CharacterData::create("snd_txtjack", 4, true);
-    charToData[Character::FLOWERY] = CharacterData::create("", 3, true);
+    charToData[Character::FLOWERY] = CharacterData::create(std::vector<std::string>{
+        "snd_flowery_voicenoise_1", "snd_flowery_voicenoise_2", "snd_flowery_voicenoise_3"
+    }, 4, true);
+    charToData[Character::FLOWERY_VOICECLIPS] = CharacterData::create(std::vector<std::string>{
+        "snd_flowery_voiceclip_all_according_to_all_according_to_plant",
+        "snd_flowery_voiceclip_blingo_blizzard",
+        "snd_flowery_voiceclip_calling_for_help",
+        "snd_flowery_voiceclip_dont_you_like_serving_humans",
+        "snd_flowery_voiceclip_flowers_blooms_in_your_heart",
+        "snd_flowery_voiceclip_flowery",
+        "snd_flowery_voiceclip_flowery2",
+        "snd_flowery_voiceclip_forget_it",
+        "snd_flowery_voiceclip_get_a_chance_1",
+        "snd_flowery_voiceclip_get_a_chance_2",
+        "snd_flowery_voiceclip_give_to_you",
+        "snd_flowery_voiceclip_glue",
+        "snd_flowery_voiceclip_go_home",
+        "snd_flowery_voiceclip_goodbye",
+        "snd_flowery_voiceclip_great_style",
+        "snd_flowery_voiceclip_grown_like_a_turnip",
+        "snd_flowery_voiceclip_hah",
+        "snd_flowery_voiceclip_heh_it_s_my_jarona",
+        "snd_flowery_voiceclip_hereicomesanfrandisco_strong",
+        "snd_flowery_voiceclip_hey_boys",
+        "snd_flowery_voiceclip_hey_raly",
+        "snd_flowery_voiceclip_hey",
+        "snd_flowery_voiceclip_heyguys",
+        "snd_flowery_voiceclip_heyguysithinkifoundaglue",
+        "snd_flowery_voiceclip_heytherelittleguy",
+        "snd_flowery_voiceclip_hoo",
+        "snd_flowery_voiceclip_huh",
+        "snd_flowery_voiceclip_huhillshowyou",
+        "snd_flowery_voiceclip_im_falling",
+        "snd_flowery_voiceclip_im_only_trying_to_help_you",
+        "snd_flowery_voiceclip_imsorryonceagainikeptaladyinwaiting",
+        "snd_flowery_voiceclip_it",
+        "snd_flowery_voiceclip_its_all_in_a_name",
+        "snd_flowery_voiceclip_its_all_yours",
+        "snd_flowery_voiceclip_its_so_human",
+        "snd_flowery_voiceclip_itsme",
+        "snd_flowery_voiceclip_itsmeflowery",
+        "snd_flowery_voiceclip_jarona1",
+        "snd_flowery_voiceclip_jarona2",
+        "snd_flowery_voiceclip_jarona3",
+        "snd_flowery_voiceclip_jarona4",
+        "snd_flowery_voiceclip_kris",
+        "snd_flowery_voiceclip_leaf_it_to_me",
+        "snd_flowery_voiceclip_minipeppers",
+        "snd_flowery_voiceclip_mostlys",
+        "snd_flowery_voiceclip_my_favorite_two",
+        "snd_flowery_voiceclip_my_human",
+        "snd_flowery_voiceclip_my_king",
+        "snd_flowery_voiceclip_mysterious_wind",
+        "snd_flowery_voiceclip_no_way_its_your_children",
+        "snd_flowery_voiceclip_nonono",
+        "snd_flowery_voiceclip_powering_up",
+        "snd_flowery_voiceclip_prism_blow",
+        "snd_flowery_voiceclip_sanfran",
+        "snd_flowery_voiceclip_say_that_again",
+        "snd_flowery_voiceclip_smile_again",
+        "snd_flowery_voiceclip_sorryaboutthatguys",
+        "snd_flowery_voiceclip_sorryaboutthatlittleguy",
+        "snd_flowery_voiceclip_sorryabouttheguy",
+        "snd_flowery_voiceclip_sorrytokeepaladyinwaiting",
+        "snd_flowery_voiceclip_sorrytokeepyouladies",
+        "snd_flowery_voiceclip_sorrytokeepyouwaiting1",
+        "snd_flowery_voiceclip_sorrytokeepyouwaiting2",
+        "snd_flowery_voiceclip_stingus",
+        "snd_flowery_voiceclip_suckle_it_up",
+        "snd_flowery_voiceclip_susie",
+        "snd_flowery_voiceclip_take_that",
+        "snd_flowery_voiceclip_thats_my_dreams",
+        "snd_flowery_voiceclip_thatsgreat",
+        "snd_flowery_voiceclip_the_boys",
+        "snd_flowery_voiceclip_the_diner", // Vaginer!
+        "snd_flowery_voiceclip_theyre_eating_my_flesh",
+        "snd_flowery_voiceclip_thisguysyourbestfriend",
+        "snd_flowery_voiceclip_try_my_flavor",
+        "snd_flowery_voiceclip_what_a_predictable_creature",
+        "snd_flowery_voiceclip_wow",
+        "snd_flowery_voiceclip_yes",
+        "snd_flowery_voiceclip_your_dad",
+        "snd_flowery_voiceclip_yourdadsmybestfriend"
+    }, 9999);
 
     titleToChar.reserve(9);
 
@@ -619,11 +714,7 @@ void DeltaruneAlertLayer::handleAprilFools() {
     if (now.tm_mon != 3 || now.tm_mday != 1)
         return;
 
-    auto const& charToData = DeltaruneMaps::characterToData;
-    auto randomSound = charToData.begin();
-
-    std::advance(randomSound, mt() % static_cast<int>(DeltaruneMaps::Character::NUM_CHARACTERS));
-    m_fields->textSound = randomSound->first;
+    // I don't want the same thing next time. I still need to come up with something lol!!!!
 }
 
 void DeltaruneAlertLayer::rollText(float dt) {
@@ -784,51 +875,35 @@ void DeltaruneAlertLayer::playSound(char character) {
 
     auto const& charData = charToData.at(textSound);
 
-    this->handleAprilFools();
-
-    float pitch = 1.f;
-
     soundTimer = 0;
+    float pitch = 1.f;
+    auto const sounds = charToData.at(textSound).m_sounds;
+    int soundNumber = 0;  
+    
+    if (sounds.size() > 1) {
+        soundNumber = mt() % sounds.size();
+        
+        while (prevSoundNum == soundNumber)
+            soundNumber = mt() % sounds.size();
 
-    std::string file = charToData.at(textSound).m_sounds.at(0);
+        prevSoundNum = soundNumber;
+    }
+    
     if (charData.m_hasPitchVariation)
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 
     if (textSound == DeltaruneMaps::Character::TENNA) {
-        int const numSounds = 10;
-        int soundNumber;
-
         if (character && character == '?')
-            soundNumber = 5;
-        else {
-            soundNumber = mt() % numSounds + 1;
-            while (prevSoundNum == soundNumber) {
-                soundNumber = mt() % numSounds + 1;
-            }
-        }
-
-        prevSoundNum = soundNumber;
-
-        file = fmt::format("snd_txtten{}", soundNumber);
+            soundNumber = 4;
     }
-    else if (textSound == DeltaruneMaps::Character::FLOWERY) {
-        int const numSounds = 3;
-        int soundNumber = mt() % numSounds + 1;
-
-        while (prevSoundNum == soundNumber) {
-            soundNumber = mt() % numSounds + 1;
-        }
-
-        prevSoundNum = soundNumber;
-
-        file = fmt::format("snd_flowery_voicenoise_{}", soundNumber);
-    }
+    std::string file = sounds.at(soundNumber);
 
     auto filePath = Mod::get()->getResourcesDir() / fmt::format("{}.wav", std::string_view(file));
 
     this->doTheSoundPlaying(string::pathToString(filePath), pitch);
 }
 
+// External sounds use this
 void DeltaruneAlertLayer::doTheSoundPlaying(std::span<std::string const> files, float pitch) {
     auto const& resFolder = Mod::get()->getResourcesDir();
     auto& prevSoundNum = m_fields->prevSoundNum;
@@ -895,6 +970,7 @@ void DeltaruneAlertLayer::setState(TextboxState newState) {
     switch (newState) {
         case TextboxState::ROLLING_TEXT:
         {
+            this->m_fields->soundTimer = this->m_fields->soundRate;
             double const pause = Mod::get()->getSettingValue<double>("textRollingPause");
             this->schedule(schedule_selector(DeltaruneAlertLayer::rollText), pause / 30);
             break;

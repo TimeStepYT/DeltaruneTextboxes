@@ -30,6 +30,10 @@ namespace deltarune_textboxes {
 
     inline geode::Result<DialogObjectPtr> copyDialogObject(DeltaruneDialogObject const& object)
     GEODE_EVENT_EXPORT(&copyDialogObject, (object));
+
+    // If your node is too big (or small) then use this function to get the proper scale to make it fit
+    inline geode::Result<float> getCharacterSpriteScaleFrom(cocos2d::CCNode* characterSpriteNode)
+    GEODE_EVENT_EXPORT(&getCharacterSpriteScaleFrom, (characterSpriteNode))
     
     // As a heads up, this will call FLAlertLayer::show() for you. Do not call show() yourself unless you want a broken double textbox
     inline geode::Result<FLAlertLayer*> createFullDialog(std::span<DialogObjectPtr> objects) 

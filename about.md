@@ -10,6 +10,8 @@ You can <cj>change the keybinds</c> in the mod settings!
 
 If you want to suggest a feature, create an issue on github or ping me on discord (@timestepyt)
 
+Also for developers, this mod has an API that lets you display your own dialog with custom character sprites!
+
 # Special Thanks
 <cr>prevter</c>: Answered my stupid questions and helped alot!
 
