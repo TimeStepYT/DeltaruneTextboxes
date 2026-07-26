@@ -867,7 +867,7 @@ void DeltaruneAlertLayer::playSound(char character) {
     auto& soundTimer = m_fields->soundTimer;
     auto& prevSoundNum = m_fields->prevSoundNum;
 
-    auto const& resFolder = Mod::get()->getResourcesDir();
+    auto const resFolder = Mod::get()->getResourcesDir();
 
     if (charToData.find(textSound) == charToData.end()) {
         return;
@@ -877,7 +877,7 @@ void DeltaruneAlertLayer::playSound(char character) {
 
     soundTimer = 0;
     float pitch = 1.f;
-    auto const sounds = charToData.at(textSound).m_sounds;
+    auto const& sounds = charToData.at(textSound).m_sounds;
     int soundNumber = 0;  
     
     if (sounds.size() > 1) {
@@ -896,9 +896,9 @@ void DeltaruneAlertLayer::playSound(char character) {
         if (character && character == '?')
             soundNumber = 4;
     }
-    std::string file = sounds.at(soundNumber);
+    std::string const& file = sounds.at(soundNumber);
 
-    auto filePath = Mod::get()->getResourcesDir() / fmt::format("{}.wav", std::string_view(file));
+    auto const filePath = Mod::get()->getResourcesDir() / fmt::format("{}.wav", std::string_view(file));
 
     this->doTheSoundPlaying(string::pathToString(filePath), pitch);
 }
