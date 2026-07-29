@@ -107,6 +107,9 @@ void DeltaruneAlertLayer::changeButtons() {
     auto* const fields = this->m_fields.self();
     auto* const bg = fields->bg;
     
+    m_buttonMenu->removeFromParent();
+
+    m_buttonMenu = CCMenu::create();
     m_buttonMenu->setPositionX(bg->getContentWidth() / 2);
     m_buttonMenu->setPositionY(32);
     m_buttonMenu->setVisible(false);
@@ -282,9 +285,7 @@ void DeltaruneAlertLayer::changeText() {
     
     textContentNode->addChild(star);
     textContentNode->addChild(newDesc);
-    
-    this->m_buttonMenu->removeFromParentAndCleanup(false);
-    
+        
     textContentNode->addChild(this->m_buttonMenu);
     
     clippingNode->addChild(textContentNode);
