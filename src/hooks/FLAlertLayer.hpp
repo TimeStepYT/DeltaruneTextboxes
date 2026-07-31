@@ -46,6 +46,7 @@ namespace DeltaruneMaps {
 		std::vector<std::string> m_sounds;
 		int m_soundRate = 2;
 		bool m_hasPitchVariation = false;
+		bool m_explicitlyExternal = false;
 
 		static CharacterData create(std::vector<std::string> const& sounds, int soundRate = 2, bool hasPitchVariation = false) {
 			CharacterData res;
@@ -61,6 +62,10 @@ namespace DeltaruneMaps {
 			res.m_soundRate = soundRate;
 			res.m_hasPitchVariation = hasPitchVariation;
 			return res;
+		}
+
+		void setExternal(bool external = true) {
+			this->m_explicitlyExternal = external;
 		}
 	};
 

@@ -828,7 +828,7 @@ void DeltaruneAlertLayer::rollText(float dt) {
         return;
     }
 
-    if (fields->externalSound.has_value()) {
+    if (fields->externalSound.has_value() || (global::lockedTextSound.has_value() && global::lockedTextSound->m_explicitlyExternal)) {
         DeltaruneAlertLayer::playExternalSound(character);
     }
     else
@@ -842,23 +842,32 @@ void DeltaruneAlertLayer::updateRenderTexture() {
 }
 
 void DeltaruneAlertLayer::playExternalSound(char character) {
-    auto const& textSound = m_fields->externalSound.value();
     auto& soundTimer = m_fields->soundTimer;
-    
-    if (DeltaruneMaps::externalNameToData.find(textSound) == DeltaruneMaps::externalNameToData.end()) {
-        return;
+
+    DeltaruneMaps::CharacterData const* data = nullptr;
+
+    if (!global::lockedTextSound.has_value()) {
+        auto const& textSound = m_fields->externalSound.value();
+        
+        if (DeltaruneMaps::externalNameToData.find(textSound) == DeltaruneMaps::externalNameToData.end()) {
+            return;
+        }
+        
+        data = &DeltaruneMaps::externalNameToData.at(textSound);
     }
-    
-    auto const& data = DeltaruneMaps::externalNameToData.at(textSound);
+    else {
+        data = &global::lockedTextSound.value();
+    }
+
     float pitch = 1.f;
     soundTimer = 0;
 
-    m_fields->soundRate = data.m_soundRate;
+    m_fields->soundRate = data->m_soundRate;
 
-    if (data.m_hasPitchVariation)
+    if (data->m_hasPitchVariation)
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 
-    this->doTheSoundPlaying(data.m_sounds, pitch);
+    this->doTheSoundPlaying(data->m_sounds, pitch);
 }
 
 void DeltaruneAlertLayer::playSound(char character) {
@@ -869,15 +878,22 @@ void DeltaruneAlertLayer::playSound(char character) {
 
     auto const resFolder = Mod::get()->getResourcesDir();
 
-    if (charToData.find(textSound) == charToData.end()) {
-        return;
-    }
+    DeltaruneMaps::CharacterData const* charData = nullptr;
 
-    auto const& charData = charToData.at(textSound);
+    if (!global::lockedTextSound.has_value()) {
+        if (charToData.find(textSound) == charToData.end()) {
+            return;
+        }
+
+        charData = &charToData.at(textSound);
+    }
+    else {
+        charData = &global::lockedTextSound.value();
+    }
 
     soundTimer = 0;
     float pitch = 1.f;
-    auto const& sounds = charToData.at(textSound).m_sounds;
+    auto const& sounds = charData->m_sounds;
     int soundNumber = 0;  
     
     if (sounds.size() > 1) {
@@ -889,7 +905,7 @@ void DeltaruneAlertLayer::playSound(char character) {
         prevSoundNum = soundNumber;
     }
     
-    if (charData.m_hasPitchVariation)
+    if (charData->m_hasPitchVariation)
         pitch = 1 + randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(0.2f);
 
     if (textSound == DeltaruneMaps::Character::TENNA) {

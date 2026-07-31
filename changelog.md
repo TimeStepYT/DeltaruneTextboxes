@@ -1,3 +1,7 @@
+### v1.7.3
+- Added an API function that I need for a future mod
+- Fixed a possible crash
+
 ### v1.7.2
 - Added a "Voiceclips" option of one of the text sounds
 - Added a lot of API stuff that noone will use

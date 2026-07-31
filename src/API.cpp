@@ -1,6 +1,7 @@
 #define GEODE_DEFINE_EVENT_EXPORTS
 #include "../api/API.hpp"
 
+#include "Global.hpp"
 #include "Events.hpp"
 #include "hooks/FLAlertLayer.hpp"
 #include "DeltaruneDialogObject.hpp"
@@ -34,6 +35,7 @@ namespace deltarune_textboxes {
             return geode::Err("Sound \"{}\" is already registered!", name);
         }
         auto newData = DeltaruneMaps::CharacterData::create(geode::utils::string::pathToString(file), soundRate, hasPitchVariation);
+        newData.setExternal();
         DeltaruneMaps::externalNameToData[name] = newData;
         return geode::Ok(true);
     }
@@ -51,6 +53,7 @@ namespace deltarune_textboxes {
         }
 
         DeltaruneMaps::CharacterData newData {res, soundRate, hasPitchVariation};
+        newData.setExternal();
 
         DeltaruneMaps::externalNameToData[name] = newData;
         return geode::Ok(true);
@@ -102,5 +105,30 @@ namespace deltarune_textboxes {
     geode::Result<DialogObjectPtr> copyDialogObject(DeltaruneDialogObject const& object) {
         auto copied = newDialogObject(object.m_characterSprite, object.m_voice, object.m_title, object.m_text);
         return geode::Ok(std::move(copied));
+    }
+
+    geode::Result<bool> lockTextSound(std::string const& textSound) {
+        auto const& n2c = DeltaruneMaps::nameToCharacter;
+
+        bool soundExistsHere = n2c.find(textSound) != n2c.end();
+        
+        if (!soundExistsHere) {
+            auto const& en2d = DeltaruneMaps::externalNameToData;
+            bool soundExistsExternally = en2d.find(textSound) != en2d.end();
+
+            if (soundExistsExternally) {
+                global::lockedTextSound = en2d.at(textSound);
+                return geode::Ok(true);
+            }
+            return geode::Err(fmt::format("The sound \"{}\" is not registered", textSound));
+        }
+
+        global::lockedTextSound = DeltaruneMaps::characterToData.at(n2c.at(textSound));
+
+        return geode::Ok(true);
+    }
+
+    void unlockTextSound() {
+        global::lockedTextSound.reset();
     }
 }

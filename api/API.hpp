@@ -38,4 +38,11 @@ namespace deltarune_textboxes {
     // As a heads up, this will call FLAlertLayer::show() for you. Do not call show() yourself unless you want a broken double textbox
     inline geode::Result<FLAlertLayer*> createFullDialog(std::span<DialogObjectPtr> objects) 
     GEODE_EVENT_EXPORT(&createFullDialog, (objects));
+
+    // Locks all text boxes to one text sound. Please use unlockTextSound() once you're done... please
+    inline geode::Result<bool> lockTextSound(std::string const& textSound)
+    GEODE_EVENT_EXPORT(&lockTextSound, (textSound));
+    
+    inline void unlockTextSound()
+    GEODE_EVENT_EXPORT_NORES(&unlockTextSound, ());
 }
