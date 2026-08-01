@@ -3,7 +3,7 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/ui/Button.hpp>
 
-#include "../../api/API.hpp"
+//#include "../../api/API.hpp"
 
 using namespace geode::prelude;
 using namespace deltarune_textboxes;

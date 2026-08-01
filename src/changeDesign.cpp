@@ -3,9 +3,11 @@
 #include <alphalaneous.alphas-ui-pack/include/API.hpp>
 #include "hooks/FLAlertLayer.hpp"
 #include "TextShaders.hpp"
-#include "Global.hpp"
 
 using namespace geode::prelude;
+
+// @geode-ignore(unknown-resource)
+auto const fontStr = "Determination.fnt"_spr;
 
 template <class I, class T>
 bool iteratorContains(I const& iterator, T const& value) {
@@ -96,7 +98,7 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 
     auto const label = buttonSprite->getChildByType<CCLabelBMFont>(0);
     if (label) {
-        label->setFntFile("Determination.fnt"_spr);
+        label->setFntFile(fontStr);
         label->setScale(1.f);
     }
 }
@@ -117,7 +119,7 @@ void DeltaruneAlertLayer::changeButtons() {
 
     if (!m_button2) return;
     float const positionStart = bg->getPositionX() - fields->buttonMenu->getPositionX() - fields->screenSize / 2;
-    Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, "Determination.fnt"_spr);
+    Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, fontStr);
     newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
     newBtn1->setPositionY(fields->old_btnY + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
@@ -126,7 +128,7 @@ void DeltaruneAlertLayer::changeButtons() {
         FLAlertLayer::onBtn1(button);
     });
 
-    Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
+    Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, fontStr);
     newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
     newBtn2->setPositionY(fields->old_btnY + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
@@ -166,7 +168,7 @@ void DeltaruneAlertLayer::changeTitle() {
     auto const title = m_fields->title;
     auto const bg = m_fields->bg;
     title->setAnchorPoint(CCPoint{0, 0});
-    title->setFntFile("Determination.fnt"_spr);
+    title->setFntFile(fontStr);
     title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, bg->getContentHeight() - 2.f});
 }
 
@@ -190,7 +192,7 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
     float const screenSize = fields->screenSize;
     auto const bg = fields->bg;
 
-    CCLabelBMFont* const star = CCLabelBMFont::create("*", "Determination.fnt"_spr);
+    CCLabelBMFont* const star = CCLabelBMFont::create("*", fontStr);
 
     float xOffset = star->getContentWidth();
 
@@ -228,13 +230,15 @@ void DeltaruneAlertLayer::changeText() {
     
     DeltaruneAlertLayer::handleSound();
     
-    std::string font = "Determination.fnt"_spr;
+    std::string font = fontStr;
     
     if (sound == DeltaruneMaps::Character::SANS) {
+        // @geode-ignore(unknown-resource)
         font = "ComicSans.fnt"_spr;
         capitalize(str, false);
     }
     else if (sound == DeltaruneMaps::Character::PAPYRUS) {
+        // @geode-ignore(unknown-resource)
         font = "Papyrus.fnt"_spr;
         capitalize(str);
     }

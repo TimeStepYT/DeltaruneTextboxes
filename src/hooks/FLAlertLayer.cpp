@@ -1,10 +1,7 @@
 #include <Geode/utils/cocos.hpp>
-#include "../TextShaders.hpp"
 #include "../ImageNode.hpp"
 #include "../Global.hpp"
 #include "FLAlertLayer.hpp"
-#include "DialogLayer.hpp"
-#include "PlatformToolbox.hpp"
 #include "../Events.hpp"
 #include "../DeltaruneDialogObject.hpp"
 
