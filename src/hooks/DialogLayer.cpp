@@ -4,9 +4,11 @@
 using namespace geode::prelude;
 
 bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOriginal, int p2) {
+	log::info("DialogLayer::init()");
 	CCArray* const objects = CCArray::create();
 	if (objectsOriginal) objects->addObjectsFromArray(objectsOriginal);
 	if (!DialogLayer::init(dialogObject, objectsOriginal, p2)) return false;
+	log::info("DialogLayer::init() didn't return early");
 
 	m_fields->dialogObject = dialogObject;
 	std::string character;
@@ -66,9 +68,11 @@ bool DeltaruneDialogLayer::init(DialogObject* dialogObject, CCArray* objectsOrig
 	return true;
 }
 void DeltaruneDialogLayer::displayNextObject() {
+	log::info("DialogLayer::displayNextObject()");
 	this->setVisible(false);
 }
 void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
+	log::info("DialogLayer::displayDialogObject()");
 	DialogLayer::displayDialogObject(obj);
 	this->setVisible(false);
 }

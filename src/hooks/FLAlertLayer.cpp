@@ -519,6 +519,7 @@ void DeltaruneAlertLayer::clickedOnButton(Button* activatedButton, Button* other
 }
 
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
+    log::info("FLAlertLayer::ccTouchBegan()");
     if (m_fields->incompatible)
         return FLAlertLayer::ccTouchBegan(touch, event);
 
