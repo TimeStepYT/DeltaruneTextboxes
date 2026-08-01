@@ -28,6 +28,7 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 
 $on_mod(Loaded) {
     DeltaruneMaps::init();
+    log::info("Loaded the mod");
 }
 
 void DeltaruneMaps::init() {
@@ -212,6 +213,8 @@ void DeltaruneAlertLayer::initSoundRate() {
 
 bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
     float& screenSize = m_fields->screenSize;
+
+    log::info("FLAlertLayer::init()");
 
     screenSize = CCDirector::sharedDirector()->getWinSize().width;
 
