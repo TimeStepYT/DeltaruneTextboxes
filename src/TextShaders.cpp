@@ -1,5 +1,4 @@
 #include "TextShaders.hpp"
-#include "Global.hpp"
 
 using namespace geode::prelude;
 
