@@ -133,6 +133,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		DeltaruneMaps::Character textSound = DeltaruneMaps::Character::NONE;
 		std::vector<DialogObjectPtr> nextAlerts;
 		TextboxState state = TextboxState::INIT;
+		cocos2d::CCMenu* buttonMenu = nullptr;
 	};
 	void registerKeybinds();
 	void animateBG(float);

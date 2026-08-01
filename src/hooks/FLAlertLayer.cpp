@@ -362,7 +362,7 @@ void DeltaruneAlertLayer::registerKeybinds() {
 void DeltaruneAlertLayer::showButtons() {
     if (m_button2 && getLinesLeft() < 3 && m_fields->doneRolling) {
         m_fields->done = true;
-        m_buttonMenu->setVisible(true);
+        m_fields->buttonMenu->setVisible(true);
         m_fields->heart->setVisible(true);
     }
 }
@@ -634,8 +634,8 @@ void DeltaruneAlertLayer::pickChoice() {
 void DeltaruneAlertLayer::progressText() {
     auto const fields = m_fields.self();
     
-    if (!m_mainLayer) return;
-    if (!m_buttonMenu) return;
+    if (!this->m_mainLayer) return;
+    if (!fields->buttonMenu) return;
 
     auto const deltaruneTextArea = fields->m_textArea;
     int& linesProgressed = fields->linesProgressed;
