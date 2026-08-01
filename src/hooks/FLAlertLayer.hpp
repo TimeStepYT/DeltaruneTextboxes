@@ -110,6 +110,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		int prevSoundNum = 200;
 		int soundRate = 2;
 		int soundTimer = 0;
+		float old_btnY = 0.f;
 		CCMenuItemSpriteExtra* old_btn1 = nullptr;
 		CCMenuItemSpriteExtra* old_btn2 = nullptr;
 		geode::Button* btn1 = nullptr;

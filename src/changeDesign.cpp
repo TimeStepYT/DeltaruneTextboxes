@@ -119,7 +119,7 @@ void DeltaruneAlertLayer::changeButtons() {
     float const positionStart = bg->getPositionX() - fields->buttonMenu->getPositionX() - fields->screenSize / 2;
     Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, "Determination.fnt"_spr);
     newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
-    newBtn1->setPositionY(fields->old_btn1->getPositionY() + 2);
+    newBtn1->setPositionY(fields->old_btnY + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
@@ -128,7 +128,7 @@ void DeltaruneAlertLayer::changeButtons() {
 
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, "Determination.fnt"_spr);
     newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
-    newBtn2->setPositionY(fields->old_btn2->getPositionY() + 2);
+    newBtn2->setPositionY(fields->old_btnY + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
@@ -148,8 +148,10 @@ void DeltaruneAlertLayer::changeButtons() {
     fields->btn1 = newBtn1;
     fields->btn2 = newBtn2;
 
-    fields->old_btn1->removeFromParent();
-    fields->old_btn2->removeFromParent();
+    if (fields->old_btn1)
+        fields->old_btn1->removeFromParent();
+    if (fields->old_btn2)
+        fields->old_btn2->removeFromParent();
 
     auto const heart = CCSprite::create("heart.png"_spr);
     heart->setVisible(false);
@@ -158,9 +160,6 @@ void DeltaruneAlertLayer::changeButtons() {
     heart->setID("heart"_spr);
     m_mainLayer->addChild(heart);
     fields->heart = heart;
-
-    changeSingleButton(fields->old_btn1, m_button1);
-    changeSingleButton(fields->old_btn2, m_button2);
 }
 
 void DeltaruneAlertLayer::changeTitle() {

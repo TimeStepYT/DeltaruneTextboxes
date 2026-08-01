@@ -274,6 +274,10 @@ bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title
     m_fields->old_btn1 = m_button1 ? static_cast<CCMenuItemSpriteExtra*>(m_button1->getParent()) : nullptr;
     m_fields->old_btn2 = m_button2 ? static_cast<CCMenuItemSpriteExtra*>(m_button2->getParent()) : nullptr;
 
+    if (m_fields->old_btn1) {
+        m_fields->old_btnY = m_fields->old_btn1->getPositionY();
+    }
+
     textArea = static_cast<TextArea*>(m_mainLayer->getChildByID("content-text-area"));
     bg = static_cast<CCScale9Sprite*>(m_mainLayer->getChildByID("background"));
     titleNode = static_cast<CCLabelBMFont*>(m_mainLayer->getChildByID("title"));
@@ -608,8 +612,6 @@ ImageNode* DeltaruneAlertLayer::createImageNode() {
 void DeltaruneAlertLayer::pickChoice() {
     auto const fields = this->m_fields.self();
     bool& done = fields->done;
-    auto const btn1 = fields->old_btn1;
-    auto const btn2 = fields->old_btn2;
     int const btnSelected = fields->btnSelected;
 
     if (!m_button2) {
@@ -620,14 +622,14 @@ void DeltaruneAlertLayer::pickChoice() {
         if (fields->dialog && dialogLayer)
             dialogLayer->keyBackClicked();
 
-        FLAlertLayer::onBtn1(btn1);
+        FLAlertLayer::onBtn1(nullptr);
     } else if (btnSelected != 0) {
         done = true;
         
         if (btnSelected == 1)
-            FLAlertLayer::onBtn1(btn1);
+            FLAlertLayer::onBtn1(nullptr);
         else if (btnSelected == 2)
-            FLAlertLayer::onBtn2(btn2);
+            FLAlertLayer::onBtn2(nullptr);
     }
 }
 
