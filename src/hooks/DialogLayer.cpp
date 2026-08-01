@@ -72,7 +72,10 @@ void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
 	DialogLayer::displayDialogObject(obj);
 	this->setVisible(false);
 }
+
+#ifndef GEODE_IS_IOS
 bool DeltaruneDialogLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
 	return false;
 }
 void DeltaruneDialogLayer::keyDown(enumKeyCodes key, double timestamp) {}
+#endif

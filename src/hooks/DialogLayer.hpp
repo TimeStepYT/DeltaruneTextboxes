@@ -11,6 +11,8 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 	bool init(DialogObject*, cocos2d::CCArray*, int);
 	void displayNextObject();
 	void displayDialogObject(DialogObject*);
+#ifndef GEODE_IS_IOS
 	bool ccTouchBegan(cocos2d::CCTouch*, cocos2d::CCEvent*) override;
 	void keyDown(cocos2d::enumKeyCodes, double) override;
+#endif
 };
