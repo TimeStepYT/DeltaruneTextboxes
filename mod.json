@@ -8,7 +8,7 @@
     },
     "id": "timestepyt.deltarune_textboxes",
     "name": "Deltarune Textboxes",
-    "version": "v1.7.4-alpha.1",
+    "version": "v1.7.4",
     "developer": "TimeStepYT",
     "description": "Makes Popups look like Deltarune",
     "links": {
@@ -18,8 +18,7 @@
         "customization"
     ],
     "dependencies": {
-        "geode.node-ids": ">=1.19.0",
-        "alphalaneous.alphas-ui-pack": ">=v1.1.0"
+        "geode.node-ids": ">=1.19.0"
     },
     "api": {
         "include": [

@@ -6,7 +6,7 @@
 #include <Geode/ui/TextArea.hpp>
 #include "../DeltaruneTextArea.hpp"
 #include "../ImageNode.hpp"
-#include <alphalaneous.alphas-ui-pack/include/API.hpp>
+#include "../external/RenderNode.hpp"
 #include "../../api/API.hpp"
 
 using namespace deltarune_textboxes;
@@ -121,7 +121,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 		cocos2d::extension::CCScale9Sprite* bg = nullptr;
 		cocos2d::CCLabelBMFont* title = nullptr;
 		cocos2d::CCSprite* heart = nullptr;
-		alpha::ui::RenderNode* renderedSprite = nullptr;
+		RenderNode* renderedSprite = nullptr;
 		ImageNode* imageNode;
 		DialogLayer* dialogLayer;
 		FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
