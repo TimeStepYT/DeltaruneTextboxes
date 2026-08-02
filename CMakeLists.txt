@@ -22,7 +22,6 @@ add_library(${PROJECT_NAME} SHARED
     src/DeltaruneTextArea.cpp
     src/Events.cpp
     src/API.cpp
-    src/external/RenderNode.cpp
     # Add any extra C++ source files here
 )
 

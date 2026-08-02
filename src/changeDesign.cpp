@@ -1,6 +1,6 @@
 #include <Geode/utils/cocos.hpp>
 #include <Geode/ui/Button.hpp>
-#include "external/RenderNode.hpp"
+#include <alphalaneous.alphas-ui-pack/include/API.hpp>
 #include "hooks/FLAlertLayer.hpp"
 #include "TextShaders.hpp"
 
@@ -295,7 +295,7 @@ void DeltaruneAlertLayer::changeText() {
     clippingNode->addChild(textContentNode);
     this->m_mainLayer->addChild(clippingNode);
 
-    auto renderNode = RenderNode::create(textContentNode, true);
+    auto renderNode = alpha::ui::RenderNode::create(textContentNode, true);
     renderNode->setPosition(bg->getPosition());
     renderNode->setZOrder(bg->getZOrder() + 1);
     fields->renderedSprite = renderNode;

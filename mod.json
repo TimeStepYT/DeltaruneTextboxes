@@ -18,7 +18,8 @@
         "customization"
     ],
     "dependencies": {
-        "geode.node-ids": ">=1.19.0"
+        "geode.node-ids": ">=1.19.0",
+        "alphalaneous.alphas-ui-pack": ">=1.1.1"
     },
     "api": {
         "include": [
