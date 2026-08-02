@@ -5,6 +5,10 @@
 #include "../Events.hpp"
 #include "../DeltaruneDialogObject.hpp"
 
+#ifdef GEODE_IS_MACOS
+#include "PlatformToolbox.hpp"
+#endif
+
 using namespace geode::prelude;
 
 static std::mt19937 mt{std::random_device{}()};
