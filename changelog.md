@@ -1,6 +1,5 @@
 ### v1.7.4
 - Another crashfix (seriously, please send me your crashlogs if my mods are to blame)
-- Removed a dependency that is unlisted on the index
 
 ### v1.7.3
 - Added an API function that I need for a future mod
