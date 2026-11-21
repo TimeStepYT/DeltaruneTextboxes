@@ -1,6 +1,6 @@
 #include <Geode/utils/cocos.hpp>
 #include <Geode/ui/Button.hpp>
-#include <alphalaneous.alphas-ui-pack/include/API.hpp>
+#include <alphalaneous.alphas-ui-pack/API.hpp>
 #include "hooks/FLAlertLayer.hpp"
 #include "TextShaders.hpp"
 
