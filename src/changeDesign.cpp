@@ -133,7 +133,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
-        FLAlertLayer::onButtonTag(0);
+        this->onButtonTagCustom(0);
     });
 
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, fontStr);
@@ -143,7 +143,7 @@ void DeltaruneAlertLayer::changeButtons() {
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
-        FLAlertLayer::onButtonTag(1);
+        this->onButtonTagCustom(1);
     });
 
     newBtn1->setSelectCallback([this, newBtn2](Button* button){

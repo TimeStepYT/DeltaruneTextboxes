@@ -160,7 +160,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void handleAprilFools();
 	void progressText();
 	void pickChoice();
-	void onButtonTag(int tag);
+	void onButtonTagCustom(int tag);
 	void onButton1();
 	void onButton2();
 	void openNextAlert();

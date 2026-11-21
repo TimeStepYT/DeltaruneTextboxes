@@ -368,22 +368,15 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
         global::blockKeys = false;
 }
 
-void DeltaruneAlertLayer::onButtonTag(int tag) {
-    if (m_fields->incompatible) {
-        FLAlertLayer::onButtonTag(tag);
-        return;
-    }
+void DeltaruneAlertLayer::onButtonTagCustom(int tag) {
+    CCDirector::get()->getTouchDispatcher()->unregisterForcePrio(this);
+    
+    if (tag == 1)
+        this->onButton2();
+    else
+        this->onButton1();
 
-    switch (tag) {
-        case 1:
-            this->onButton1();
-            break;
-        case 2:
-            this->onButton2();
-            break;
-        default:
-            FLAlertLayer::onButtonTag(tag);
-    }
+    this->removeFromParent();
 }
 
 void DeltaruneAlertLayer::onButton2() {
@@ -395,19 +388,17 @@ void DeltaruneAlertLayer::onButton2() {
     if (btnSelected == 0)
         return;
 
-    FLAlertLayer::onButtonTag(btnSelected - 1);
+    if (this->m_alertProtocol)
+        this->m_alertProtocol->FLAlert_Clicked(this, btnSelected - 1);
+    else
+        log::error("Cannot execute FLAlert_Clicked in onButton2: m_alertProcotol is nullptr");
 }
 
 void DeltaruneAlertLayer::onButton1() {
-    global::blockKeys = false;
-
-    if (this->m_button2) {
-        FLAlertLayer::onButtonTag(1);
-        return;
-    }
-
     this->openNextAlert();
-    FLAlertLayer::onButtonTag(1);
+    
+    if (this->m_alertProtocol)
+        this->m_alertProtocol->FLAlert_Clicked(this, false);
 }
 
 void DeltaruneAlertLayer::openNextAlert() {
