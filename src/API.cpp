@@ -1,5 +1,5 @@
 #define GEODE_DEFINE_EVENT_EXPORTS
-#include "../api/API.hpp"
+#include "../include/API.hpp"
 
 #include "Global.hpp"
 #include "Events.hpp"

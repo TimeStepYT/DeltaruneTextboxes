@@ -7,7 +7,7 @@
 #include "../DeltaruneTextArea.hpp"
 #include "../ImageNode.hpp"
 #include <alphalaneous.alphas-ui-pack/API.hpp>
-#include "../../api/API.hpp"
+#include "../../include/API.hpp"
 
 using namespace deltarune_textboxes;
 
