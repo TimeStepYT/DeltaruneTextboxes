@@ -23,7 +23,7 @@
     },
     "api": {
         "include": [
-            "api/*.hpp"
+            "include/*.hpp"
         ]
     },
     "resources": {
