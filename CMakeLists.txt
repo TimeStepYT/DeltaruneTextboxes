@@ -13,9 +13,7 @@ project(DeltaruneTextboxes VERSION 1.7.4)
 add_library(${PROJECT_NAME} SHARED
     src/hooks/FLAlertLayer.cpp
     src/hooks/DialogLayer.cpp
-    src/hooks/CCKeyboardDispatcher.cpp
     src/hooks/PurchaseItemPopup.cpp
-    src/hooks/PlatformToolbox.cpp
     src/changeDesign.cpp
     src/ImageNode.cpp
     src/TextShaders.cpp

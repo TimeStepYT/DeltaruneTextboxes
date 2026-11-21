@@ -149,7 +149,7 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void decideToBlockKeys();
 	void show() override;
 	void initSoundRate();
-	bool init(FLAlertLayerProtocol*, char const*, gd::string, char const*, char const*, float, bool, float, float);
+	bool init(FLAlertLayerProtocol*, char const*, std::string, char const*, char const*, float, bool, float, float);
 	void rollText(float);
 	void showButtons();
 	void setHeartPosition(geode::Button*);
@@ -160,8 +160,10 @@ class $modify(DeltaruneAlertLayer, FLAlertLayer) {
 	void handleAprilFools();
 	void progressText();
 	void pickChoice();
-	void onBtn2(CCObject*);
-	void onBtn1(CCObject*);
+	void onButtonTag(int tag);
+	void onButton1();
+	void onButton2();
+	void openNextAlert();
 	void clickedOnButton(geode::Button*, geode::Button*, int);
 	bool ccTouchBegan(cocos2d::CCTouch*, cocos2d::CCEvent*) override;
 	void playSound(char);

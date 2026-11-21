@@ -1,13 +1,11 @@
 #include <Geode/utils/cocos.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <random>
 #include "../ImageNode.hpp"
 #include "../Global.hpp"
 #include "FLAlertLayer.hpp"
 #include "../Events.hpp"
 #include "../DeltaruneDialogObject.hpp"
-
-#ifdef GEODE_IS_MACOS
-#include "PlatformToolbox.hpp"
-#endif
 
 using namespace geode::prelude;
 
@@ -29,7 +27,6 @@ float randomNumberInAGivenRangeThatGetsAddedOrRemovedFromADifferentNumber(float 
 
 $on_mod(Loaded) {
     DeltaruneMaps::init();
-    log::info("Loaded the mod");
 }
 
 void DeltaruneMaps::init() {
@@ -212,45 +209,22 @@ void DeltaruneAlertLayer::initSoundRate() {
     soundTimer = soundRate;
 }
 
-bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, gd::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
+bool DeltaruneAlertLayer::init(FLAlertLayerProtocol* delegate, char const* title, std::string desc, char const* btn1, char const* btn2, float width, bool scroll, float height, float textScale) {
     float& screenSize = m_fields->screenSize;
-
-    log::info("FLAlertLayer::init()");
 
     screenSize = CCDirector::sharedDirector()->getWinSize().width;
 
     m_fields->text = desc;
     scroll = false;
 
-#ifdef GEODE_IS_WINDOWS
-    // Removing controller glyphs like this seems better than removing the sprites afterwards
-    const auto app = CCApplication::get();
-    const bool controllerConnected = app->m_bControllerConnected;
+    auto res = FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale);
 
-    app->m_bControllerConnected = false;
-    
-    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
-        app->m_bControllerConnected = controllerConnected;
+    if (!res)
         return false;
-    }
-    app->m_bControllerConnected = controllerConnected;
-#elifdef GEODE_IS_MACOS
-    PlatToolbox::disable = true;
-    
-    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale)) {
-        PlatToolbox::disable = false;
-        return false;
-    }
-
-    PlatToolbox::disable = false;
-#else
-    if (!FLAlertLayer::init(delegate, title, desc, btn1, btn2, width, scroll, height, textScale))
-        return false;
-#endif
-    
 
     NodeIDs::provideFor(this);
-    this->setID("FLAlertLayer");
+    
+    //this->setID("FLAlertLayer");
 
     std::string_view descString = desc;
     bool const isEmpty = std::ranges::all_of(descString, [](unsigned char c) {
@@ -312,8 +286,11 @@ void DeltaruneAlertLayer::registerKeybinds() {
                 return;
 
             int& btnSelected = m_fields->btnSelected;
-            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
-            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+            auto const label1 = m_fields->btn1->getChildByType<geode::Label*>(0);
+            auto const label2 = m_fields->btn2->getChildByType<geode::Label*>(0);
+
+            if (!label1 || !label2)
+                return;
 
             btnSelected = 1;
             label1->setColor(ccColor3B{255, 255, 0});
@@ -327,8 +304,8 @@ void DeltaruneAlertLayer::registerKeybinds() {
                 return;
 
             int& btnSelected = m_fields->btnSelected;
-            auto const label1 = m_fields->btn1->getChildByType<CCLabelBMFont>(0);
-            auto const label2 = m_fields->btn2->getChildByType<CCLabelBMFont>(0);
+            auto const label1 = m_fields->btn1->getChildByType<geode::Label>(0);
+            auto const label2 = m_fields->btn2->getChildByType<geode::Label>(0);
 
             btnSelected = 2;
             label2->setColor(ccColor3B{255, 255, 0});
@@ -391,11 +368,25 @@ void DeltaruneAlertLayer::decideToBlockKeys() {
         global::blockKeys = false;
 }
 
-void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
+void DeltaruneAlertLayer::onButtonTag(int tag) {
     if (m_fields->incompatible) {
-        FLAlertLayer::onBtn2(sender);
+        FLAlertLayer::onButtonTag(tag);
         return;
     }
+
+    switch (tag) {
+        case 1:
+            this->onButton1();
+            break;
+        case 2:
+            this->onButton2();
+            break;
+        default:
+            FLAlertLayer::onButtonTag(tag);
+    }
+}
+
+void DeltaruneAlertLayer::onButton2() {
     if (!m_fields->done) {
         return;
     }
@@ -403,25 +394,23 @@ void DeltaruneAlertLayer::onBtn2(CCObject* sender) {
     int const btnSelected = m_fields->btnSelected;
     if (btnSelected == 0)
         return;
-    if (btnSelected == 2)
-        FLAlertLayer::onBtn2(sender);
-    else if (btnSelected == 1)
-        FLAlertLayer::onBtn1(sender);
+
+    FLAlertLayer::onButtonTag(btnSelected - 1);
 }
 
-void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
-    if (m_fields->incompatible) {
-        FLAlertLayer::onBtn1(sender);
-        return;
-    }
-
+void DeltaruneAlertLayer::onButton1() {
     global::blockKeys = false;
 
     if (this->m_button2) {
-        FLAlertLayer::onBtn1(sender);
+        FLAlertLayer::onButtonTag(1);
         return;
     }
 
+    this->openNextAlert();
+    FLAlertLayer::onButtonTag(1);
+}
+
+void DeltaruneAlertLayer::openNextAlert() {
     auto& nextAlerts = this->m_fields->nextAlerts;
     
     size_t skippedCount = 0;
@@ -459,8 +448,6 @@ void DeltaruneAlertLayer::onBtn1(CCObject* sender) {
         }
         break;
     }
-
-    FLAlertLayer::onBtn1(sender);
 }
 
 int DeltaruneAlertLayer::getLinesLeft() {
@@ -500,7 +487,7 @@ void DeltaruneAlertLayer::show() {
 
 void DeltaruneAlertLayer::setHeartPosition(Button* button) {
     auto const heart = m_fields->heart;
-    auto const text = button->getChildByType<CCLabelBMFont>(0);
+    auto const text = button->getChildByType<geode::Label*>(0);
 
     if (!text) return;
 
@@ -512,8 +499,8 @@ void DeltaruneAlertLayer::setHeartPosition(Button* button) {
 }
 
 void DeltaruneAlertLayer::clickedOnButton(Button* activatedButton, Button* otherButton, int btnSelected) {
-    auto const label = activatedButton->getChildByType<CCLabelBMFont*>(0);
-    auto const otherLabel = otherButton->getChildByType<CCLabelBMFont*>(0);
+    auto const label = activatedButton->getChildByType<geode::Label*>(0);
+    auto const otherLabel = otherButton->getChildByType<geode::Label*>(0);
     if (!label || !otherLabel) return;
 
     label->setColor(ccColor3B{255, 255, 0});
@@ -523,7 +510,6 @@ void DeltaruneAlertLayer::clickedOnButton(Button* activatedButton, Button* other
 }
 
 bool DeltaruneAlertLayer::ccTouchBegan(CCTouch* touch, CCEvent* event) {
-    log::info("FLAlertLayer::ccTouchBegan()");
     if (m_fields->incompatible)
         return FLAlertLayer::ccTouchBegan(touch, event);
 
@@ -627,14 +613,11 @@ void DeltaruneAlertLayer::pickChoice() {
         if (fields->dialog && dialogLayer)
             dialogLayer->keyBackClicked();
 
-        FLAlertLayer::onBtn1(nullptr);
+        FLAlertLayer::onButtonTag(0);
     } else if (btnSelected != 0) {
         done = true;
         
-        if (btnSelected == 1)
-            FLAlertLayer::onBtn1(nullptr);
-        else if (btnSelected == 2)
-            FLAlertLayer::onBtn2(nullptr);
+        FLAlertLayer::onButtonTag(btnSelected - 1);
     }
 }
 
@@ -654,10 +637,15 @@ void DeltaruneAlertLayer::progressText() {
     if (!textArea) return;
     
     if (this->getLinesLeft() - this->emptyLinesAmount(3) <= 3) {
-        this->pickChoice();
+        // need to queue or else something in the KeybindEvent crashes when it destroys the FLAlertLayer inside
+        // It can probably be removed in the future idk
+        Loader::get()->queueInMainThread([this](){
+            this->pickChoice();
+        });
         if (fields->done)
             return;
     }
+
     // Don't progress if there's only a choice left!
     if (this->getLinesLeft() - this->emptyLinesAmount(3) < 3 && m_button2)
         return;
@@ -883,8 +871,6 @@ void DeltaruneAlertLayer::playSound(char character) {
     auto& soundTimer = m_fields->soundTimer;
     auto& prevSoundNum = m_fields->prevSoundNum;
 
-    auto const resFolder = Mod::get()->getResourcesDir();
-
     DeltaruneMaps::CharacterData const* charData = nullptr;
 
     if (!global::lockedTextSound.has_value()) {
@@ -923,12 +909,11 @@ void DeltaruneAlertLayer::playSound(char character) {
 
     auto const filePath = Mod::get()->getResourcesDir() / fmt::format("{}.wav", std::string_view(file));
 
-    this->doTheSoundPlaying(string::pathToString(filePath), pitch);
+    this->doTheSoundPlaying(filePath.string(), pitch);
 }
 
 // External sounds use this
 void DeltaruneAlertLayer::doTheSoundPlaying(std::span<std::string const> files, float pitch) {
-    auto const& resFolder = Mod::get()->getResourcesDir();
     auto& prevSoundNum = m_fields->prevSoundNum;
 
     auto system = m_fields->system;
@@ -949,7 +934,7 @@ void DeltaruneAlertLayer::doTheSoundPlaying(std::span<std::string const> files, 
     }
 
     auto const path = files[soundNumber];
-    system->createSound(string::pathToString(path).c_str(), FMOD_DEFAULT, nullptr, &sound);
+    system->createSound(path.c_str(), FMOD_DEFAULT, nullptr, &sound);
     system->playSound(sound, nullptr, false, &channel);
     channel->setPitch(pitch);
     channel->setVolumeRamp(false);

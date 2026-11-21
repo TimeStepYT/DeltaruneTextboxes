@@ -106,6 +106,13 @@ void DeltaruneAlertLayer::changeSingleButton(CCMenuItemSpriteExtra* btn, ButtonS
 void DeltaruneAlertLayer::changeButtons() {
     if (!this->m_buttonMenu) return;
 
+    // I don't know how many ways of removing controller glyphs I have in my code already
+    for (auto child : this->m_mainLayer->getChildrenExt()) {
+        if (auto sprite = typeinfo_cast<CCSprite*>(child)) {
+            sprite->setVisible(false);
+        }
+    }
+
     auto* const fields = this->m_fields.self();
     auto* const bg = fields->bg;
     
@@ -120,21 +127,23 @@ void DeltaruneAlertLayer::changeButtons() {
     if (!m_button2) return;
     float const positionStart = bg->getPositionX() - fields->buttonMenu->getPositionX() - fields->screenSize / 2;
     Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, fontStr);
+    newBtn1->setTag(0);
     newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
     newBtn1->setPositionY(fields->old_btnY + 2);
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
-        FLAlertLayer::onBtn1(button);
+        FLAlertLayer::onButtonTag(0);
     });
 
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, fontStr);
+    newBtn2->setTag(1);
     newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
     newBtn2->setPositionY(fields->old_btnY + 2);
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
-        FLAlertLayer::onBtn2(button);
+        FLAlertLayer::onButtonTag(1);
     });
 
     newBtn1->setSelectCallback([this, newBtn2](Button* button){

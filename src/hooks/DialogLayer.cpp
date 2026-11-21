@@ -65,11 +65,9 @@ void DeltaruneDialogLayer::changeDialogDesign(DialogObject* dialogObject) {
 }
 
 void DeltaruneDialogLayer::displayNextObject() {
-	log::info("DialogLayer::displayNextObject()");
 	this->setVisible(false);
 }
 void DeltaruneDialogLayer::displayDialogObject(DialogObject* obj) {
-	log::info("DialogLayer::displayDialogObject()");
 	DialogLayer::displayDialogObject(obj);
 	this->changeDialogDesign(obj);
 	this->m_mainLayer->setVisible(false);

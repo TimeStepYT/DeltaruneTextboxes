@@ -30,17 +30,17 @@ namespace deltarune_textboxes {
         return geode::Ok(std::move(res));
     }
 
-    geode::Result<bool> registerSound(std::string const& name, std::filesystem::path const& file, int soundRate, bool hasPitchVariation) {
+    geode::Result<bool> registerSound(std::string const& name, asp::fs::Path const& file, int soundRate, bool hasPitchVariation) {
         if (DeltaruneMaps::externalNameToData.find(name) != DeltaruneMaps::externalNameToData.end()) {
             return geode::Err("Sound \"{}\" is already registered!", name);
         }
-        auto newData = DeltaruneMaps::CharacterData::create(geode::utils::string::pathToString(file), soundRate, hasPitchVariation);
+        auto newData = DeltaruneMaps::CharacterData::create(file.string(), soundRate, hasPitchVariation);
         newData.setExternal();
         DeltaruneMaps::externalNameToData[name] = newData;
         return geode::Ok(true);
     }
 
-    geode::Result<bool> registerVaryingSound(std::string const& name, std::span<std::filesystem::path> files, int soundRate, bool hasPitchVariation) {
+    geode::Result<bool> registerVaryingSound(std::string const& name, std::span<asp::fs::Path> files, int soundRate, bool hasPitchVariation) {
         if (DeltaruneMaps::externalNameToData.find(name) != DeltaruneMaps::externalNameToData.end()) {
             return geode::Err("Sound \"{}\" is already registered!", name);
         }
@@ -49,7 +49,7 @@ namespace deltarune_textboxes {
         res.reserve(files.size());
 
         for (auto const& file : files) {
-            res.emplace_back(string::pathToString(file));
+            res.emplace_back(file.string());
         }
 
         DeltaruneMaps::CharacterData newData {res, soundRate, hasPitchVariation};
@@ -78,7 +78,7 @@ namespace deltarune_textboxes {
         if (!unmodifiedAlert)
             return geode::Err("Initial alert couldn't be created");
 
-        auto alert = static_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
+        auto alert = reinterpret_cast<DeltaruneAlertLayer*>(unmodifiedAlert);
 
         alert->setNextAlerts({objects.begin() + 1, objects.end()});
         return geode::Ok(unmodifiedAlert);

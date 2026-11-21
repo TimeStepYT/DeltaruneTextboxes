@@ -3,7 +3,7 @@
 std::shared_ptr<DeltaruneTextArea> DeltaruneTextArea::create(std::string const& str, std::string const& font, float width, float size) {
     auto instance = std::make_shared<DeltaruneTextArea>();
     
-    TextArea* newTextArea = TextArea::create(str, font.c_str(), 1, width, {0.f, 1.f}, size, false);
+    TextArea* newTextArea = TextArea::create(str, font.c_str(), 1, width, {0.f, 1.f}, size, false, 5);
     newTextArea->setAnchorPoint({0.f, 1.f});
     newTextArea->setContentWidth(width);
 
