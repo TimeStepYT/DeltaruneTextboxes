@@ -8,7 +8,6 @@ class $modify(DeltaruneDialogLayer, DialogLayer) {
 		FLAlertLayer* alert;
 		CCLayer* dialogMainLayer;
 	};
-	void displayNextObject();
 	void displayDialogObject(DialogObject*);
 	void changeDialogDesign(DialogObject*);
 #ifndef GEODE_IS_IOS
