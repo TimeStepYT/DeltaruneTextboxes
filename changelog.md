@@ -1,3 +1,7 @@
+### v1.7.6
+- Fixed broken tags in about.md
+- Fixed weird text and heart positions
+
 ### v1.7.5
 - Update to 2.2091
 

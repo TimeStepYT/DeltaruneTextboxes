@@ -8,7 +8,7 @@ else()
 endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(DeltaruneTextboxes VERSION 1.7.4)
+project(DeltaruneTextboxes VERSION 1.7.6)
 
 add_library(${PROJECT_NAME} SHARED
     src/hooks/FLAlertLayer.cpp
