@@ -129,7 +129,7 @@ void DeltaruneAlertLayer::changeButtons() {
     Button* newBtn1 = Button::createWithLabel(this->m_button1->m_caption, fontStr);
     newBtn1->setTag(0);
     newBtn1->setPositionX(positionStart + bg->getContentWidth() / 4);
-    newBtn1->setPositionY(fields->old_btnY + 2);
+    newBtn1->setPositionY(fields->old_btnY - 1);
     newBtn1->setAnimationType(Button::AnimationType::None);
     newBtn1->setTouchPriority(-1000);
     newBtn1->setActivateCallback([this](Button* button) {
@@ -139,7 +139,7 @@ void DeltaruneAlertLayer::changeButtons() {
     Button* newBtn2 = Button::createWithLabel(this->m_button2->m_caption, fontStr);
     newBtn2->setTag(1);
     newBtn2->setPositionX(positionStart + (bg->getContentWidth() / 4) * 3);
-    newBtn2->setPositionY(fields->old_btnY + 2);
+    newBtn2->setPositionY(fields->old_btnY - 1);
     newBtn2->setAnimationType(Button::AnimationType::None);
     newBtn2->setTouchPriority(-1000);
     newBtn2->setActivateCallback([this](Button* button) {
@@ -178,7 +178,7 @@ void DeltaruneAlertLayer::changeTitle() {
     auto const bg = m_fields->bg;
     title->setAnchorPoint(CCPoint{0, 0});
     title->setFntFile(fontStr);
-    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, bg->getContentHeight() - 2.f});
+    title->setPosition(CCPoint{bg->getPositionX() - bg->getContentWidth() / 2 + 24, bg->getContentHeight() - 5.f});
 }
 
 void DeltaruneAlertLayer::handleSound() {
@@ -209,7 +209,7 @@ CCLabelBMFont* DeltaruneAlertLayer::createStar() {
         xOffset = fields->imageNode->getContentWidth() + star->getContentWidth();
 
     star->setPositionX(xOffset - star->getContentWidth() + 27);
-    star->setPositionY(bg->getContentHeight() - 30.f);
+    star->setPositionY(bg->getContentHeight() - 33.f);
     star->setZOrder(1);
     star->setID("star"_spr);
 
@@ -265,7 +265,7 @@ void DeltaruneAlertLayer::changeText() {
     auto const newDesc = deltaruneTextArea->getTextArea();
     
     newDesc->setPositionX(24 + xOffset + star->getContentWidth());
-    newDesc->setPositionY(bg->getContentHeight() - 20.f);
+    newDesc->setPositionY(bg->getContentHeight() - 23.f);
     newDesc->setZOrder(oldTextArea->getZOrder());
     newDesc->setID("content-text-area");
 
